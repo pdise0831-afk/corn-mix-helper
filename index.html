@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v33</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v35</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -471,11 +471,10 @@ function syncClose(){const m=document.getElementById('syncModal');if(m)m.classLi
 function syncRefresh(){const on=synOn()||ghOn();const s=document.getElementById('syncStat'),d=document.getElementById('syncDot2');
   if(s)s.classList.toggle('on',on);if(d)d.classList.toggle('on',on);
   const st=document.getElementById('syncState'),wh=document.getElementById('syncWhen');
-  if(st)st.textContent=ghOn()?'영구 동기화 켜짐':synOn()?'간편 동기화 켜짐':'동기화 꺼짐';
+  if(st)st.textContent=ghOn()?'영구 동기화 켜짐':synOn()?'실시간 동기화 켜짐':'동기화 꺼짐';
   if(wh)wh.textContent=ghOn()?('자동 · '+(SYN?'이름 '+SYN:'영구 저장소 연결됨')):synOn()?('이름 '+SYN+' · 실시간 연결'):'설정하면 기기 간에 자동으로 이어져요';
   const hd=document.getElementById('syncDot');if(hd)hd.classList.toggle('on',on);
   const s2=document.getElementById('syncState2');if(s2){s2.textContent=on?(ghOn()?'영구 동기화 켜짐':'실시간 동기화 켜짐'):'꺼짐';s2.style.color=on?'var(--gp)':'var(--mute)'}
-  try{renderSyncBar()}catch(_){}}
   try{renderSyncBar()}catch(_){}}
 function initSyncUI(){const g=id=>document.getElementById(id);
   const sin=g('synin');if(sin&&SYN)sin.value=SYN;const gin=g('ghin');if(gin&&GH.token)gin.value=GH.token;
