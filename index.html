@@ -310,7 +310,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v30</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v31</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -344,9 +344,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   <div class="modal-card" role="dialog" aria-modal="true" aria-label="동기화">
     <div class="modal-head"><b>동기화 · 불러오기</b><button class="btn sm" id="syncClose">닫기</button></div>
     <div class="syncstat" id="syncStat"><i class="dot" id="syncDot2"></i><div style="min-width:0"><b id="syncState">동기화 꺼짐</b><div class="lv" id="syncWhen">설정하면 기기 간에 자동으로 이어져요</div></div></div>
-    <div class="mtabs" id="mtabs"><button data-m="easy" class="on">간편 (설정 0)</button><button data-m="git">영구 (GitHub)</button><button data-m="code">코드 · 파일</button></div>
+    <div class="mtabs" id="mtabs"><button data-m="easy" class="on">실시간 (설정 0)</button><button data-m="git">영구 (GitHub)</button><button data-m="code">코드 · 파일</button></div>
     <div class="msect on" data-m="easy">
-      <p class="hint">가입 없이 <b>이름 하나</b>면 바로 됩니다. 서버 사본이 <b>마지막 사용 후 12시간</b>이면 지워져요(이 기기엔 계속 남음). 오래 쉬었다 쓰려면 <b>영구(GitHub)</b>을 쓰세요.</p>
+      <p class="hint">가입 없이 <b>이름 하나</b>면 끝. 값을 바꾸면 <b>앱을 켜 둔 다른 기기에 실시간으로</b> 반영돼요. 오래 껐던 기기까지 확실히 맞추려면 <b>영구(GitHub)</b>도 함께 켜 두세요.</p>
       <div class="bar"><input class="ctl" id="synin" placeholder="동기화 이름 (예: cornmix-a1b2c3d)" style="flex:1;min-width:170px" autocomplete="off"><button class="btn pri" id="synon">켜기</button><button class="btn" id="synrand">새 이름</button></div>
       <div class="bar"><button class="btn" id="synnow">지금 보내기</button><button class="btn" id="syncopy">이름 복사</button><button class="btn" id="synoff">끄기</button><span class="lv" id="synst">꺼짐</span></div>
     </div>
@@ -415,6 +415,7 @@ const NTFY='https://ntfy.sh/';
 let SYN='';try{SYN=localStorage.getItem('cornMixHelper.syn')||''}catch(e){}
 const synSave=()=>{try{localStorage.setItem('cornMixHelper.syn',SYN)}catch(e){}};
 const synOn=()=>!!SYN;
+let SYNSRC=null,APPLYING=false,LASTSYNC='';
 function synStatus(t,err){const el=document.getElementById('synst');if(el){el.textContent=t;el.style.color=err?'var(--need)':'var(--mute)'}try{syncRefresh()}catch(_){}}
 async function synPush(silent){if(!synOn())return false;
   try{const r=await fetch(NTFY+encodeURIComponent(SYN),{method:'POST',body:JSON.stringify(slimS())});
@@ -424,11 +425,22 @@ async function synPull(){if(!synOn())return false;
   try{const r=await fetch(NTFY+encodeURIComponent(SYN)+'/json?poll=1&since=all');if(!r.ok)throw new Error('HTTP '+r.status);
     const txt=await r.text();let last=null;
     txt.split('\n').forEach(l=>{l=l.trim();if(!l)return;try{const j=JSON.parse(l);if(j.event==='message'&&j.message)last=j.message}catch(e){}});
-    if(!last)return false;
+    if(!last||last===LASTSYNC)return false;
     const o=JSON.parse(last);if(!o||typeof o!=='object')return false;
-    SYNC_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});save();synStatus('받음 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));return true}
+    synApply(o);synStatus('받음 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));return true}
   catch(e){synStatus('받기 실패 · '+e.message,1);return false}}
 function synRand(){return 'cornmix-'+Math.random().toString(36).slice(2,9)}
+/* ── 실시간 반영(SSE): 값이 바뀌면 다른 기기에 즉시 전달 ── */
+function synApply(o){if(!o||typeof o!=='object')return false;APPLYING=true;
+  try{SYNC_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});LASTSYNC=JSON.stringify(slimS());save()}finally{APPLYING=false}return true}
+function synListen(){if(!synOn()){if(SYNSRC){try{SYNSRC.close()}catch(e){}SYNSRC=null}return}
+  if(SYNSRC)return;
+  try{SYNSRC=new EventSource(NTFY+encodeURIComponent(SYN)+'/sse');
+    SYNSRC.onopen=()=>synStatus('실시간 연결됨');
+    SYNSRC.onmessage=e=>{try{const j=JSON.parse(e.data);if(j.event!=='message'||!j.message)return;
+      const str=String(j.message);if(str===LASTSYNC)return;if(synApply(JSON.parse(str))){synStatus('실시간 반영 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));if(cur)render()}}catch(_){}};
+    SYNSRC.onerror=()=>synStatus('실시간 재연결 중…');
+  }catch(e){}}
 /* ── 동기화 창(모달) ── */
 function syncOpen(){const m=document.getElementById('syncModal');if(!m)return;m.classList.add('on');syncRefresh()}
 function syncClose(){const m=document.getElementById('syncModal');if(m)m.classList.remove('on')}
@@ -436,7 +448,7 @@ function syncRefresh(){const on=synOn()||ghOn();const s=document.getElementById(
   if(s)s.classList.toggle('on',on);if(d)d.classList.toggle('on',on);
   const st=document.getElementById('syncState'),wh=document.getElementById('syncWhen');
   if(st)st.textContent=ghOn()?'영구 동기화 켜짐':synOn()?'간편 동기화 켜짐':'동기화 꺼짐';
-  if(wh)wh.textContent=ghOn()?('자동 · '+(SYN?'이름 '+SYN:'영구 저장소 연결됨')):synOn()?('이름 '+SYN+' · 마지막 사용 후 12시간 보관'):'설정하면 기기 간에 자동으로 이어져요';
+  if(wh)wh.textContent=ghOn()?('자동 · '+(SYN?'이름 '+SYN:'영구 저장소 연결됨')):synOn()?('이름 '+SYN+' · 실시간 연결'):'설정하면 기기 간에 자동으로 이어져요';
   const hd=document.getElementById('syncDot');if(hd)hd.classList.toggle('on',on);
   const s2=document.getElementById('syncState2');if(s2){s2.textContent=on?(ghOn()?'영구 동기화 켜짐':'간편 동기화 켜짐'):'꺼짐';s2.style.color=on?'var(--gp)':'var(--mute)'}}
 function initSyncUI(){const g=id=>document.getElementById(id);
@@ -499,7 +511,7 @@ let syncT=null;
 let ghT=null;
 const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
   if(syncT)clearTimeout(syncT);syncT=setTimeout(syncHash,500);
-  if(ghT)clearTimeout(ghT);ghT=setTimeout(()=>{if(synOn())synPush(1);if(ghOn())ghPush(1)},1200)};
+  if(ghT)clearTimeout(ghT);ghT=setTimeout(()=>{if(APPLYING)return;const sn=JSON.stringify(slimS());if(sn===LASTSYNC)return;LASTSYNC=sn;if(synOn())synPush(1);if(ghOn())ghPush(1)},450)};
 let cur=null;let GS=null;
 const ovOf=()=>S.ov[cur]||(S.ov[cur]={});
 const olvOf=()=>S.olv[cur]||(S.olv[cur]={});
@@ -1046,7 +1058,7 @@ document.addEventListener('click',async e=>{
   if(id==='synrand'){const i=g('#synin');if(i)i.value=synRand();return}
   if(id==='synon'){const i=g('#synin'),nm=i?i.value.trim():'';if(!nm){toast('동기화 이름을 넣어 주세요');return}
     SYN=nm.replace(/[^A-Za-z0-9_-]/g,'');if(!SYN){toast('영문·숫자 이름을 써 주세요');return}if(i)i.value=SYN;synSave();synStatus('연결 중…');
-    const got=await synPull();if(!got)await synPush(1);toast('자동 동기화를 켰어요 · 다른 기기에 같은 이름을 넣으세요');if(cur)render();return}
+    synListen();const got=await synPull();if(!got)await synPush(1);toast('실시간 동기화를 켰어요 · 다른 기기에 같은 이름을 넣으세요');if(cur)render();return}
   if(id==='synnow'){if(!synOn()){toast('먼저 동기화를 켜 주세요');return}toast(await synPush()?'보냈어요 · 다른 기기에서 받아요':'보내기 실패');return}
   if(id==='syncopy'){if(!SYN){toast('아직 이름이 없어요');return}copy(SYN);toast('이름을 복사했어요');return}
   if(id==='synoff'){if(confirm('이 기기에서 자동 동기화를 끌까요?')){SYN='';synSave();const i=g('#synin');if(i)i.value='';synStatus('꺼짐');toast('껐어요')}return}
@@ -1096,7 +1108,9 @@ $('#cntM').textContent=Object.keys(M).length;$('#cntX').textContent=Object.value
 renderWelcome();
 initSyncUI();
 try{const sp=new URLSearchParams(location.hash.slice(1)).get('s');if(sp&&applyCode(sp)){toast('불러왔어요 · 이어서 보세요')}}catch(e){}
-if(synOn()){synStatus('동기화 켜짐');synPull().then(ok=>{if(ok){if(cur)render()}else synPush(1)})}
+if(synOn()){synStatus('동기화 켜짐');synListen();synPull().then(ok=>{if(ok){if(cur)render()}else synPush(1)})}
+setInterval(()=>{if(synOn()&&document.visibilityState==='visible')synPull().then(ok=>{if(ok&&cur)render()})},20000);
+document.addEventListener('visibilitychange',()=>{if(!synOn()||document.visibilityState!=='visible')return;synListen();synPull().then(ok=>{if(ok&&cur)render()})});
 if(ghOn()){ghStatus('자동 동기화 켜짐');ghPull().then(ok=>{if(ok&&cur)render()})}
 const hp=new URLSearchParams(location.hash.slice(1)).get('h');if(hp&&M[hp])pick(+hp);
 document.addEventListener('keydown',e=>{if(e.altKey&&e.key==='ArrowLeft'){e.preventDefault();goBack()}});
