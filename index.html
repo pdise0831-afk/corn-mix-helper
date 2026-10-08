@@ -3,243 +3,321 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#141A33">
+<meta name="theme-color" content="#0E1428">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>콘 믹스 도우미</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#141A33;--ink2:#1D2547;--ink3:#28315C;--line:#3A4478;--corn:#F2C14E;--husk:#E9E4D0;--mute:#9AA2C8;--drop:#5FD3C4;--need:#FF7A8A;--junk:#F2C14E;--own:#8C93B8;--pt:#B99CFF;--gp:#7FD67A;--r:10px;--onCorn:#141A33}
-[data-theme=light]{--ink:#F3F1EA;--ink2:#FFFFFF;--ink3:#E7E3D6;--line:#CFC8B4;--corn:#B57E10;--husk:#1C2140;--mute:#6A6F8C;--drop:#0F8F84;--need:#C93450;--junk:#9A6A00;--own:#7B809C;--pt:#6A44D0;--gp:#2E8A2A;--onCorn:#fff}
+:root{
+  --bg:#0E1428;--bg2:#151C38;--card:#1A2242;--card2:#222C55;
+  --line:#2C3768;--line2:#3C4988;
+  --corn:#F5C542;--husk:#ECE7D6;--mute:#8B94C2;--mute2:#6D77AA;
+  --drop:#56D6C7;--need:#FF8195;--pt:#B49CFF;--gp:#7ED97C;--junk:#F5C542;--own:#8C93B8;
+  --onCorn:#0E1428;--r:14px;
+}
+[data-theme=light]{
+  --bg:#F4F2EA;--bg2:#FFFFFF;--card:#FFFFFF;--card2:#F0EDE0;
+  --line:#D8D2BE;--line2:#C3BBA0;
+  --corn:#B07C0C;--husk:#1B2140;--mute:#6A6F8C;--mute2:#8A8FA8;
+  --drop:#0E8F84;--need:#C7324E;--pt:#6A44D0;--gp:#2E8A2A;--junk:#8A6200;--own:#7B809C;
+  --onCorn:#FFFFFF;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--ink);color:var(--husk);font-family:"IBM Plex Sans KR",system-ui,sans-serif;font-size:15px;line-height:1.5}
-body{min-height:100vh;background:radial-gradient(1200px 500px at 110% -10%,rgba(242,193,78,.10),transparent 60%),var(--ink)}
-.wrap{max-width:1000px;margin:0 auto;padding:16px 14px 110px}
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;border-bottom:2px solid var(--corn);padding-bottom:10px;margin-bottom:14px}
-.brand{font-family:"Black Han Sans",sans-serif;font-size:28px;color:var(--corn);line-height:1}
-.brand small{display:block;font-family:"IBM Plex Sans KR";font-size:12px;color:var(--mute);margin-top:6px;font-weight:500}
-.hdr-r{margin-left:auto;display:flex;gap:6px;align-items:center}
-.stamp{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--mute);text-align:right;line-height:1.35}
+html,body{margin:0;background:var(--bg);color:var(--husk);font-family:"IBM Plex Sans KR",system-ui,sans-serif;font-size:15px;line-height:1.55}
+body{min-height:100vh;background:
+  radial-gradient(900px 420px at 108% -8%,color-mix(in srgb,var(--corn) 13%,transparent),transparent 62%),
+  radial-gradient(700px 380px at -10% 8%,color-mix(in srgb,var(--drop) 9%,transparent),transparent 60%),
+  var(--bg)}
+.wrap{max-width:920px;margin:0 auto;padding:16px 15px 120px}
+
+/* header */
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;padding-bottom:12px;margin-bottom:14px;border-bottom:2px solid var(--corn)}
+.brand{font-family:"Black Han Sans",sans-serif;font-size:29px;color:var(--corn);line-height:1;letter-spacing:-.5px}
+.brand small{display:block;font-family:"IBM Plex Sans KR";font-size:11.5px;color:var(--mute);margin-top:7px;font-weight:500;letter-spacing:0}
+.hdr-r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.stamp{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--mute2);text-align:right;line-height:1.4}
 .mono{font-family:"JetBrains Mono",monospace}
+
+/* search */
 .search{position:relative;display:flex;gap:6px}
 .search .in{position:relative;flex:1}
-.search input{width:100%;padding:13px 14px 13px 40px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--ink2);color:var(--husk);font-size:16px;font-family:inherit;outline:none}
+.search input{width:100%;padding:15px 14px 15px 42px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--card);color:var(--husk);font-size:16px;font-family:inherit;outline:none;transition:border-color .15s}
 .search input:focus{border-color:var(--corn)}
-.search .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mute)}
-.sugg{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);background:var(--ink2);border:1.5px solid var(--line);border-radius:var(--r);max-height:60vh;overflow:auto;display:none;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.search input::placeholder{color:var(--mute2)}
+.search .ico{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--mute);font-size:16px}
+.sugg{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 6px);background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r);max-height:60vh;overflow:auto;display:none;box-shadow:0 22px 50px rgba(0,0,0,.45)}
 .sugg.on{display:block}
-.sugg button{display:flex;width:100%;align-items:center;gap:10px;padding:9px 12px;background:none;border:0;border-bottom:1px solid var(--ink3);color:var(--husk);text-align:left;font:inherit;cursor:pointer}
-.sugg button:hover,.sugg button.act{background:var(--ink3)}
-.face{width:30px;height:30px;border-radius:7px;background:var(--ink3);object-fit:cover;flex:none}
-.face.sm{width:24px;height:24px;border-radius:5px}
-.tag{font-size:11px;padding:1px 7px;border-radius:99px;border:1px solid currentColor;white-space:nowrap;font-weight:500}
-.tag.drop{color:var(--drop)}.tag.mix{color:var(--corn)}.tag.no{color:var(--mute)}.tag.need{color:var(--need)}
-.lv{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--mute)}
+.sugg button{display:flex;width:100%;align-items:center;gap:10px;padding:10px 13px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--husk);text-align:left;font:inherit;cursor:pointer}
+.sugg button:last-child{border-bottom:0}
+.sugg button:hover,.sugg button.act{background:var(--card2)}
+
+/* faces & tags */
+.face{width:30px;height:30px;border-radius:8px;background:var(--card2);object-fit:cover;flex:none}
+.face.sm{width:24px;height:24px;border-radius:6px}
+.tag{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap;font-weight:600;display:inline-block}
+.tag.drop{color:var(--drop)}.tag.mix{color:var(--corn)}.tag.no{color:var(--mute)}.tag.need{color:var(--need)}.tag.evo{color:var(--drop)}
+.tag.f5{color:var(--corn);font-weight:700}
+.lv{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--mute)}
 .pt{color:var(--pt)}.gp{color:var(--gp)}
-.target{margin-top:14px;display:none;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--ink2);border:1.5px solid var(--line);border-radius:14px;padding:14px}
+
+/* target */
+.target{margin-top:14px;display:none;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(180deg,var(--card),var(--bg2));border:1.5px solid var(--line2);border-radius:18px;padding:16px}
 .target.on{display:grid}
-.target>img{width:60px;height:60px;border-radius:12px;background:var(--ink3);object-fit:cover}
-.target h2{margin:0;font-family:"Black Han Sans";font-weight:400;font-size:25px;line-height:1.1}
-.target .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.target>img{width:64px;height:64px;border-radius:14px;background:var(--card2);object-fit:cover}
+.target h2{margin:0;font-family:"Black Han Sans";font-weight:400;font-size:26px;line-height:1.05;letter-spacing:-.5px}
+.target .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;align-items:center}
 .trail{margin-top:12px;display:flex;align-items:center;gap:8px;min-width:0}
 .trail .back{flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
 .crumbs{display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;min-width:0;white-space:nowrap}
 .crumbs::-webkit-scrollbar{display:none}
-.crumb{display:inline-flex;align-items:center;gap:5px;background:none;border:0;color:var(--mute);font:inherit;font-size:12.5px;padding:3px 4px;cursor:pointer;border-radius:6px}
-.crumb:hover{color:var(--husk);background:var(--ink3)}
+.crumb{display:inline-flex;align-items:center;gap:5px;background:none;border:0;color:var(--mute);font:inherit;font-size:12.5px;padding:3px 5px;cursor:pointer;border-radius:8px}
+.crumb:hover{color:var(--husk);background:var(--card2)}
 .crumb.now{color:var(--corn);font-weight:700;cursor:default}
 .crumb .face{width:20px;height:20px}
-.lineage{grid-column:1/-1;display:grid;gap:6px;border-top:1px dashed var(--line);padding-top:10px}
-.lrow{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center;min-width:0}
+.lineage{grid-column:1/-1;display:grid;gap:7px;border-top:1px dashed var(--line);padding-top:11px}
+.lrow{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:center;min-width:0}
 .ltag{font-size:11.5px;font-weight:700;white-space:nowrap}
 .ltag.dn{color:var(--drop)}.ltag.up{color:var(--corn)}
 .lscroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .lscroll::-webkit-scrollbar{display:none}
 .lscroll .chip{flex:none}
-.fav{background:none;border:1.5px solid var(--line);color:var(--mute);border-radius:9px;font-size:18px;width:40px;height:40px;cursor:pointer}
+.fav{background:none;border:1.5px solid var(--line);color:var(--mute);border-radius:11px;font-size:19px;width:42px;height:42px;cursor:pointer;transition:.15s}
+.fav:hover{border-color:var(--corn)}
 .fav.on{color:var(--corn);border-color:var(--corn)}
+
+/* kpis */
 .kpis{grid-column:1/-1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.kpi{background:var(--ink);border-radius:9px;padding:8px 10px;border-left:3px solid var(--line);min-width:0}
-.kpi b{display:block;font-family:"JetBrains Mono";font-size:20px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi span{font-size:11.5px;color:var(--mute)}
+.kpi{background:var(--bg);border-radius:12px;padding:10px 11px;border-left:3px solid var(--line);min-width:0}
+.kpi b{display:block;font-family:"JetBrains Mono";font-weight:700;font-size:21px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi span{font-size:11px;color:var(--mute);display:block;margin-top:1px}
 .kpi.k1{border-color:var(--drop)}.kpi.k1 b{color:var(--drop)}
 .kpi.k2{border-color:var(--need)}.kpi.k2 b{color:var(--need)}
 .kpi.k3{border-color:var(--junk)}.kpi.k3 b{color:var(--junk)}
-.kpi.k5{border-color:var(--pt)}.kpi.k5 b{color:var(--pt)}
-.progress{grid-column:1/-1;height:6px;background:var(--ink);border-radius:9px;overflow:hidden}
-.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--drop),var(--corn));width:0;transition:width .3s}
-.tabs{display:flex;gap:2px;margin:16px 0 0;border-bottom:1.5px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.kpi.k5{border-color:var(--corn)}.kpi.k5 b{color:var(--corn)}
+.progress{grid-column:1/-1;height:7px;background:var(--bg);border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--drop),var(--corn));width:0;transition:width .35s}
+
+/* tabs */
+.tabs{display:flex;gap:5px;margin:18px 0 0;border-bottom:1.5px solid var(--line);overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:24;background:var(--bg)}
 .tabs::-webkit-scrollbar{display:none}
-.tabs button{background:none;border:0;color:var(--mute);font:inherit;font-weight:700;padding:10px 13px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1.5px;white-space:nowrap}
+.tabs button{background:none;border:0;color:var(--mute);font:inherit;font-weight:600;padding:11px 14px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1.5px;white-space:nowrap;transition:color .15s}
+.tabs button:hover{color:var(--husk)}
 .tabs button.on{color:var(--corn);border-color:var(--corn)}
-.panel{display:none;padding-top:14px}.panel.on{display:block}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
-.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:nowrap}
-.seg button{background:none;border:0;color:var(--mute);font:inherit;font-size:13px;padding:7px 10px;cursor:pointer;border-right:1px solid var(--line);white-space:nowrap}
+.panel{display:none;padding-top:16px}.panel.on{display:block}
+
+/* bars & buttons */
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:11px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:11px;overflow:hidden;flex-wrap:nowrap}
+.seg button{background:none;border:0;color:var(--mute);font:inherit;font-size:13px;padding:8px 11px;cursor:pointer;border-right:1px solid var(--line);white-space:nowrap}
 .seg button:last-child{border-right:0}
 .seg button.on{background:var(--corn);color:var(--onCorn);font-weight:700}
-.btn{background:var(--ink3);border:1.5px solid var(--line);color:var(--husk);font:inherit;font-size:13px;padding:7px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.btn{background:var(--card2);border:1.5px solid var(--line);color:var(--husk);font:inherit;font-size:13px;padding:8px 13px;border-radius:11px;cursor:pointer;white-space:nowrap;transition:.15s}
 .btn:hover{border-color:var(--corn)}
 .btn.pri{background:var(--corn);color:var(--onCorn);border-color:var(--corn);font-weight:700}
-.btn.sm{padding:4px 9px;font-size:12px}
-select.ctl,input.ctl{background:var(--ink2);color:var(--husk);border:1.5px solid var(--line);border-radius:9px;font:inherit;font-size:13px;padding:7px 9px}
-.hint{font-size:12.5px;color:var(--mute);margin:4px 0 12px}
-.note{border:1.5px solid var(--corn);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px;background:rgba(242,193,78,.06)}
-.mgroup{margin-bottom:18px}
-.mgroup h3{font-size:14px;margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.mgroup h3 i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.btn.sm{padding:5px 10px;font-size:12px;border-radius:9px}
+select.ctl,input.ctl{background:var(--card);color:var(--husk);border:1.5px solid var(--line);border-radius:11px;font:inherit;font-size:13px;padding:8px 10px}
+.hint{font-size:12.5px;color:var(--mute);margin:4px 0 13px;line-height:1.65}
+.note{border:1.5px solid var(--corn);border-radius:12px;padding:11px 13px;font-size:13px;margin-bottom:12px;background:color-mix(in srgb,var(--corn) 8%,transparent)}
+.mgroup{margin-bottom:20px}
+.mgroup h3{font-size:14px;margin:0 0 9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mgroup h3 i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
 .mgroup h3 .sub{margin-left:auto;font-weight:500}
-.mt{width:100%;border-collapse:separate;border-spacing:0 5px}
-.mt td{background:var(--ink2);padding:6px 8px;border-top:1px solid var(--ink3);border-bottom:1px solid var(--ink3);vertical-align:middle}
-.mt td:first-child{border-left:1px solid var(--ink3);border-radius:9px 0 0 9px}
-.mt td:last-child{border-right:1px solid var(--ink3);border-radius:0 9px 9px 0}
-.mt th{font-size:11px;color:var(--mute);font-weight:500;text-align:left;padding:0 8px}
+.empty{color:var(--mute);font-size:13px;padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center}
+
+/* tables */
+.mt{width:100%;border-collapse:separate;border-spacing:0 6px}
+.mt td{background:var(--card);padding:7px 9px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);vertical-align:middle}
+.mt td:first-child{border-left:1px solid var(--line);border-radius:10px 0 0 10px}
+.mt td:last-child{border-right:1px solid var(--line);border-radius:0 10px 10px 0}
+.mt th{font-size:11px;color:var(--mute);font-weight:500;text-align:left;padding:0 9px}
 .mt .num{text-align:right;font-family:"JetBrains Mono";white-space:nowrap}
 .mt tr.done td{opacity:.45}
 .mt tr.done .nmc b{text-decoration:line-through}
 .nmc{display:flex;align-items:center;gap:8px;min-width:0}
 .nmc b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 .need-n{font-family:"JetBrains Mono";font-weight:700;font-size:15px}
-.stp{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.stp button{background:var(--ink3);border:0;color:var(--husk);width:28px;height:28px;font-size:15px;cursor:pointer}
-.stp input{width:38px;text-align:center;background:var(--ink);border:0;color:var(--husk);font-family:"JetBrains Mono";font-size:13px;height:28px;-moz-appearance:textfield}
+.stp{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.stp button{background:var(--card2);border:0;color:var(--husk);width:28px;height:28px;font-size:15px;cursor:pointer}
+.stp input{width:38px;text-align:center;background:var(--bg);border:0;color:var(--husk);font-family:"JetBrains Mono";font-size:13px;height:28px;-moz-appearance:textfield}
 .stp input::-webkit-inner-spin-button{display:none}
 .px{font-size:12px}
-.px input{width:72px;background:var(--ink);border:1px dashed var(--line);color:var(--husk);border-radius:6px;font-family:"JetBrains Mono";font-size:12px;padding:3px 5px;text-align:right}
-.px small{display:block;color:var(--mute);font-size:10.5px}
-.empty{color:var(--mute);font-size:13px;padding:10px;border:1px dashed var(--line);border-radius:9px}
-.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-bottom:14px}
-.tot{background:var(--ink2);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px}
+.px input{width:72px;background:var(--bg);border:1px dashed var(--line);color:var(--husk);border-radius:7px;font-family:"JetBrains Mono";font-size:12px;padding:4px 6px;text-align:right}
+.px small{display:block;color:var(--mute2);font-size:10.5px}
+.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px;margin-bottom:15px}
+.tot{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:11px 13px}
 .tot b{font-family:"JetBrains Mono";font-size:22px;display:block}
 .tot span{font-size:12px;color:var(--mute)}
-.step{display:grid;grid-template-columns:34px 1fr;gap:10px;background:var(--ink2);border:1px solid var(--ink3);border-radius:11px;padding:10px 12px;margin-bottom:7px;cursor:pointer}
+.step{display:grid;grid-template-columns:36px 1fr;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
 .step .no{font-family:"JetBrains Mono";font-weight:700;color:var(--corn);font-size:15px;padding-top:2px}
 .step.done{opacity:.4}.step.done .no{color:var(--drop)}
 .step.final{border-color:var(--corn)}
 .formula{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
 .hn{display:inline-flex;align-items:center;gap:6px}
-.op{color:var(--mute);font-family:"JetBrains Mono"}
+.op{color:var(--mute);font-family:"JetBrains Mono";font-size:13px}
 .res{font-weight:700;color:var(--corn)}
-.need{font-size:12px;color:var(--mute);margin-top:4px}
+.need{font-size:12px;color:var(--mute);margin-top:5px}
 .need b{color:var(--junk)}
-.pl{font-family:"JetBrains Mono";font-size:11.5px;padding:1px 6px;border-radius:6px;background:var(--ink3);color:var(--husk)}
+.pl{font-family:"JetBrains Mono";font-size:11.5px;padding:2px 7px;border-radius:7px;background:var(--card2);color:var(--husk)}
 .pl.up{color:var(--corn)}.pl.hw{color:var(--drop)}
 .gr{font-family:"JetBrains Mono";font-size:11px;color:var(--mute)}
 .tree{font-size:14px}
-.tn{margin-left:14px;border-left:1.5px dashed var(--line);padding-left:12px}
+.tn{margin-left:14px;border-left:1.5px dashed var(--line);padding-left:13px}
 .tree>.tn{margin-left:0;border-left:0;padding-left:0}
-.row{display:flex;align-items:center;gap:7px;padding:5px 0;flex-wrap:wrap}
-.row .role{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--ink3);color:var(--mute)}
+.row{display:flex;align-items:center;gap:7px;padding:6px 0;flex-wrap:wrap}
+.row .role{font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:6px;background:var(--card2);color:var(--mute)}
 .row .role.m{color:var(--corn)}.row .role.s{color:var(--drop)}
-.row select{background:var(--ink2);color:var(--husk);border:1px solid var(--line);border-radius:7px;font:inherit;font-size:12px;padding:3px 6px;max-width:260px}
-.st{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
-.st button{background:none;border:0;color:var(--mute);font:inherit;font-size:11.5px;padding:3px 8px;cursor:pointer;border-right:1px solid var(--line)}
+.row select{background:var(--card);color:var(--husk);border:1px solid var(--line);border-radius:8px;font:inherit;font-size:12px;padding:4px 7px;max-width:280px}
+.st{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.st button{background:none;border:0;color:var(--mute);font:inherit;font-size:11.5px;padding:4px 9px;cursor:pointer;border-right:1px solid var(--line)}
 .st button:last-child{border-right:0}
-.st button.on{background:var(--ink3);color:var(--husk);font-weight:700}
+.st button.on{background:var(--card2);color:var(--husk);font-weight:700}
 .row.owned .nmx{text-decoration:line-through;color:var(--own)}
-.row input.olv{width:58px;background:var(--ink);border:1px solid var(--line);color:var(--husk);border-radius:6px;font-family:"JetBrains Mono";font-size:12px;padding:2px 4px}
+.row input.olv{width:58px;background:var(--bg);border:1px solid var(--line);color:var(--husk);border-radius:7px;font-family:"JetBrains Mono";font-size:12px;padding:3px 5px}
 .tog{background:none;border:0;color:var(--mute);cursor:pointer;font-family:"JetBrains Mono";width:18px;padding:0}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.field{background:var(--ink2);border:1px solid var(--ink3);border-radius:10px;padding:10px 12px}
-.field label{font-size:12px;color:var(--mute);display:block;margin-bottom:4px}
-.field input,.field select{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--husk);border-radius:7px;padding:8px;font:inherit}
-.out{grid-column:1/-1;background:var(--ink);border:1.5px solid var(--corn);border-radius:12px;padding:14px;display:flex;gap:18px;flex-wrap:wrap;align-items:baseline}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.field{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+.field label{font-size:12px;color:var(--mute);display:block;margin-bottom:5px}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--husk);border-radius:9px;padding:9px;font:inherit}
+.out{grid-column:1/-1;background:var(--bg);border:1.5px solid var(--corn);border-radius:14px;padding:15px;display:flex;gap:18px;flex-wrap:wrap;align-items:baseline}
 .out b{font-family:"JetBrains Mono";font-size:28px;color:var(--corn)}
-.mapc{background:var(--ink2);border:1px solid var(--ink3);border-radius:11px;padding:10px 12px;margin-bottom:8px}
-.mapc h4{margin:0 0 6px;font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mapc{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin-bottom:9px}
+.mapc h4{margin:0 0 7px;font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .mapc .rk{font-family:"JetBrains Mono";color:var(--corn)}
+.mdet{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:7px}
+.mdet span{font-size:12px;color:var(--mute)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:inline-flex;align-items:center;gap:5px;background:var(--ink3);border-radius:99px;padding:2px 9px 2px 3px;font-size:12.5px;cursor:pointer;border:0;color:var(--husk);font-family:inherit}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border-radius:99px;padding:3px 10px 3px 4px;font-size:12.5px;cursor:pointer;border:0;color:var(--husk);font-family:inherit}
 .chip .face{width:20px;height:20px;border-radius:99px}
 .chip.got{opacity:.4;text-decoration:line-through}
-.welcome{margin-top:20px;border:1.5px dashed var(--line);border-radius:14px;padding:20px;color:var(--mute)}
+.chip.sel{outline:2px solid var(--corn)}
+.welcome{margin-top:22px;border:1.5px dashed var(--line);border-radius:16px;padding:22px;color:var(--mute)}
 .welcome h3{color:var(--husk);margin:0 0 8px;font-size:16px}
 .welcome .chips{margin-top:10px}
 .ptbl{width:100%;border-collapse:collapse;font-size:13px}
-.ptbl th,.ptbl td{padding:6px 8px;border-bottom:1px solid var(--ink3);text-align:left}
-.ptbl th{color:var(--mute);font-weight:500;font-size:11.5px;position:sticky;top:0;background:var(--ink)}
+.ptbl th,.ptbl td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left}
+.ptbl th{color:var(--mute);font-weight:500;font-size:11.5px;position:sticky;top:0;background:var(--bg)}
 .ptbl td.n{text-align:right;font-family:"JetBrains Mono"}
-.scroll{max-height:65vh;overflow:auto;border:1px solid var(--ink3);border-radius:10px}
-.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(30px);background:var(--corn);color:var(--onCorn);font-weight:700;padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:60;max-width:90vw;text-align:center}
+.scroll{max-height:65vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(30px);background:var(--corn);color:var(--onCorn);font-weight:700;padding:11px 18px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:60;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%)}
 .fab{position:fixed;right:16px;bottom:18px;z-index:40;display:none;gap:6px}
 .fab.on{display:flex}
-.fab button{border-radius:99px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.fab button{border-radius:99px;box-shadow:0 10px 28px rgba(0,0,0,.4)}
+.sumcard{background:linear-gradient(180deg,var(--card),var(--bg2));border:1.5px solid var(--corn);border-radius:18px;padding:15px 16px;margin-bottom:12px}
+.sc-main b{font-family:"JetBrains Mono";font-weight:700;font-size:38px;color:var(--corn);line-height:1.1}
+.sc-main b small{font-size:16px;color:var(--husk)}
+.sc-main>span{display:block;font-size:12.5px;color:var(--mute)}
+.sc-cmp{display:flex;gap:9px;align-items:baseline;border-top:1px dashed var(--line);padding-top:9px;margin-top:9px;flex-wrap:wrap}
+.sc-cmp b{font-family:"JetBrains Mono";font-size:19px;color:var(--husk)}
+.sb{font-family:"JetBrains Mono";font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:7px;background:var(--card2);color:var(--husk);white-space:nowrap}
+.sb.s5{background:var(--corn);color:var(--onCorn)}
+.sb.s4{color:var(--corn);border:1px solid var(--corn)}
+.sb.s2{color:var(--mute)}.sb.s1{color:var(--drop)}
+.glist{display:grid;gap:9px}
+.gstep{display:grid;grid-template-columns:32px 1fr;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 13px}
+.gstep.now{border-color:var(--line2)}
+.gstep.final{border-color:var(--drop)}
+.gstep .no{font-family:"JetBrains Mono";font-weight:700;color:var(--corn)}
+.gstep.evo .no{color:var(--drop)}
+.gact{margin-top:7px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.gact .btn{border-style:dashed;border-color:var(--line2);background:transparent}
+.gact .btn.pri{border-style:solid;border-color:var(--corn);background:var(--corn);color:var(--onCorn)}
+.jsub{margin-top:8px}
+.jsub summary{cursor:pointer;color:var(--mute);font-size:12.5px}
+.js{display:flex;gap:6px;align-items:center;padding:4px 0;flex-wrap:wrap;cursor:pointer;font-size:13px}
+.js.done{opacity:.45;text-decoration:line-through}
+.done-all{border:1.5px solid var(--drop);background:color-mix(in srgb,var(--drop) 9%,transparent);border-radius:14px;padding:13px;margin-bottom:11px;font-weight:700}
+.ivr{border:1px solid var(--line);border-radius:13px;padding:11px 12px;margin-bottom:9px;background:var(--card)}
+.ivr.has{border-color:var(--mute)}
+.ivr.done{border-color:var(--gp);background:color-mix(in srgb,var(--gp) 8%,transparent)}
+.ivtop{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap}
+.ivstat{font-size:.78rem;color:var(--mute)}
+.ivstat b{color:var(--need)}
+.ivstat.ok b{color:var(--gp)}
+.ivreq{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.nch{font-size:.78rem;background:var(--card2);border-radius:9px;padding:4px 10px;white-space:nowrap}
+.nch b{color:var(--corn)}
+.ivs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ivc{display:flex;align-items:center;gap:5px}
+.ivc .stp input{width:30px;height:26px}
+.lvc{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:9px;background:var(--card2);white-space:nowrap}
+.lvc.s5{background:var(--corn);color:var(--onCorn)}
+.lvc.s4{background:var(--drop);color:var(--onCorn)}
+.logbox{border:1.5px solid var(--corn);border-radius:14px;padding:11px;margin-bottom:11px;background:var(--card)}
+.lbh{display:flex;gap:9px;align-items:center;margin-bottom:9px}
+.lbh b{display:block}
+.lbg{display:grid;gap:7px}
+.lbc{display:flex;gap:9px;align-items:center;border-top:1px solid var(--line);padding-top:7px}
+.lbc>div{margin-left:auto}
+.gainbox{border:1.5px solid var(--corn);border-radius:14px;padding:11px;background:color-mix(in srgb,var(--corn) 6%,transparent)}
+.rates{flex-wrap:wrap}
+.rates .rt{font-size:.78rem;display:inline-flex;align-items:center;gap:4px;background:var(--card2);border-radius:9px;padding:4px 9px}
+.rates .rt input{width:46px;border:none;background:transparent;color:inherit;font:inherit;text-align:right}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-top:13px}
+.rules summary{cursor:pointer;font-weight:700}
+.rules ul{margin:9px 0 0;padding-left:19px;font-size:13px}
+.rules li{margin-bottom:5px}
+.rules code{font-family:"JetBrains Mono";font-size:12px;color:var(--corn)}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--corn);outline-offset:2px}
 .hide-m{}
 @media (max-width:700px){
   .kpis{grid-template-columns:repeat(3,1fr)}.kpi b{font-size:17px}
-  .grid2{grid-template-columns:1fr}.brand{font-size:23px}.target h2{font-size:21px}
-  .target{grid-template-columns:auto 1fr auto;padding:12px}.target>img{width:48px;height:48px}
+  .grid2{grid-template-columns:1fr}.brand{font-size:24px}.target h2{font-size:21px}
+  .target{grid-template-columns:auto 1fr auto;padding:13px;gap:11px}.target>img{width:50px;height:50px}
   .hide-m{display:none}
-  .tabs{position:sticky;top:0;z-index:20;background:var(--ink);margin-left:-14px;margin-right:-14px;padding:0 8px}
+  .tabs{position:sticky;top:0;z-index:20;background:var(--bg);margin-left:-15px;margin-right:-15px;padding:0 9px}
   .mt,.mt tbody{display:block}.mt thead{display:none}
-  .mt tr{display:grid;grid-template-columns:1fr 1fr;background:var(--ink2);border:1px solid var(--ink3);border-radius:10px;margin-bottom:6px;padding:6px 8px;gap:4px 8px}
+  .mt tr{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:7px;padding:7px 9px;gap:4px 8px}
   .mt td{display:block;background:none;border:0!important;padding:0;border-radius:0!important}
   .mt td:first-child{grid-column:1/-1}.mt td.num{grid-column:1/-1;text-align:right}
   .mt td[data-l]::before{content:attr(data-l);display:block;font-size:10.5px;color:var(--mute)}
   .stp button{width:32px;height:30px}
-  .seg button{padding:7px 8px;font-size:12.5px}
-  .fab{left:0;right:0;bottom:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--ink);border-top:1.5px solid var(--line);justify-content:flex-end}
+  .seg button{padding:8px 9px;font-size:12.5px}
+  .fab{left:0;right:0;bottom:0;padding:9px 13px calc(9px + env(safe-area-inset-bottom));background:var(--bg);border-top:1.5px solid var(--line);justify-content:flex-end}
   .fab button{box-shadow:none;flex:1}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-.sumcard{background:var(--ink2);border:1.5px solid var(--corn);border-radius:14px;padding:12px;margin-bottom:10px}
-.sc-main b{font-family:"JetBrains Mono";font-size:34px;color:var(--corn)}
-.sc-main b small{font-size:15px;color:var(--husk)}
-.sc-main span{display:block;font-size:12.5px;color:var(--mute)}
-.sc-cmp{display:flex;gap:8px;align-items:baseline;border-top:1px dashed var(--line);padding-top:8px;flex-wrap:wrap}
-.sc-cmp b{font-family:"JetBrains Mono";font-size:18px}
-.sb{font-family:"JetBrains Mono";font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--ink3);color:var(--husk);white-space:nowrap}
-.sb.s5{background:var(--corn);color:var(--onCorn)}
-.sb.s4{color:var(--corn);border:1px solid var(--corn)}
-.sb.s2{color:var(--mute)}.sb.s1{color:var(--drop)}
-.glist{display:grid;gap:8px}
-.gstep{display:grid;grid-template-columns:30px 1fr;gap:8px;background:var(--ink2);border:1px solid var(--ink3);border-radius:11px;padding:10px 12px}
-.gstep.now{border-color:var(--corn)}
-.gstep.final{border-color:var(--drop)}
-.gstep .no{font-family:"JetBrains Mono";font-weight:700;color:var(--corn)}
-.gstep.evo .no{color:var(--drop)}
-.gact{margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.jsub{margin-top:6px}
-.jsub summary{cursor:pointer;color:var(--mute);font-size:12.5px}
-.js{display:flex;gap:6px;align-items:center;padding:3px 0;flex-wrap:wrap;cursor:pointer;font-size:13px}
-.js.done{opacity:.45;text-decoration:line-through}
-.tag.evo{color:var(--drop)}.tag.f5{color:var(--corn);font-weight:700}
-.done-all{border:1.5px solid var(--drop);background:rgba(95,211,196,.08);border-radius:12px;padding:12px;margin-bottom:10px;font-weight:700}
-.ivr{background:var(--ink2);border:1px solid var(--ink3);border-radius:10px;padding:8px 10px;margin-bottom:6px}
-.ivr.has{border-color:var(--corn)}
-.ivr .ivi{margin:4px 0}
-.ivs{display:flex;flex-wrap:wrap;gap:6px}
-.ivc{display:inline-flex;align-items:center;gap:3px}
-.ivc .stp input{width:30px;height:26px}
-.logbox{border:1.5px solid var(--corn);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--ink2)}
-.lbh{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-.lbh b{display:block}
-.lbg{display:grid;gap:6px}
-.lbc{display:flex;gap:8px;align-items:center;border-top:1px solid var(--ink3);padding-top:6px}
-.lbc>div{margin-left:auto}
-.mdet{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px}
-.mdet span{font-size:12px;color:var(--mute)}
-.chip.sel{outline:2px solid var(--corn)}
-.gainbox{border:1.5px solid var(--corn);border-radius:12px;padding:10px;background:rgba(242,193,78,.05)}
-.rules{background:var(--ink2);border:1px solid var(--ink3);border-radius:12px;padding:10px 12px;margin-top:12px}
-.rules summary{cursor:pointer;font-weight:700}
-.rules ul{margin:8px 0 0;padding-left:18px;font-size:13px}
-.rules li{margin-bottom:4px}
-.rules code{font-family:"JetBrains Mono";font-size:12px;color:var(--corn)}
+
+.stickbar{position:sticky;top:47px;z-index:23;display:flex;gap:9px;align-items:center;flex-wrap:wrap;background:var(--card);border:1.5px solid var(--line2);border-radius:12px;padding:8px 11px;margin-bottom:11px;box-shadow:0 6px 18px rgba(0,0,0,.28)}
+.stickbar .tag b{font-family:"JetBrains Mono"}
+.ivr.done::after{content:"";display:none}
+@media (max-width:700px){.stickbar{top:44px}}
+
+/* sync & modal */
+#syncBtn{display:inline-flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:99px;background:var(--mute);display:inline-block;flex:none}
+.dot.on{background:var(--gp);box-shadow:0 0 0 3px color-mix(in srgb,var(--gp) 26%,transparent)}
+.modal{position:fixed;inset:0;z-index:70;background:rgba(6,9,20,.62);display:none;align-items:flex-start;justify-content:center;padding:5vh 14px;overflow:auto}
+.modal.on{display:flex}
+.modal-card{background:var(--bg2);border:1.5px solid var(--line2);border-radius:18px;width:100%;max-width:600px;padding:16px 17px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+.modal-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:11px;border-bottom:1.5px solid var(--line)}
+.modal-head b{font-family:"Black Han Sans";font-weight:400;font-size:19px;color:var(--corn)}
+.modal-head .btn{margin-left:auto}
+.syncstat{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:13px;padding:11px 13px;margin-bottom:12px}
+.syncstat.on{border-color:var(--gp)}
+.syncstat.on b{color:var(--gp)}
+.syncstat b{font-size:14px}
+.mtabs{display:flex;gap:6px;margin-bottom:12px}
+.mtabs button{flex:1;background:var(--card);border:1.5px solid var(--line);color:var(--mute);font:inherit;font-size:12.5px;font-weight:600;padding:9px 6px;border-radius:10px;cursor:pointer}
+.mtabs button.on{background:var(--corn);color:var(--onCorn);border-color:var(--corn)}
+.msect{display:none}.msect.on{display:block}
+@media (max-width:480px){.mtabs button{font-size:11.5px;padding:8px 4px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header class="top">
-  <div class="brand">콘 믹스 도우미<small>Corn Project 믹스 연구소 · 마켓 시세 · 몬스터 정보 기반</small></div>
-  <div class="hdr-r"><div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>시세 <span id="cntP"></span>종 · 데이터 <span id="dstamp"></span></div>
-  <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button></div>
+  <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
+  <div class="hdr-r">
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v30</b></div>
+    <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
+    <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
+  </div>
 </header>
 <div class="search"><div class="in">
   <span class="ico">⌕</span>
-  <input id="q" type="search" placeholder="만들 헨치 이름 검색 (예: 배틀드래곤)" autocomplete="off" enterkeyhint="search">
+  <input id="q" type="search" placeholder="만들 헨치 이름 검색 (예: 켈베로스)" autocomplete="off" enterkeyhint="search">
   <div id="sugg" class="sugg" role="listbox"></div></div>
 </div>
 <div id="trail" class="trail" style="display:none"></div>
@@ -247,25 +325,53 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <div id="welcome" class="welcome"></div>
 <div id="main" style="display:none">
   <nav class="tabs" role="tablist">
-    <button class="on" data-t="guide">믹스 가이드</button>
-    <button data-t="inv">보유 코어</button>
-    <button data-t="mat">재료·비용</button>
-    <button data-t="map">사냥 맵</button>
-    <button data-t="tree">공식 트리</button>
-    <button data-t="plan">레벨 플래너</button>
-    <button data-t="tools">계산기·시세</button>
+    <button class="on" data-t="guide">가이드</button>
+    <button data-t="inv">모은 것</button>
+    <button data-t="map">사냥</button>
+    <button data-t="plan">레벨 플랜</button>
+    <button data-t="tools">공식·도구</button>
   </nav>
   <div class="panel on" id="p-guide"></div>
   <div class="panel" id="p-inv"></div>
-  <div class="panel" id="p-mat"></div>
   <div class="panel" id="p-map"></div>
-  <div class="panel" id="p-steps" style="display:none"></div>
   <div class="panel" id="p-plan"></div>
-  <div class="panel" id="p-tree"></div>
   <div class="panel" id="p-tools"></div>
+  <div class="panel" id="p-steps" style="display:none"></div>
 </div>
 </div>
-<div class="fab" id="fab"><button class="btn" id="fabCopy">텍스트 복사</button><button class="btn pri" id="fabXlsx">엑셀 받기</button></div>
+<div class="fab" id="fab"><button class="btn pri" id="fabCopy">가이드 복사</button></div>
+<div id="syncModal" class="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-label="동기화">
+    <div class="modal-head"><b>동기화 · 불러오기</b><button class="btn sm" id="syncClose">닫기</button></div>
+    <div class="syncstat" id="syncStat"><i class="dot" id="syncDot2"></i><div style="min-width:0"><b id="syncState">동기화 꺼짐</b><div class="lv" id="syncWhen">설정하면 기기 간에 자동으로 이어져요</div></div></div>
+    <div class="mtabs" id="mtabs"><button data-m="easy" class="on">간편 (설정 0)</button><button data-m="git">영구 (GitHub)</button><button data-m="code">코드 · 파일</button></div>
+    <div class="msect on" data-m="easy">
+      <p class="hint">가입 없이 <b>이름 하나</b>면 바로 됩니다. 서버 사본이 <b>마지막 사용 후 12시간</b>이면 지워져요(이 기기엔 계속 남음). 오래 쉬었다 쓰려면 <b>영구(GitHub)</b>을 쓰세요.</p>
+      <div class="bar"><input class="ctl" id="synin" placeholder="동기화 이름 (예: cornmix-a1b2c3d)" style="flex:1;min-width:170px" autocomplete="off"><button class="btn pri" id="synon">켜기</button><button class="btn" id="synrand">새 이름</button></div>
+      <div class="bar"><button class="btn" id="synnow">지금 보내기</button><button class="btn" id="syncopy">이름 복사</button><button class="btn" id="synoff">끄기</button><span class="lv" id="synst">꺼짐</span></div>
+    </div>
+    <div class="msect" data-m="git">
+      <p class="hint">GitHub <b>비공개 gist</b>를 앱이 자동으로 만들어 주고받아요. <b>한 번만 설정</b>하면 어느 기기에서 켤 때 불러오고 바꾸면 자동 저장돼요. 토큰은 이 브라우저에만 있고 공유되지 않아요.</p>
+      <div class="bar"><input class="ctl" id="ghin" type="password" placeholder="GitHub 토큰 (gist 권한)" style="flex:1;min-width:170px" autocomplete="off"><button class="btn pri" id="ghon">켜기</button></div>
+      <div class="bar"><button class="btn" id="ghpull">지금 불러오기</button><button class="btn" id="ghnow">지금 저장</button><button class="btn" id="ghoff">끄기</button><span class="lv" id="ghst">꺼짐</span></div>
+      <details class="rules"><summary>GitHub 토큰 만드는 법 (한 번만 하면 끝)</summary>
+      <ol style="margin:9px 0 0;padding-left:20px;font-size:13px;line-height:1.7">
+      <li>github.com 로그인 (없으면 무료 가입)</li>
+      <li>프로필 → <b>Settings</b> → 왼쪽 맨 아래 <b>Developer settings</b></li>
+      <li><b>Personal access tokens</b> → <b>Tokens (classic)</b> → <b>Generate new token (classic)</b></li>
+      <li>Note 아무 이름 · Expiration <b>No expiration</b> · Scope는 <b>gist</b> 하나만 체크</li>
+      <li><b>Generate token</b> → <code>ghp_…</code> 복사 → 위 칸에 붙여넣고 <b>켜기</b></li>
+      <li>회사 PC·노트북에서도 <b>같은 토큰을 한 번만</b> 붙여넣으면 끝나요</li>
+      </ol>
+      <p class="hint" style="margin-top:8px">토큰은 <b>이 브라우저에만</b> 저장돼요. 지우려면 GitHub에서 Revoke 하세요.</p></details>
+    </div>
+    <div class="msect" data-m="code">
+      <p class="hint">토큰 없이 잠깐 옮길 때: 아래 코드를 복사해 다른 기기에서 불러오세요. 백업 파일로 저장·복원할 수도 있어요.</p>
+      <div class="bar"><input class="ctl" id="syin" placeholder="동기화 코드 붙여넣기" style="flex:1;min-width:170px"><button class="btn" id="syl">불러오기</button><button class="btn" id="syc">코드 복사</button></div>
+      <div class="bar"><button class="btn" id="bk">백업 파일 받기</button><button class="btn" id="rs">백업 불러오기</button><button class="btn" id="sh">이 헨치 링크 복사</button><button class="btn" id="pxr">입력 단가 지우기</button></div>
+    </div>
+  </div>
+</div>
 <div id="toast" class="toast"></div>
 <input type="file" id="restoreFile" accept=".json" hidden>
 <script>
@@ -299,8 +405,102 @@ const LS='cornMixHelper.v2';
 let S={sel:{},ov:{},olv:{},done:{},have:{},recent:[],fav:[],mode:0,qty:{},cur:'p',basis:'med',px:{},theme:'dark',cap:180,hw:0,tgt:{}};
 try{const old=JSON.parse(localStorage.getItem('cornMixHelper.v1')||'null');if(old)Object.assign(S,{sel:old.sel||{},ov:old.ov||{},done:old.done||{},recent:old.recent||[],mode:old.mode||0})}catch(e){}
 try{Object.assign(S,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
-const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
-let cur=null;
+const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','gmode','ivLeft','w5','hist','jd'];
+function slimS(){const o={};SYNC_KEYS.forEach(k=>{const v=S[k];if(v===undefined)return;if(v&&typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)return;o[k]=v});return o}
+const b64=e=>btoa(unescape(encodeURIComponent(e))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const ub64=e=>decodeURIComponent(escape(atob(e.replace(/-/g,'+').replace(/_/g,'/'))));
+const syncCode=()=>b64(JSON.stringify(slimS()));
+/* ── 자동 동기화 (A) 무설정: ntfy.sh 토픽 ── */
+const NTFY='https://ntfy.sh/';
+let SYN='';try{SYN=localStorage.getItem('cornMixHelper.syn')||''}catch(e){}
+const synSave=()=>{try{localStorage.setItem('cornMixHelper.syn',SYN)}catch(e){}};
+const synOn=()=>!!SYN;
+function synStatus(t,err){const el=document.getElementById('synst');if(el){el.textContent=t;el.style.color=err?'var(--need)':'var(--mute)'}try{syncRefresh()}catch(_){}}
+async function synPush(silent){if(!synOn())return false;
+  try{const r=await fetch(NTFY+encodeURIComponent(SYN),{method:'POST',body:JSON.stringify(slimS())});
+    if(!r.ok)throw new Error('HTTP '+r.status);synStatus('보냄 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));return true}
+  catch(e){synStatus('보내기 실패 · '+e.message,1);return false}}
+async function synPull(){if(!synOn())return false;
+  try{const r=await fetch(NTFY+encodeURIComponent(SYN)+'/json?poll=1&since=all');if(!r.ok)throw new Error('HTTP '+r.status);
+    const txt=await r.text();let last=null;
+    txt.split('\n').forEach(l=>{l=l.trim();if(!l)return;try{const j=JSON.parse(l);if(j.event==='message'&&j.message)last=j.message}catch(e){}});
+    if(!last)return false;
+    const o=JSON.parse(last);if(!o||typeof o!=='object')return false;
+    SYNC_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});save();synStatus('받음 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));return true}
+  catch(e){synStatus('받기 실패 · '+e.message,1);return false}}
+function synRand(){return 'cornmix-'+Math.random().toString(36).slice(2,9)}
+/* ── 동기화 창(모달) ── */
+function syncOpen(){const m=document.getElementById('syncModal');if(!m)return;m.classList.add('on');syncRefresh()}
+function syncClose(){const m=document.getElementById('syncModal');if(m)m.classList.remove('on')}
+function syncRefresh(){const on=synOn()||ghOn();const s=document.getElementById('syncStat'),d=document.getElementById('syncDot2');
+  if(s)s.classList.toggle('on',on);if(d)d.classList.toggle('on',on);
+  const st=document.getElementById('syncState'),wh=document.getElementById('syncWhen');
+  if(st)st.textContent=ghOn()?'영구 동기화 켜짐':synOn()?'간편 동기화 켜짐':'동기화 꺼짐';
+  if(wh)wh.textContent=ghOn()?('자동 · '+(SYN?'이름 '+SYN:'영구 저장소 연결됨')):synOn()?('이름 '+SYN+' · 마지막 사용 후 12시간 보관'):'설정하면 기기 간에 자동으로 이어져요';
+  const hd=document.getElementById('syncDot');if(hd)hd.classList.toggle('on',on);
+  const s2=document.getElementById('syncState2');if(s2){s2.textContent=on?(ghOn()?'영구 동기화 켜짐':'간편 동기화 켜짐'):'꺼짐';s2.style.color=on?'var(--gp)':'var(--mute)'}}
+function initSyncUI(){const g=id=>document.getElementById(id);
+  const sin=g('synin');if(sin&&SYN)sin.value=SYN;const gin=g('ghin');if(gin&&GH.token)gin.value=GH.token;
+  if(synOn())synStatus('켜짐');if(ghOn())ghStatus('켜짐');
+  const bk=g('bk');if(bk)bk.onclick=()=>{const b=new Blob([JSON.stringify(S)],{type:'application/json'});dl(b,'콘믹스도우미_백업_'+today()+'.json')};
+  const rs=g('rs');if(rs)rs.onclick=()=>g('restoreFile').click();
+  const sh=g('sh');if(sh)sh.onclick=()=>copy(location.href.split('#')[0]+'#h='+(cur||''));
+  const pxr=g('pxr');if(pxr)pxr.onclick=()=>{if(confirm('직접 입력한 단가를 모두 지울까요?')){S.px={};save();render()}};
+  const ob=g('syncBtn');if(ob)ob.onclick=syncOpen;const cb=g('syncClose');if(cb)cb.onclick=syncClose;const ot=g('syncOpenTools');if(ot)ot.onclick=syncOpen;
+  const md=g('syncModal');if(md)md.addEventListener('click',e=>{if(e.target===md)syncClose()});
+  document.querySelectorAll('#mtabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#mtabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.msect').forEach(s=>s.classList.toggle('on',s.dataset.m===b.dataset.m))});
+  if(sin)sin.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const b=g('synon');if(b)b.click()}});
+  if(gin)gin.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const b=g('ghon');if(b)b.click()}});
+  syncRefresh()}
+/* ── 자동 동기화 (B) 영구 보관: GitHub Gist(비공개) ── */
+const GHLS='cornMixHelper.gh',GHFILE='corn-mix-helper.json';
+let GH={token:'',gist:''};
+try{GH=Object.assign(GH,JSON.parse(localStorage.getItem(GHLS)||'{}'))}catch(e){}
+const ghSave=()=>{try{localStorage.setItem(GHLS,JSON.stringify(GH))}catch(e){}};
+const ghHdr=()=>({Authorization:'Bearer '+GH.token,Accept:'application/vnd.github+json','Content-Type':'application/json'});
+function ghStatus(t,err){const el=document.getElementById('ghst');if(el){el.textContent=t;el.style.color=err?'var(--need)':'var(--mute)'}try{syncRefresh()}catch(_){}}
+const ghOn=()=>!!(GH.token&&GH.gist);
+async function ghFetchGist(){const r=await fetch('https://api.github.com/gists/'+GH.gist,{headers:ghHdr()});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json(),f=j.files&&j.files[GHFILE];if(!f)return{};
+  let c=f.content;if(f.truncated&&f.raw_url)c=await(await fetch(f.raw_url)).text();try{return JSON.parse(c)||{}}catch(e){return{}}}
+const hasData=o=>!!o&&Object.keys(o).some(k=>{const v=o[k];return v&&(typeof v!=='object'||Array.isArray(v)||Object.keys(v).length)});
+async function ghFindGist(){const r=await fetch('https://api.github.com/gists?per_page=100',{headers:ghHdr()});
+  if(!r.ok)throw new Error(r.status===401?'토큰이 올바르지 않아요':'HTTP '+r.status);
+  const arr=await r.json();const hit=(Array.isArray(arr)?arr:[]).find(g=>g.files&&g.files[GHFILE]);return hit?hit.id:null}
+async function ghPush(silent){if(!ghOn())return false;
+  try{const r=await fetch('https://api.github.com/gists/'+GH.gist,{method:'PATCH',headers:ghHdr(),body:JSON.stringify({files:{[GHFILE]:{content:JSON.stringify(slimS())}}})});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    ghStatus('동기화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));return true}
+  catch(e){ghStatus('저장 실패 · '+e.message,1);return false}}
+async function ghPull(){if(!ghOn())return false;
+  try{
+    const o=await ghFetchGist();if(!hasData(o))return false;
+    SYNC_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});save();
+    ghStatus('불러옴 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));return true}
+  catch(e){ghStatus('불러오기 실패 · '+e.message,1);return false}}
+async function ghInit(token){GH.token=String(token||'').trim();ghSave();
+  try{let id=GH.gist||await ghFindGist();
+    if(!id){const r=await fetch('https://api.github.com/gists',{method:'POST',headers:ghHdr(),body:JSON.stringify({description:'콘 믹스 도우미 자동 동기화',public:false,files:{[GHFILE]:{content:JSON.stringify(slimS())}}})});
+      if(!r.ok)throw new Error(r.status===401?'토큰이 올바르지 않아요':'HTTP '+r.status);
+      const j=await r.json();id=j.id;GH.gist=id;ghSave();
+      ghStatus('새 저장소를 만들었어요 (이 토큰의 첫 기기)');return{ok:true,created:true}}
+    GH.gist=id;ghSave();
+    const data=await ghFetchGist();
+    if(hasData(data)){SYNC_KEYS.forEach(k=>{if(data[k]!==undefined)S[k]=data[k]});save();
+      ghStatus('다른 기기 기록을 불러왔어요');return{ok:true,pulled:true}}
+    await ghPush();
+    ghStatus('이 기기 기록을 올렸어요');
+    return{ok:true,pushed:true}}
+  catch(e){GH.gist='';ghSave();return{ok:false,err:e.message}}}
+function applyCode(c){try{const o=JSON.parse(ub64(String(c||'').trim()));if(!o||typeof o!=='object')return false;SYNC_KEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k]});save();return true}catch(e){return false}}
+function syncHash(){try{history.replaceState(null,'',location.pathname+location.search+'#s='+syncCode())}catch(e){}}
+let syncT=null;
+let ghT=null;
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
+  if(syncT)clearTimeout(syncT);syncT=setTimeout(syncHash,500);
+  if(ghT)clearTimeout(ghT);ghT=setTimeout(()=>{if(synOn())synPush(1);if(ghOn())ghPush(1)},1200)};
+let cur=null;let GS=null;
 const ovOf=()=>S.ov[cur]||(S.ov[cur]={});
 const olvOf=()=>S.olv[cur]||(S.olv[cur]={});
 const haveOf=()=>S.have[cur]||(S.have[cur]={});
@@ -381,12 +581,37 @@ function planSteps(n,L,table,out,role,parent){const T=table(n);
 const BONUS=[[120,30],[130,28],[140,25],[150,20],[160,15],[170,10],[180,5],[190,3]];
 const bonusP=l=>{for(const[h,p]of BONUS)if(l<=h)return p;return 0};
 const MIXW=0.25,NEEDF=2;
-if(S.w5==null)S.w5=2;if(S.gc==null)S.gc=true;if(!S.inv)S.inv={};if(!S.hist)S.hist={};if(!S.jd)S.jd={};
+if(S.w5==null)S.w5=1;S.strat='smart';if(S.mode==null)S.mode=0;if(!S.inv)S.inv={};if(S.ivLeft==null)S.ivLeft=true;if(!S.hist)S.hist={};if(!S.jd)S.jd={};if(!S.fix)S.fix={};if(S.gmode==null)S.gmode='g';
 const baseK=(id,s)=>(1+(S.w5-1)*(Math.max(1,s)-1)/4+0.002*(s-1))*(core(id)>0?1:NEEDF);
 const invOf=()=>S.inv[cur]||(S.inv[cur]={});
 const histOf=()=>S.hist[cur]||(S.hist[cur]={});
 const jdOf=()=>S.jd[cur]||(S.jd[cur]={});
-const gReq=g=>S.gc?Math.max(1,g||0):1;
+const fixOf=()=>S.fix[cur]||(S.fix[cur]={});
+const gReq=g=>2;
+/* ── 운(보너스) 기대값 + 사냥 평균 ── */
+const DEFRATE={2:25,3:25,4:25,5:25};
+if(!S.rate)S.rate=Object.assign({},DEFRATE);
+const rateAll=()=>[2,3,4,5].reduce((a,s)=>a+(+S.rate[s]||0),0)||1;
+function huntsFor(s){if(s<=2)return 1;const ge=[2,3,4,5].reduce((a,k)=>a+(k>=s?(+S.rate[k]||0):0),0);return ge>0?rateAll()/ge:99}
+const huntOf=slots=>slots.reduce((a,s)=>a+huntsFor(s),0);
+function luckEV(root){const memo=new Map();
+  function evn(n){if(memo.has(n.path))return memo.get(n.path);
+    const itC=[null,0,0,0,0,0],mxC=[null,0,0,0,0,0],evC=[null,0,0,0,0,0];
+    if(n.eff==='own'){for(let s=2;s<=5;s++){itC[s]=0;mxC[s]=0;evC[s]=0}}
+    else if(n.eff!=='mix'){for(let s=2;s<=5;s++){itC[s]=1;mxC[s]=0;evC[s]=0}}
+    else{const A=evn(n.main),B=evn(n.sub),p=(bonusP(n.lvl)||0)/100;
+      let one=Infinity,omx=Infinity,oev=Infinity;
+      for(let a=2;a<=5;a++)for(let b=2;b<=5;b++){const c=A.itC[a]+B.itC[b];if(c<one){one=c;omx=A.mxC[a]+B.mxC[b]+1;oev=A.evC[a]+B.evC[b]}}
+      for(let s=2;s<=5;s++){let bi=Infinity,bm=Infinity,be=Infinity;
+        for(let a=2;a<=5;a++)for(let b=2;b<=5;b++){const c=A.itC[a]+B.itC[b];if(!isFinite(c))continue;
+          const s0=mixStar(n.main.id,a,n.sub.id,b,n.id,n.lvl);
+          if(s0>=s){if(c<bi){bi=c;bm=A.mxC[a]+B.mxC[b]+1;be=A.evC[a]+B.evC[b]}}
+          else if(s0===s-1&&p>0){const cc=c/p;if(cc<bi){bi=cc;bm=(A.mxC[a]+B.mxC[b]+1)/p;be=(A.evC[a]+B.evC[b])/p}}}
+        if(s>=3){const c2=itC[s-1]+one;if(c2<bi){bi=c2;bm=mxC[s-1]+omx;be=evC[s-1]+oev}}
+        itC[s]=bi;mxC[s]=bm;evC[s]=be}}
+    const r={itC,mxC,evC};memo.set(n.path,r);return r}
+  const t=evn(root);
+  return{items:Math.round(t.itC[5]),mixes:Math.round(t.mxC[5]),evos:Math.round(t.evC[5])}}
 function markEff(root,mode){const smartB=n=>n.core>0||n.leaf||isException(n.name);
   (function w(n,d){if(n.state==='own'){n.eff='own';return}const forced=ovOf()[n.path]==='mix';if(d===-1&&smartB(n))d=0;
     let leaf=n.leaf;if(!leaf&&!forced&&d!==-1&&d>=mode&&smartB(n))leaf=true;n.eff=leaf?'leaf':'mix';
@@ -394,21 +619,23 @@ function markEff(root,mode){const smartB=n=>n.core>0||n.leaf||isException(n.name
 /* 완료 기록(hist) 먼저, 그다음 보유 중인 중간 헨치를 최종에 가까운 자리부터 배정 */
 function assignOwned(root,iv,hist){const pool={},act={};
   Object.keys(iv).forEach(id=>{const a=[];for(let s=5;s>=1;s--)for(let k=0;k<(iv[id][s]||0);k++)a.push(s);if(a.length)pool[id]=a});
-  const q=[root];while(q.length){const n=q.shift();if(n.eff!=='mix')continue;
-    if(hist[n.path]){act[n.path]=+(hist[n.path].s||hist[n.path]);continue}
-    if(n.path!=='root'&&pool[n.id]&&pool[n.id].length){act[n.path]=pool[n.id].shift();continue}q.push(n.main,n.sub)}
+  const q=[root];while(q.length){const n=q.shift();
+    if(hist[n.path]){act[n.path]=+(hist[n.path].s||hist[n.path]);if(n.eff==='mix')q.push(n.main,n.sub);continue}
+    if(n.path!=='root'&&n.eff==='mix'&&pool[n.id]&&pool[n.id].length){act[n.path]=pool[n.id].shift();q.push(n.main,n.sub);continue}
+    if(n.eff==='mix')q.push(n.main,n.sub)}
   return{act,pool}}
-function starPlan(root,opt={}){const act=opt.act||{},lk=opt.lk||baseK,spare=opt.spare||{},EG=!!opt.eager,DS=new Map(),DA=new Map();
+function starPlan(root,opt={}){const act=opt.act||{},lk=opt.lk||baseK,spare=opt.spare||{},bonus=opt.bonus||new Set(),EG=!!opt.eager,DS=new Map(),DA=new Map();
   function dp(n,k){const D=k==='S'?DS:DA;if(D.has(n))return D.get(n);const ua=k!=='S',eg=EG&&ua;
     const e=new Array(6).fill(Infinity),ch=[];let J,jh;const leafLike=n.eff!=='mix';
     if(n.eff==='own'){for(let s=1;s<=5;s++){e[s]=0;ch[s]={t:'own'}}}
-    else if(leafLike){for(let s=eg?5:1;s<=5;s++){e[s]=lk(n.id,s);ch[s]={t:'leaf'}}}
+    else if(leafLike){for(let s=eg?5:2;s<=5;s++){e[s]=lk(n.id,s);ch[s]={t:'leaf'}}}
     else{const A=dp(n.main,k),B=dp(n.sub,k),ga=eg?5:gReq(n.mg),gb=eg?5:gReq(n.sg);
-      for(let a=ga;a<=5;a++)if(A.e[a]<Infinity)for(let b=gb;b<=5;b++)if(B.e[b]<Infinity){const s=mixStar(n.main.id,a,n.sub.id,b,n.id,n.lvl),v=A.e[a]+B.e[b]+MIXW;if(v<e[s]-1e-9){e[s]=v;ch[s]={t:'mix',a,b}}}}
-    if(leafLike){J=lk(n.id,1);jh={t:core(n.id)>0?'hunt':'buy'}}
+      for(let a=ga;a<=5;a++)if(A.e[a]<Infinity)for(let b=gb;b<=5;b++)if(B.e[b]<Infinity){const s=mixStar(n.main.id,a,n.sub.id,b,n.id,n.lvl),v=A.e[a]+B.e[b]+MIXW;if(v<e[s]-1e-9){e[s]=v;ch[s]={t:'mix',a,b}}}
+      if(bonus.has(n.path)){for(let s=2;s<=4;s++)if(e[s]<Infinity&&ch[s]&&ch[s].t==='mix'){const ss=s+1;if(e[s]<e[ss]-1e-9){e[ss]=e[s];ch[ss]={t:'mix',a:ch[s].a,b:ch[s].b,bon:1}}}}}
+    if(leafLike){J=lk(n.id,2);jh={t:core(n.id)>0?'hunt':'buy'}}
     else if(ua){const r0=dp(n,'S');J=r0.J;jh=r0.jh}
     else{let mn=Infinity,ms=0;for(let s=1;s<=5;s++)if(e[s]<mn){mn=e[s];ms=s}
-      if(n.core>0&&lk(n.id,1)<=mn){J=lk(n.id,1);jh={t:'hunt'}}else{J=mn;jh={t:'mix',s:ms}}}
+      if(n.core>0&&lk(n.id,2)<=mn){J=lk(n.id,2);jh={t:'hunt'}}else{J=mn;jh={t:'mix',s:ms}}}
     if(ua&&act[n.path]){const s0=act[n.path];for(let s=1;s<=5;s++){e[s]=s<=s0?0:Infinity;ch[s]=s<=s0?{t:'act',s0}:undefined}}
     for(let s=2;s<=5;s++){const v=e[s-1]+J+MIXW;if(v<e[s]-1e-9){e[s]=v;ch[s]={t:'evo'}}}
     if(eg&&!leafLike&&!act[n.path])for(let s=1;s<5;s++)e[s]=Infinity;
@@ -423,7 +650,7 @@ function starPlan(root,opt={}){const act=opt.act||{},lk=opt.lk||baseK,spare=opt.
     if(c.t==='evo'){realC(n,s-1,sink,k);const l0=out.log.length,jc=junk(n);out.evos++;sink.push({t:'evo',n,from:s-1,to:s,jc,used:jc.t==='spare'?[[n.id,jc.s,1]]:out.log.slice(l0)})}
     else{const dl=[],isL=(ch,st)=>{const t=D.get(ch).ch[st].t;return t==='leaf'};
       if(isL(n.main,c.a))dl.push([n.main.id,c.a]);if(isL(n.sub,c.b))dl.push([n.sub.id,c.b]);
-      realC(n.main,c.a,sink,k);realC(n.sub,c.b,sink,k);out.mixes++;sink.push({t:'mix',n,a:c.a,b:c.b,s:mixStar(n.main.id,c.a,n.sub.id,c.b,n.id,n.lvl),used:dl})}
+      realC(n.main,c.a,sink,k);realC(n.sub,c.b,sink,k);out.mixes++;sink.push({t:'mix',n,a:c.a,b:c.b,s:mixStar(n.main.id,c.a,n.sub.id,c.b,n.id,n.lvl)+(c.bon||0),bon:c.bon||0,used:dl})}
     if(k==='A'){const d=out.mc-b,v=out.val[n.id];if(!v||d>v.m)out.val[n.id]={m:d,s}}}
   function junk(n){if(spare[n.id]&&spare[n.id].length){const s=spare[n.id].shift();return{t:'spare',id:n.id,s}}
     const d=dp(n,'S');if(d.jh.t==='buy'||d.jh.t==='hunt'){addMat(n.id,1);return{t:d.jh.t,id:n.id}}
@@ -434,29 +661,41 @@ function starPlan(root,opt={}){const act=opt.act||{},lk=opt.lk||baseK,spare=opt.
 function alloc(slots,poolArr){const pool=[...(poolArr||[])].sort((a,b)=>a-b),need=[...slots].sort((a,b)=>b-a),rem=[];let used=0;
   for(const r of need){const i=pool.findIndex(s=>s>=r);if(i>=0){pool.splice(i,1);used++}else rem.push(r)}
   return{rem,left:pool,used}}
-const starTxt=s=>s>=5?'5성':s<=1?'잡성':s+'성↑';
-function groupSlots(a){const g={};a.forEach(s=>g[s]=(g[s]||0)+1);return Object.keys(g).map(Number).sort((x,y)=>y-x).map(s=>[s,g[s]])}
+const starTxt=s=>s>=5?'5성':s<=2?'아무 별':s+'성 이상';
+function groupSlots(a){const g={};a.forEach(s=>{const k=s>=5?5:s<=2?2:s;g[k]=(g[k]||0)+1});return Object.keys(g).map(Number).sort((x,y)=>y-x).map(s=>[s,g[s]])}
 const clonePool=p=>{const o={};Object.keys(p).forEach(k=>o[k]=[...p[k]]);return o};
+function packPlan(P,lpool){const mats=Object.keys(P.mats).map(id=>{const a=alloc(P.mats[id],lpool[id]);return{id:+id,slots:P.mats[id],...a,kind:core(id)>0?'drop':'need'}});
+  mats.sort((x,y)=>(x.kind>y.kind?1:x.kind<y.kind?-1:0)||(y.rem.length>0)-(x.rem.length>0)||y.slots.length-x.slots.length||lvl(x.id)-lvl(y.id));
+  let f=0,j=0;mats.forEach(m=>m.slots.forEach(s=>s>=5?f++:j++));
+  return{mats,f,j,t:f+j,steps:P.steps.length+P.steps.reduce((a,s)=>a+(s.jc&&s.jc.sub?s.jc.sub.length:0),0),mixes:P.mixes,evos:P.evos,
+    remain:mats.reduce((a,m)=>a+m.rem.length,0),hunts:Math.round(mats.reduce((a,m)=>a+huntOf(m.slots),0)),huntsRem:Math.round(mats.reduce((a,m)=>a+m.rem.reduce((x,s)=>x+huntsFor(s),0),0)),P}}
 /* 전체 스마트 계산: 완료·보유 반영 → 보유 재료 할인 → 재계산 → 배정 */
 function smartAll(clean){const root=build(cur,'root',[],0);markEff(root,S.mode);
   const {act,pool}=assignOwned(root,clean?{}:invOf(),clean?{}:histOf());
   const mixIds=new Set();(function w(n){if(n.eff==='mix'){mixIds.add(n.id);w(n.main);w(n.sub)}})(root);
   const spare={},lpool={};Object.keys(pool).forEach(id=>{if(mixIds.has(+id))spare[id]=pool[id];else lpool[id]=pool[id]});
-  let P=starPlan(root,{act,spare:clonePool(spare)});
-  if(Object.keys(lpool).length){const base=P;const lk=(id,s)=>{const slots=(base.mats[id]||[]).length||1,have=(lpool[id]||[]).filter(x=>x>=s).length;return baseK(id,s)*Math.max(0.02,1-have/slots)};
-    P=starPlan(root,{act,lk,spare:clonePool(spare)})}
-  const mats=Object.keys(P.mats).map(id=>{const a=alloc(P.mats[id],lpool[id]);return{id:+id,slots:P.mats[id],...a,kind:core(id)>0?'drop':'need'}});
-  mats.sort((x,y)=>(x.kind>y.kind?1:x.kind<y.kind?-1:0)||(y.rem.length>0)-(x.rem.length>0)||y.slots.length-x.slots.length||lvl(x.id)-lvl(y.id));
-  let f=0,j=0;mats.forEach(m=>m.slots.forEach(s=>s>=5?f++:j++));
-  const steps=P.steps.length+P.steps.reduce((a,s)=>a+(s.jc&&s.jc.sub?s.jc.sub.length:0),0);
-  const E=starPlan(root,{act,eager:true});let ef=0,ej=0;Object.values(E.mats).forEach(a=>a.forEach(s=>s>=5?ef++:ej++));
-  return{root,P,mats,act,spare,f,j,t:f+j,steps,remain:mats.reduce((a,m)=>a+m.rem.length,0),total:f+j,eg:{f:ef,j:ej,t:ef+ej}}}
+  const planHunt=P=>+Object.values(P.mats).reduce((a,arr)=>a+arr.reduce((x,s)=>x+huntsFor(s),0),0).toFixed(1);
+  const mkPlan=opt=>{const Q=starPlan(root,opt);const mm=Object.keys(Q.mats).map(id=>{const a=alloc(Q.mats[id],lpool[id]);return{id:+id,slots:Q.mats[id],...a,kind:core(id)>0?'drop':'need'}});
+    mm.sort((x,y)=>(x.kind>y.kind?1:x.kind<y.kind?-1:0)||(y.rem.length>0)-(x.rem.length>0)||y.slots.length-x.slots.length||lvl(x.id)-lvl(y.id));
+    let ff=0,jj=0;mm.forEach(m=>m.slots.forEach(s=>s>=5?ff++:jj++));
+    return{P:Q,mats:mm,f:ff,j:jj,t:ff+jj,steps:Q.steps.length+Q.steps.reduce((a,s)=>a+(s.jc&&s.jc.sub?s.jc.sub.length:0),0),remain:mm.reduce((a,m)=>a+m.rem.length,0)}};
+  const ownedAt=(id,s)=>{const o=invOf()[id];return o?Object.keys(o).filter(k=>+k>=s).reduce((a,k)=>a+(o[k]||0),0):0};
+  const lkOwn=(id,s)=>ownedAt(id,s)>0?baseK(id,s)*0.45:baseK(id,s);
+  let C=mkPlan({act,spare:clonePool(spare)});
+  if(Object.keys(invOf()).length){const C2=mkPlan({act,lk:lkOwn,spare:clonePool(spare)});if(C2.remain<C.remain||(C2.remain===C.remain&&C2.steps<C.steps))C=C2}
+  const P=C.P,mats=C.mats,f=C.f,j=C.j;
+  const hasInv=Object.keys(invOf()).length>0;
+  const B=hasInv?packPlan(starPlan(root,{}),{}):null;
+  const fxK=S.fix&&S.fix[cur]?Object.keys(S.fix[cur]):[];
+  const F=fxK.length?packPlan(starPlan(root,{act,bonus:new Set(fxK),spare:clonePool(spare)}),lpool):null;
+  return{F,base:B?{t:B.t,steps:B.steps,evos:B.evos,hunts:B.hunts}:null,root,P,mats,act,spare,f,j,t:f+j,steps:C.steps,remain:C.remain,total:f+j,
+  hunts:Math.round(planHunt(P)),huntsRem:Math.round(mats.reduce((a,m)=>a+m.rem.reduce((x,s)=>x+huntsFor(s),0),0))}}
 /* 공식 추천: 헨치별로 수고 점수가 가장 낮은 공식을 고름 (스마트 단계 기준) */
 function recommend(rootId){const memo=new Map();
   function tab(id,isRoot,stack){const key=id+(isRoot?'r':'');if(memo.has(key))return memo.get(key);
     const fs=X[id]||[];let idx=fs.map((f,i)=>i).filter(i=>selectableF(fs[i]));if(!idx.length)idx=fs.map((f,i)=>i).filter(i=>validF(fs[i]));
     let res;
-    if(!idx.length||stack.includes(+id)||core(id)>0||(!isRoot&&isException(nm(id)))){const e=[Infinity];for(let s=1;s<=5;s++)e[s]=baseK(id,s);res={e,idx:-1}}
+    if(!idx.length||stack.includes(+id)||core(id)>0||(!isRoot&&isException(nm(id)))){const e=[Infinity];for(let s=2;s<=5;s++)e[s]=baseK(id,s);res={e,idx:-1}}
     else{let best=null;for(const i of idx){const f=fs[i],st=[...stack,+id],A=tab(f[0],false,st),B=tab(f[2],false,st),e=new Array(6).fill(Infinity);
         for(let a=gReq(f[1]);a<=5;a++)for(let b=gReq(f[3]);b<=5;b++){const s=mixStar(f[0],a,f[2],b,id,lvl(id)),v=A.e[a]+B.e[b]+MIXW;if(v<e[s])e[s]=v}
         let mn=Math.min(...e.slice(1));const J=core(id)>0?Math.min(mn,baseK(id,1)):mn;for(let s=2;s<=5;s++)e[s]=Math.min(e[s],e[s-1]+J+MIXW);
@@ -508,18 +747,17 @@ function renderTrail(){const el=$('#trail');if(!el)return;
 window.pick=pick;
 function setTab(t){TAB=t;$$('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));$$('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+TAB));if(TAB==='plan'&&!PLAN&&cur)renderPlan()}
 $$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
-const MODES=[['스마트(드랍 우선)',0],['1단계 더',1],['2단계 더',2],['3단계 더',3]];
 let R=null,ROOT=null,ROWS=[],COST=null;
 const qty=()=>Math.max(1,+(S.qty[cur]||1));
-function render(){renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();buildRows();
-  renderTarget();renderGuide();renderInv();renderMat();renderMap();renderTree();renderTools();if(TAB==='plan')renderPlan();else PLAN=null}
+function render(){renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();
+  renderTarget();renderGuide();renderInv();renderMap();renderTools();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
 let SM=null;
 function buildRows(){const Q=qty();
   ROWS=SM.mats.map(m=>{const id=m.id,f=m.slots.filter(x=>x>=5).length*Q,j=m.slots.filter(x=>x<5).length*Q,rf0=m.rem.filter(x=>x>=5).length,rj0=m.rem.filter(x=>x<5).length;
     const rf=Q>1?f-(m.slots.filter(x=>x>=5).length-rf0):rf0,rj=Q>1?j-(m.slots.filter(x=>x<5).length-rj0):rj0,hf=f-rf,hj=j-rj;
     const p5=price5(id),pj=priceJ(id);
     return{id,kind:m.kind,f,j,hf,hj,rf,rj,p5,pj,slots:m.slots,cost:(rf&&p5?rf*p5.v:0)+(rj&&pj?rj*pj.v:0),miss:(rf>0&&!p5)||(rj>0&&!pj)}});
-  ROWS.sort((a,b)=>(a.kind>b.kind?1:a.kind<b.kind?-1:0)||b.f-a.f||b.j-a.j||lvl(a.id)-lvl(b.id));
+  ROWS.sort((a,b)=>(a.kind>b.kind?1:a.kind<b.kind?-1:0)||b.f-a.f||b.j-a.j||lvl(a.id)-lvl(b.id));ROWS.forEach(r=>{r.hunt=+huntOf(r.slots||[]).toFixed(1)});
   const tot=ROWS.reduce((a,r)=>{a.need+=r.f+r.j;a.have+=r.hf+r.hj;a.cost+=r.cost;a.costAll+=(r.f&&r.p5?r.f*r.p5.v:0)+(r.j&&r.pj?r.j*r.pj.v:0);if(r.miss)a.miss++;return a},{need:0,have:0,cost:0,costAll:0,miss:0});COST=tot}
 function lineage(){const up=Object.keys(X).filter(k=>X[k].some(f=>f[0]==cur||f[2]==cur)).map(Number);
   const f=X[cur]&&X[cur][selIdx(cur)];const down=f&&validF(f)?[f[0],f[2]]:[];
@@ -533,30 +771,26 @@ function renderTarget(){const sum=o=>Object.values(o).reduce((a,b)=>a+b,0);const
   const pct=SM.total?Math.round(100*(SM.total-SM.remain)/SM.total):0;
   t.innerHTML=`${face(cur)}<div style="min-width:0"><h2>${esc(nm(cur))}</h2><div class="meta"><span class="lv">기본 Lv.${lvl(cur)} · 최대 Lv.${maxLv(cur)}</span>${srcTag(cur)}<span class="lv hide-m">공식 ${(X[cur]||[]).length}개 · 재료로 쓰이는 곳 ${uses}곳</span>${qty()>1?`<span class="tag mix">×${qty()}마리</span>`:''}</div></div>
   <button class="fav ${isFav?'on':''}" id="favBtn" aria-label="즐겨찾기">${isFav?'★':'☆'}</button>
-  <div class="kpis"><div class="kpi k1"><b>${SM.f}</b><span>5성 재료</span></div><div class="kpi k3"><b>${SM.j}</b><span>잡성 재료</span></div><div class="kpi k2"><b>${SM.remain}</b><span>남은 재료</span></div><div class="kpi"><b>${SM.steps}</b><span>믹스·진화 횟수</span></div><div class="kpi k5"><b>${SM.eg.t>SM.t?'−'+(SM.eg.t-SM.t):'0'}</b><span>매번 5성 복구 대비 절약</span></div></div>
+  <div class="kpis"><div class="kpi k1"><b>${SM.t}</b><span>총 재료(최소)</span></div><div class="kpi k3"><b>${SM.j}</b><span>아무 별(진화 활용)</span></div><div class="kpi k2"><b>${SM.remain}</b><span>남은 재료</span></div><div class="kpi"><b>${SM.steps}</b><span>믹스·진화 횟수</span></div><div class="kpi k5"><b>${SM.f}</b><span>★5 직접 사냥</span></div></div>
   ${lineage()}
   <div class="progress" title="재료 모은 정도 ${pct}%"><i style="width:${pct}%"></i></div>`;
   $('#favBtn').onclick=()=>{S.fav=isFav?S.fav.filter(x=>x!==cur):[cur,...S.fav];save();renderTarget()}}
-function modeBar(){return `<div class="seg modeSeg">${MODES.map(m=>`<button class="${S.mode===m[1]?'on':''}" data-m="${m[1]}">${m[0]}</button>`).join('')}</div>`}
-function bindMode(root){root.querySelectorAll('.modeSeg button').forEach(b=>b.onclick=()=>{S.mode=+b.dataset.m;save();render()})}
 /* ───── 재료·비용 탭 ───── */
 function pxCell(r,kind){const p=kind==='f'?r.p5:r.pj,n=kind==='f'?r.f:r.j;if(!n)return'';
   const o=S.px[r.id]||{},mv=o[S.cur+(kind==='f'?'5':'j')]||'';
   const lab=!p?`<small class="${otherHas(r.id)?'':''}">${otherHas(r.id)?(S.cur==='p'?'GP 시세만 있음':'포인트 시세만 있음'):'시세 없음 · 직접 입력'}</small>`:p.src==='manual'?'<small>직접 입력값</small>':p.src==='as5'?'<small>잡성 시세 없어 5성가 적용</small>':`<small>${kind==='j'&&p.star?p.star+'성 · ':''}${p.n}건 · ${p.d.slice(5)}</small>`;
   return `<div class="px"><input inputmode="numeric" data-px="${r.id}" data-k="${kind==='f'?'5':'j'}" placeholder="${p&&p.src!=='manual'?fmt(p.v):'단가'}" value="${mv}" aria-label="${esc(nm(r.id))} ${kind==='f'?'5성':'잡성'} 단가">${lab}</div>`}
 function stepper(id,k,v,max){return `<span class="stp"><button data-h="${id}" data-k="${k}" data-d="-1" aria-label="빼기">−</button><input data-hi="${id}" data-k="${k}" value="${v}" inputmode="numeric" aria-label="보유 수량"><button data-h="${id}" data-k="${k}" data-d="1" aria-label="더하기">+</button></span><span class="lv"> / ${max}</span>`}
-function matTable(rows){return `<table class="mt"><thead><tr><th>헨치</th><th>5성 보유/필요</th><th class="hide-m">5성 단가</th><th>잡성 보유/필요</th><th class="hide-m">잡성 단가</th><th class="num">남은 금액</th></tr></thead><tbody>${rows.map(r=>{const done=r.rf===0&&r.rj===0;
+function matTable(rows){return `<table class="mt"><thead><tr><th>헨치</th><th>5성 보유/필요</th><th class="hide-m">5성 단가</th><th>잡성 보유/필요</th><th class="hide-m">잡성 단가</th><th class="hide-m">기대 사냥</th><th class="num">남은 금액</th></tr></thead><tbody>${rows.map(r=>{const done=r.rf===0&&r.rj===0;
   return `<tr class="${done?'done':''}"><td><div class="nmc">${face(r.id,'face sm')}<b onclick="pick(${r.id})" title="이 헨치로 이동">${esc(nm(r.id))}</b><span class="lv">Lv.${lvl(r.id)}</span></div></td>
   <td data-l="5성 보유/필요">${r.f?stepper(r.id,'f',r.hf,r.f):'<span class="lv">-</span>'}</td><td class="hide-m">${pxCell(r,'f')}</td>
-  <td data-l="잡성 보유/필요">${r.j?stepper(r.id,'j',r.hj,r.j):'<span class="lv">-</span>'}</td><td class="hide-m">${pxCell(r,'j')}</td>
+  <td data-l="잡성 보유/필요">${r.j?stepper(r.id,'j',r.hj,r.j):'<span class="lv">-</span>'}</td><td class="hide-m">${pxCell(r,'j')}</td><td class="hide-m">${r.hunt?r.hunt+'회':''}</td>
   <td class="num ${S.cur==='p'?'pt':'gp'}">${r.cost||r.miss?'<span class="lv">남은 </span>':''}${r.cost?fmt(r.cost):(r.miss?'<span class="lv">?</span>':'0')}</td></tr>`}).join('')}</tbody></table>`}
-function renderMat(){const p=$('#p-mat');const drop=ROWS.filter(r=>r.kind==='drop'),need=ROWS.filter(r=>r.kind==='need');
+function renderMat(){const p=$('#p-mat');if(!p)return;const drop=ROWS.filter(r=>r.kind==='drop'),need=ROWS.filter(r=>r.kind==='need');
   const sub=rs=>{const c=rs.reduce((a,r)=>a+r.cost,0);return `<span class="sub lv">남은 ${fmt(c)} ${curU()}</span>`};
-  p.innerHTML=`<div class="bar">${modeBar()}</div>
-  <div class="bar"><label class="lv">만들 수량</label><span class="stp"><button id="qm">−</button><input id="qv" value="${qty()}" inputmode="numeric"><button id="qp">+</button></span>
+  p.innerHTML=`<div class="bar"><label class="lv">만들 수량</label><span class="stp"><button id="qm">−</button><input id="qv" value="${qty()}" inputmode="numeric"><button id="qp">+</button></span>
   <div class="seg" id="curSeg"><button data-c="p" class="${S.cur==='p'?'on':''}">포인트</button><button data-c="g" class="${S.cur==='g'?'on':''}">GP</button></div>
   <select class="ctl" id="basis">${Object.entries(BASIS).map(([k,v])=>`<option value="${k}" ${S.basis===k?'selected':''}>${v[1]}</option>`).join('')}</select></div>
-  ${ROOT.core>0&&S.mode===0&&ROOT.canMix?`<div class="note">${esc(nm(cur))}은(는) 필드 드랍 헨치라 스마트(드랍 우선)에서는 직접 사냥이 기본이에요. 믹스 재료를 보려면 <b>1단계 더</b> 이상을 고르세요.</div>`:''}
   <div class="totals"><div class="tot"><span>남은 재료 구매 비용</span><b class="${S.cur==='p'?'pt':'gp'}">${fmt(COST.cost)} ${curU()}</b><span>보유분 빼고 계산 · ${fmtK(COST.cost)}</span></div>
   <div class="tot"><span>전체 재료 비용 (보유 무시)</span><b>${fmt(COST.costAll)} ${curU()}</b><span>${BASIS[S.basis][1]} 기준</span></div>
   <div class="tot"><span>모은 재료</span><b>${COST.have} / ${COST.need}</b><span>${COST.miss?`시세가 없는 재료 ${COST.miss}종은 금액에서 빠졌어요`:'모든 재료에 시세가 있어요'}</span></div></div>
@@ -565,8 +799,7 @@ function renderMat(){const p=$('#p-mat');const drop=ROWS.filter(r=>r.kind==='dro
   <div class="mgroup"><h3><i style="background:var(--drop)"></i>필드 드랍으로 구할 헨치 <span class="lv">${drop.length}종</span>${sub(drop)}</h3>${drop.length?matTable(drop):'<div class="empty">해당 재료가 없어요.</div>'}</div>
   <div class="mgroup"><h3><i style="background:var(--need)"></i>드랍 불가 · 이벤트/직접 구할 헨치 <span class="lv">${need.length}종</span>${sub(need)}</h3>${need.length?matTable(need):'<div class="empty">모두 필드 드랍으로 구할 수 있어요.</div>'}</div>
   ${Object.keys(R.own).length?`<div class="mgroup"><h3><i style="background:var(--own)"></i>보유 처리한 헨치(계산 제외)</h3><div class="chips">${Object.entries(R.own).map(([id,c])=>`<span class="chip">${face(id)}${esc(nm(id))} ×${c}</span>`).join('')}</div></div>`:''}
-  <p class="hint">※ 잡성 칸: 5성이 아니어도 되는 재료(공식 별 조건만 맞으면 됨)와, 진화에 넣는 별 무관 재료예요. 확률 보너스는 빼고 보장 기준으로 계산합니다. 잡성 단가는 1~4성 중 가장 싼 시세를 씁니다.</p>`;
-  bindMode(p);
+  <p class="hint">※ 잡성 칸: 5성이 아니어도 되는 재료(진화로 별만 올리면 됨)와, 진화에 넣는 별 무관 재료예요. 확률 보너스는 빼고 보장 기준으로 계산합니다. 잡성 단가는 1~4성 중 가장 싼 시세를 씁니다.</p>`;
   $('#curSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.cur=b.dataset.c;save();render()});
   $('#basis').onchange=e=>{S.basis=e.target.value;save();render()};
   const setQ=v=>{S.qty[cur]=Math.max(1,Math.min(99,v|0));save();render()};
@@ -578,7 +811,7 @@ function renderMat(){const p=$('#p-mat');const drop=ROWS.filter(r=>r.kind==='dro
   $('#rsh').onclick=()=>{if(confirm('이 목표의 보유 코어 입력을 모두 지울까요?')){delete S.inv[cur];save();render()}};
   $('#fill').onclick=()=>{const iv=invOf();SM.mats.forEach(m=>{const o=iv[m.id]||(iv[m.id]={});m.rem.forEach(s=>o[s]=(o[s]||0)+1)});save();render()}}
 function setHave(id,k,abs,d){const r=ROWS.find(x=>x.id==id);if(!r)return;const cv=k==='f'?r.hf:r.hj;if(abs!==null)d=abs-cv;if(!d)return;
-  const st=k==='f'?5:Math.max(1,...r.slots.filter(x=>x<5));addInv(+id,st,d);buildRows();renderMat()}
+  const st=k==='f'?5:Math.max(1,...r.slots.filter(x=>x<5));addInv(+id,st,d);SM=smartAll();renderTarget();renderGuide();renderInv();renderMap()}
 /* ───── 사냥 맵 (스마트 가이드 기준 남은 재료) ───── */
 const slotTxt=a=>groupSlots(a).map(([s,c])=>`${starTxt(s)}×${c}`).join(' · ');
 function mapAgg(){const need={},det={};SM.mats.forEach(m=>{if(m.kind==='drop'){need[m.id]=m.rem.length;det[m.id]=m.rem}});
@@ -590,6 +823,7 @@ function renderMap(){const p=$('#p-map'),A=mapAgg();
   const left=Object.values(A.need).filter(v=>v>0).length,remN=Object.values(A.need).reduce((a,b)=>a+b,0);
   const lg=LOGID&&A.det[LOGID]!==undefined?LOGID:null;
   p.innerHTML=`<p class="hint">믹스 가이드 기준으로 <b>아직 모자란 드랍 재료</b>가 많이 나오는 맵부터 보여 줘요. 헨치를 누르면 <b>득템 기록</b> 창이 열려요. 사냥하다 코어를 얻으면 별을 눌러 기록하세요. 높은 별 코어가 나오면 가이드가 다시 계산돼서 모을 재료가 줄어들 수 있어요.</p>
+  <div class="bar rates"><span class="lv">별 드랍 확률(%)</span>${[2,3,4,5].map(s=>`<label class="rt">★${s}<input data-rate="${s}" value="${S.rate[s]}" inputmode="numeric"></label>`).join('')}<span style="flex:1"></span><span class="lv">남은 기대 사냥 <b>${SM.huntsRem}회</b></span></div>
   <div class="bar"><span class="tag drop">남은 드랍 재료 ${left}종 · ${remN}마리</span><button class="btn sm" id="cpMap">사냥 동선 복사</button><button class="btn sm" id="gainBtn">5성 득템 효과 보기</button></div>
   ${lg?logBox(lg):''}
   ${GAIN&&GAIN.cur===cur?gainBox():''}
@@ -599,6 +833,7 @@ function renderMap(){const p=$('#p-map'),A=mapAgg();
   p.querySelectorAll('[data-lid]').forEach(b=>b.onclick=()=>{LOGID=LOGID==b.dataset.lid?null:+b.dataset.lid;renderMap();const el=$('#logbox');if(el)el.scrollIntoView({block:'nearest',behavior:'smooth'})});
   p.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const[id,st,d]=b.dataset.add.split(',').map(Number);addInv(id,st,d)});
   const gb=$('#gainBtn');if(gb)gb.onclick=calcGain;
+  p.querySelectorAll('[data-rate]').forEach(i=>i.onchange=()=>{S.rate[+i.dataset.rate]=Math.max(0,+i.value||0);save();render()});
   $('#cpMap').onclick=()=>copy(`[${nm(cur)}] 사냥 동선 (스마트 가이드 기준)\n`+A.maps.filter(m=>m.kinds>0).slice(0,20).map((m,i)=>`${i+1}. ${LOCM[m.mi]} — `+m.items.filter(x=>x.rem>0).map(x=>`${nm(x.id)}(${slotTxt(x.det)})`).join(', ')).join('\n'))}
 function logBox(id){const iv=invOf()[id]||{},m=SM.mats.find(x=>x.id==id);
   return `<div class="logbox" id="logbox"><div class="lbh">${face(id)}<div><b>${esc(nm(id))}</b> 득템 기록<div class="lv">필요: ${m?slotTxt(m.slots):'-'} · 남음 ${m?m.rem.length:0}마리</div></div><button class="btn sm" data-lid="${id}">닫기</button></div>
@@ -614,93 +849,106 @@ function gainBox(){return `<div class="mgroup gainbox"><h3><i style="background:
 document.addEventListener('click',e=>{if(e.target&&e.target.id==='gainX'){GAIN=null;renderMap()}});
 /* ───── 믹스 가이드 (메인) ───── */
 const sb=(s,t)=>`<span class="sb s${Math.min(5,Math.max(1,s))}">${t||('★'+s)}</span>`;
-const need5=s=>s>=5?sb(5):s<=1?sb(1,'잡성'):sb(s,'★'+s+'↑');
+const need5=s=>s>=5?sb(5,'5성'):s<=2?sb(2,'아무 별'):sb(s,s+'성 이상');
 const hnS=(id,s,role='')=>`<span class="hn">${face(id,'face sm')}<span>${esc(nm(id))}</span>${role||''}</span>`;
-function nextUse(n){const st=SM.P.steps;const i=st.findIndex(x=>x.t==='mix'&&(x.n.main===n||x.n.sub===n));return i>=0?st[i]:null}
+function nextUse(n){const st=GS?GS.P.steps:SM.P.steps;const i=st.findIndex(x=>x.t==='mix'&&(x.n.main===n||x.n.sub===n));return i>=0?st[i]:null}
 function jcHtml(jc,n){if(jc.t==='spare')return `보유 중인 ${sb(jc.s)} ${esc(n.name)}을(를) 잡성으로 넣어요`;
   if(jc.t==='hunt')return `잡성 ${esc(n.name)} 1마리(별 무관)를 <b>사냥</b>해서 넣어요`;
   if(jc.t==='buy')return `잡성 ${esc(n.name)} 1마리(별 무관)를 <b>구해서</b> 넣어요`;
   return `잡성 ${esc(n.name)} 1마리를 <b>먼저 만들어서</b> 넣어요 (별 무관 · 아래 ${jc.sub.length}단계)`}
-function subHtml(jc,key){const jd=jdOf();return `<details class="jsub"><summary>잡성 ${esc(nm(jc.id))} 만드는 법 · ${jc.sub.length}단계</summary>${jc.sub.map((x,i)=>{const k=key+'.'+i,d=jd[k];
-  return x.t==='mix'?`<div class="js ${d?'done':''}" data-jd="${k}"><span class="no">${d?'✓':i+1}</span>${hnS(x.n.main.id,x.a,'')}<span class="op">+</span>${hnS(x.n.sub.id,x.b,'')}<span class="op">→</span><span class="res">${esc(x.n.name)}</span> ${sb(x.s)}</div>`
-   :`<div class="js ${d?'done':''}" data-jd="${k}"><span class="no">${d?'✓':i+1}</span><span class="res">${esc(x.n.name)}</span> ${sb(x.from)}→${sb(x.to)} 진화 <span class="lv">(${x.jc.t==='mix'?'잡성 '+esc(nm(x.jc.id))+' 하나 더 만들기':x.jc.t==='spare'?'보유분 사용':'잡성 '+esc(nm(x.jc.id))+' '+(x.jc.t==='hunt'?'사냥':'구함')})</span></div>`}).join('')}</details>`}
+function subHtml(jc,key){return `<details class="jsub"><summary>잡성 ${esc(nm(jc.id))} 만드는 법 · ${jc.sub.length}단계</summary>${jc.sub.map((x,i)=>{
+  return x.t==='mix'?`<div class="js"><span class="no">${i+1}</span>${hnS(x.n.main.id,x.a,'')}<span class="op">+</span>${hnS(x.n.sub.id,x.b,'')}<span class="op">→</span><span class="res">${esc(x.n.name)}</span> ${sb(x.s)}</div>`
+   :`<div class="js"><span class="no">${i+1}</span><span class="res">${esc(x.n.name)}</span> ${sb(x.from)}→${sb(x.to)} 진화 <span class="lv">(${x.jc.t==='mix'?'잡성 '+esc(nm(x.jc.id))+' 하나 더 만들기':x.jc.t==='spare'?'보유분 사용':'잡성 '+esc(nm(x.jc.id))+' '+(x.jc.t==='hunt'?'사냥':'구함')})</span></div>`}).join('')}</details>`}
 function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m');
   const nu=nextUse(n),use=last?'<span class="tag mix">최종 목표</span>':nu?`<span class="lv">→ ${esc(nu.n.name)} 재료로</span>`:'';
   if(x.t==='mix'){const fixed=mixStar(n.main.id,5,n.sub.id,5,n.id,n.lvl)===5,p=x.s<5?bonusP(n.lvl):0;
     return `<div class="gstep ${i===0?'now':''} ${last?'final':''}"><div class="no">${i===0?'▶':i+1}</div><div class="gb">
-    <div class="formula">${hnS(n.main.id)}${need5(x.a)}<span class="op">+</span>${hnS(n.sub.id)}${need5(x.b)}<span class="op">→</span><span class="res">${esc(n.name)}</span>${sb(x.s)}${use}</div>
-    <div class="need">${fixed?'<span class="tag f5">5+5=5 헨치</span> ':''}${x.a>=5&&x.b>=5&&!fixed?'5성+5성이어도 ★4로 떨어지는 헨치예요. ':''}${p?`믹스 성공 시 ${p}% 확률로 ★${x.s+1}`:''}</div>
-    <div class="gact"><span class="lv">결과가 나왔나요?</span><button class="btn sm pri" data-done="${n.path},${x.s}">★${x.s} 완료</button>${x.s<5?`<button class="btn sm" data-done="${n.path},${x.s+1}">★${x.s+1} 떴어요 (보너스)</button>`:''}</div></div></div>`}
+    <div class="formula">${hnS(n.main.id)}${need5(x.a)}${n.mg>0?`<span class="lv">${n.mg}단</span>`:''}<span class="op">+</span>${hnS(n.sub.id)}${need5(x.b)}${n.sg>0?`<span class="lv">${n.sg}단</span>`:''}<span class="op">→</span><span class="res">${esc(n.name)}</span>${sb(x.s)}${use}</div>
+    <div class="need">${fixed?'<span class="tag f5">5+5=5 헨치</span> ':''}${x.a>=5&&x.b>=5&&!fixed?'5성+5성이어도 ★4로 떨어지는 헨치예요. ':''}${p?`믹스 성공 시 ${p}% 확률로 ★${x.s+1} 보너스`:""}</div>${S.gmode==="f"?`<div class="gact">${x.bon?"<span class=\"tag evo\">운 +1 반영</span>":""}<button class="btn sm ${fixOf()[n.path]?"pri":""}" data-bon="${n.path}">${fixOf()[n.path]?"★+1 떴음 ✓":"★+1 떴으면 누르기"}</button></div>`:""}
+    </div></div>`}
   return `<div class="gstep evo ${i===0?'now':''} ${last?'final':''}"><div class="no">${i===0?'▶':i+1}</div><div class="gb">
     <div class="formula"><span class="tag evo">진화</span>${hnS(n.id)}${sb(x.from)}<span class="op">→</span>${sb(x.to)}${use}</div>
     <div class="need">${jcHtml(x.jc,n)}</div>${x.jc.t==='mix'?subHtml(x.jc,key):''}
-    <div class="gact"><button class="btn sm pri" data-done="${n.path},${x.to}">★${x.to} 진화 완료</button></div></div></div>`}
-function renderGuide(){const p=$('#p-guide');if(!SM)return;const st=SM.P.steps,H=histOf(),hk=Object.keys(H).length;
-  const fin=H.root;
-  const saved=SM.eg.t-SM.t;
-  p.innerHTML=`<div class="sumcard"><div class="sc-main"><span class="lv">스마트 가이드 · 최종까지 필요한 재료</span><b>${SM.t}<small>마리</small></b><span>${sb(5)} 5성 ${SM.f} · ${sb(1,'잡성')} 잡성(별 낮아도 됨) ${SM.j}</span></div>
-    <div class="sc-cmp"><span class="lv">매번 5성으로 복구할 때</span><b>${SM.eg.t}마리</b><span class="${saved>0?'gp':''}">${saved>0?`${saved}마리 덜 모아요`:'차이 없음'}</span></div></div>
-  <div class="bar">${modeBar()}</div>
-  <div class="bar"><div class="seg" id="gcSeg"><button data-v="1" class="${S.gc?'on':''}">공식 별 조건 지킴</button><button data-v="0" class="${!S.gc?'on':''}">별 조건 무시</button></div>
-  <div class="seg" id="w5Seg">${[[1,'5성=잡성'],[2,'5성 2배 귀함'],[3,'5성 3배 귀함']].map(([v,t])=>`<button data-v="${v}" class="${S.w5==v?'on':''}">${t}</button>`).join('')}</div>
-  <button class="btn sm" id="gcp">가이드 복사</button>${hk?`<button class="btn sm" id="ghr">완료 기록 초기화 (${hk})</button>`:''}</div>
-  <p class="hint">위에서부터 하나씩 하세요. ${sb(5)}=5성 필요, ${sb(3,'★3↑')}=3성 이상이면 됨, ${sb(1,'잡성')}=별 상관없음. 별이 떨어지는 일반 헨치는 고치지 않고 그대로 진행하다가, <b>5+5=5 헨치</b>나 최종 목표에 넣기 직전에만 잡성으로 진화시켜요. 결과를 누르면 그 단계가 사라지고, 보너스로 별이 더 높게 나오면 남은 계획이 자동으로 다시 짜여요.</p>
-  ${S.gc?'':`<div class="note">별 조건 무시: 공식 옆 괄호 숫자(재료 최소 별)를 지키지 않는 계산이에요. 괄호가 최소 별 조건이라면 실제로는 믹스가 안 될 수 있어요.</div>`}
+    </div></div>`}
+function renderGuide(){const p=$('#p-guide');if(!SM)return;const FM=(S.gmode==='f'&&SM.F)?SM.F:null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
+  p.innerHTML=`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'아무 별')} ${G.j}마리 진화로 올림</span></div>
+    <div class="sc-cmp"><span class="lv">기대 사냥 (별 확률 기준)</span><b>${SM.hunts}회</b><span>남은 ${SM.huntsRem}회</span></div>${SM.base?`<div class="sc-cmp"><span class="lv">보유 재료 반영</span><b>남은 ${SM.remain}마리 · 행동 ${SM.steps}회</b><span>빈손이면 남은 ${SM.base.t}마리 · 행동 ${SM.base.steps}회${SM.base.steps>SM.steps?' → '+(SM.base.steps-SM.steps)+'회 단축':''}</span></div>`:''}${FM?`<div class="sc-cmp"><span class="lv">운 반영(보너스 체크) 재료</span><b>${FM.t}마리</b><span>${SM.t>FM.t?'보장 '+SM.t+' → −'+(SM.t-FM.t)+'마리':'보장과 동일'} · 진화 ${FM.evos}회</span></div>`:''}
+</div>
+  <div class="bar"><div class="seg" id="gmodeSeg"><button data-v="g" class="${S.gmode!=='f'?'on':''}">보장 가이드</button><button data-v="f" class="${S.gmode==='f'?'on':''}">운 반영 가이드</button></div>${S.gmode==='f'?`<button class="btn sm" id="fxr">보너스 체크 초기화</button>`:''}<button class="btn sm" id="gcp">가이드 복사</button></div>
+  <p class="hint"><b>최소 재료 · 최단 믹스 경로</b>예요. 별이 떨어지는 헨치는 낮은 별에서 <b>진화</b>로 올려 재료 마릿수와 믹스 횟수를 함께 줄입니다. 위에서부터 하나씩 하세요. ${sb(5,'5성')}=5성이어야 함 · ${sb(3,'3성 이상')}=3성 이상이면 됨 · ${sb(2,'아무 별')}=별 상관없음. 재료 옆 <b>n단</b>은 발라야 하는 바르는 재료의 단(티어)이에요.</p>
+  
   ${qty()>1?`<div class="note">가이드는 1마리 기준이에요. (재료·비용 탭의 수량 ${qty()}마리와 별개)</div>`:''}
-  ${fin?`<div class="done-all">🎉 ${esc(nm(cur))} ★${H.root.s||H.root} 완성! <button class="btn sm" id="ghr2">기록 지우고 다시</button></div>`:SM.P.fail?'<div class="empty">현재 설정으로는 5성까지 만들 수 없어요.</div>':''}
-  ${!fin?`<div class="glist">${st.map((x,i)=>stepCard(x,i,i===st.length-1)).join('')}</div>`:''}
-  ${!fin&&!st.length?'<div class="empty">이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다.</div>':''}
+  ${G.P.fail?'<div class="empty">현재 설정으로는 5성까지 만들 수 없어요.</div>':''}
+  ${st.length?`<div class="glist">${st.map((x,i)=>stepCard(x,i,i===st.length-1)).join('')}</div>`:'<div class="empty">이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다.</div>'}
   <details class="rules"><summary>별(성급) 규칙 자세히 보기</summary><ul>
   <li><b>5+5=5</b> 조건(둘 중 하나): 결과 헨치 기본 Lv.192 이상 · 확정 리스트 · 메인 재료가 에보 코어. 이때만 <code>★5+★5 → ★5</code>.</li>
   <li>일반 헨치는 <code>결과 별 = (메인 별 + 서브 별) ÷ 3 올림</code> → 5+5=★4, 5+4=★3, 4+4=★3.</li>
-  <li><b>진화</b>: 같은 헨치 1마리(별 등급 무관)를 넣으면 별 +1. 이게 '잡성'의 정체예요.</li>
-  <li>공식 옆 괄호 숫자 = 그 재료의 <b>최소 별 조건</b>이에요(3이면 ★3 이상).</li>
+  <li><b>진화</b>: 같은 헨치 1마리(별 등급 무관)를 넣으면 별 +1. ★2 한 마리에 아무 별 3마리를 붙이면 ★5가 돼요(총 4마리). 이 도구는 중간 재료를 ★5로 맞추지 않고 낮은 별 그대로 믹스한 뒤 <b>진화로만</b> 별을 올려, 재료 마릿수와 믹스 횟수를 함께 최소로 만듭니다.</li>
+  <li>공식 옆 괄호 숫자는 <b>별이 아니라 '단(티어)'</b>이에요. 예: <code>골든피기(3)</code> = 3단 골든피기. 각 재료는 사냥/드랍으로 얻는 <b>바르는 재료</b>를 발라 그 단을 맞춰야 믹스가 돼요(예: 골든피기 = 블루피기(2단) + 뉴부메이더(2단)).</li>
   <li><b>확률 보너스</b>(믹스 성공 시 별 +1, 운빨): Lv.1~120 30% · 121~130 28% · 131~140 25% · 141~150 20% · 151~160 15% · 161~170 10% · 171~180 5% · 181~190 3%.</li>
   <li>사냥 드랍은 <b>★2~★5 랜덤</b>이에요. 그래서 '보유 코어' 탭에 별별로 기록해 두면 가이드가 그만큼 줄여 줘요.</li>
   <li><b>5+5=5 확정 리스트</b>: 블루가루곤·아그네스·뉴가루곤 / 닌자걸·히나인형·뉴닌자걸 / 큐티캣·머메이드·뉴큐티캣·폭주아기산타늑대 / 칼린엔젤·블루버드·뉴페르소나소울·뉴칼린엔젤 / 메가혼즈·비틀나이츠·티타니스·뉴집게마왕 / 덤블러머·블루덤블·뉴블루덤블 / 롱팔아이·슈퍼매직·뉴롱팔아이·뉴소울이터 / 메탈탱크·핑크메탈탱크·뉴메탈탱크</li>
   <li>이 도구의 판정은 사이트 계산기 코드 기준이에요. 공지 리스트의 <b>칼린엔젤</b>이 코드 목록엔 없고, 코드 목록의 <b>매드오키드·흑피니티</b>는 공지에 없어요 → 게임에서 한 번 확인해 주세요.</li></ul></details>`;
-  bindMode(p);
-  $$('#gcSeg button').forEach(b=>b.onclick=()=>{S.gc=b.dataset.v==='1';save();render()});
-  $$('#w5Seg button').forEach(b=>b.onclick=()=>{S.w5=+b.dataset.v;save();render()});
+  
+  $$('#gmodeSeg button').forEach(b=>b.onclick=()=>{S.gmode=b.dataset.v;save();render()});
+  const fr=$('#fxr');if(fr)fr.onclick=()=>{delete S.fix[cur];save();render()};
+  $$('[data-bon]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.bon,f=fixOf();if(f[k])delete f[k];else f[k]=1;save();render()});
   $('#gcp').onclick=()=>copy(guideText());
-  const clr=()=>{if(confirm('이 헨치의 완료 기록을 모두 지울까요? (보유 코어는 그대로)')){delete S.hist[cur];delete S.jd[cur];save();render()}};
-  if($('#ghr'))$('#ghr').onclick=clr;if($('#ghr2'))$('#ghr2').onclick=clr;
-  p.querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>{const[path,s]=b.dataset.done.split(',');const before=SM.t;histOf()[path]={s:+s};save();const y=window.scrollY;render();window.scrollTo(0,y);
-    toast(path==='root'?'완성!':`완료 · 남은 단계 ${SM.P.steps.length}개${SM.t<before?` · 재료 ${before-SM.t}마리 줄었어요`:''}`)});
-  p.querySelectorAll('[data-jd]').forEach(el=>el.onclick=()=>{const k=el.dataset.jd,j=jdOf();j[k]=!j[k];if(!j[k])delete j[k];save();el.classList.toggle('done',!!j[k]);el.querySelector('.no').textContent=j[k]?'✓':(+k.split('.').pop()+1)})}
-const starW=s=>s>=5?'5성':s<=1?'잡성':s+'성이상';
-function guideText(){const st=SM.P.steps;let t=`[${nm(cur)}] 스마트 믹스 가이드 — 재료 ${SM.t}마리 (5성 ${SM.f}, 잡성 ${SM.j})\n`;
-  st.forEach((x,i)=>{if(x.t==='mix')t+=`${i+1}. ${x.n.main.name}(${starW(x.a)}) + ${x.n.sub.name}(${starW(x.b)}) → ${x.n.name} ★${x.s}\n`;
+}
+const starW=s=>s>=5?'5성':s<=2?'잡성':s+'성이상';
+function guideText(){const g=GS||SM;const st=g.P.steps;let t=`[${nm(cur)}] 스마트(최소재료) 가이드 — 재료 ${g.t}마리 (5성 ${g.f}, 잡성 ${g.j})\n`;
+  st.forEach((x,i)=>{if(x.t==='mix')t+=`${i+1}. ${x.n.main.name}(${starW(x.a)}${x.n.mg>0?'/'+x.n.mg+'단':''}) + ${x.n.sub.name}(${starW(x.b)}${x.n.sg>0?'/'+x.n.sg+'단':''}) → ${x.n.name} ★${x.s}\n`;
     else{t+=`${i+1}. [진화] ${x.n.name} ★${x.from}→★${x.to} : 잡성 ${x.n.name} ${x.jc.t==='mix'?'만들어 넣기':x.jc.t==='spare'?'(보유분)':x.jc.t==='hunt'?'사냥':'구함'}\n`;
       if(x.jc.t==='mix')x.jc.sub.forEach((y,k)=>{t+=`   ${i+1}-${k+1}) `+(y.t==='mix'?`${y.n.main.name} + ${y.n.sub.name} → ${y.n.name} ★${y.s}`:`${y.n.name} ★${y.from}→★${y.to} 진화`)+'\n'})}});
-  t+='\n■ 모을 재료\n'+SM.mats.filter(m=>m.rem.length).map(m=>`- ${nm(m.id)}: ${slotTxt(m.rem)}${m.kind==='need'?' (드랍 불가)':''}`).join('\n');return t}
+  t+='\n■ 모을 재료\n'+g.mats.filter(m=>m.rem.length).map(m=>`- ${nm(m.id)}: ${slotTxt(m.rem)}${m.kind==='need'?' (드랍 불가)':''}`).join('\n');return t}
 /* ───── 보유 코어 ───── */
 function treeIds(){const ids=new Map();(function w(n){if(!n)return;if(!ids.has(n.id))ids.set(n.id,n.eff==='mix'?'mix':'leaf');if(n.eff==='mix'){w(n.main);w(n.sub)}})(SM.root);return ids}
 function renderInv(){const p=$('#p-inv');if(!SM)return;const iv=invOf(),ids=treeIds(),mm={};SM.mats.forEach(m=>mm[m.id]=m);
-  const row=(id,kind)=>{const o=iv[id]||{},m=mm[id],tot=[1,2,3,4,5].reduce((a,s)=>a+(o[s]||0),0);
-    const info=kind==='mix'?'<span class="tag mix">중간 헨치</span>':m?`<span class="lv">필요 ${slotTxt(m.slots)}${m.rem.length?` · 남음 ${m.rem.length}`:' · ✓ 충분'}</span>`:'<span class="lv">가이드에서 안 씀</span>';
-    return `<div class="ivr ${tot?'has':''}"><div class="nmc">${face(id,'face sm')}<b onclick="pick(${id})">${esc(nm(id))}</b>${srcTag(id)}</div><div class="ivi">${info}</div><div class="ivs">${[5,4,3,2,1].map(s=>`<span class="ivc"><span class="sb s${s}">★${s}</span><span class="stp"><button data-iv="${id},${s},-1" aria-label="빼기">−</button><input data-ivi="${id},${s}" value="${o[s]||0}" inputmode="numeric"><button data-iv="${id},${s},1" aria-label="더하기">+</button></span></span>`).join('')}</div></div>`};
-  const leaf=[...ids].filter(([id,k])=>k==='leaf').map(([id])=>id).sort((a,b)=>((mm[b]&&mm[b].slots.length)||0)-((mm[a]&&mm[a].slots.length)||0));
-  const mix=[...ids].filter(([id,k])=>k==='mix'&&id!==cur).map(([id])=>id).sort((a,b)=>lvl(b)-lvl(a));
-  p.innerHTML=`<p class="hint">이미 가진 코어를 별 등급별로 넣으세요. 가이드가 바로 다시 계산해요. <b>중간 헨치</b>(믹스로 만드는 헨치)를 갖고 있으면 그 아래 단계가 통째로 빠지고, 별이 모자라면 잡성 진화부터 이어서 하도록 바뀌어요. 남는 코어는 잡성으로 재활용돼요.</p>
-  <div class="bar"><span class="tag drop">입력한 코어 ${Object.values(iv).reduce((a,o)=>a+Object.values(o).reduce((x,y)=>x+y,0),0)}마리</span><button class="btn sm" id="ivr">보유 코어 초기화</button></div>
-  <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.map(id=>row(id,'leaf')).join('')}</div>
-  ${mix.length?`<div class="mgroup"><h3><i style="background:var(--corn)"></i>중간 헨치 (이미 만들어 둔 것) <span class="lv">${mix.length}종</span></h3>${mix.map(id=>row(id,'mix')).join('')}</div>`:''}`;
-  const set=(id,s,v)=>{const o=iv[id]||(iv[id]={});o[s]=Math.max(0,Math.min(999,v));if(!o[s])delete o[s];if(!Object.keys(o).length)delete iv[id];save();const y=window.scrollY;SM=smartAll();renderTarget();renderGuide();renderInv();renderMap();buildRows();renderMat();window.scrollTo(0,y)};
+  const starsOf=id=>{const o=iv[id]||{},a=[];for(let s=5;s>=2;s--)for(let k=0;k<(o[s]||0);k++)a.push(s);return a};
+  const lbl=s=>s>=5?'5성':s===4?'4성 이상':s===3?'3성 이상':'아무 별';
+  const reqChips=slots=>groupSlots(slots).map(([s,c])=>`<span class="nch">${lbl(s)} <b>×${c}</b></span>`).join('');
+  const rows=[...ids].map(([id,k])=>({id,kind:k,m:mm[id]}));
+  let shortN=0,shortM=0;
+  rows.forEach(r=>{if(r.m){const A=alloc(r.m.slots,starsOf(r.id));r.left=A.rem.length;r.need=r.m.slots.length;r.have=A.used;r.done=r.left===0;if(r.left){shortN++;shortM+=r.left}}else{r.left=0;r.need=0;r.have=0;r.done=false}});
+  const only=S.ivLeft!==false;
+  const show=rows.filter(r=>!only||r.left>0||r.kind==='mix'||r.have>0);
+  const row=r=>{const id=r.id,o=iv[id]||{},m=r.m;
+    const lvls=m?[...new Set([...groupSlots(m.slots).map(([s])=>s),...Object.keys(o).map(Number).filter(s=>s>=2&&s<=5)])].sort((a,b)=>b-a):[5,4,3,2];
+    const have=Object.keys(o).reduce((a,s)=>a+(o[s]||0),0);
+    const status=m?`<span class="ivstat ${r.done?'ok':''}">필요 <b>${r.need}</b> · 모음 ${r.have} · <b>남음 ${r.left}</b></span>`:'<span class="ivstat">중간 헨치 · 갖고 있으면 넣어두세요</span>';
+    const req=m?`<div class="ivreq">${reqChips(m.slots)}</div>`:'';
+    const ctrls=lvls.map(s=>`<span class="ivc"><span class="lvc s${s}">${lbl(s)}</span><span class="stp"><button data-iv="${id},${s},-1" aria-label="빼기">−</button><input data-ivi="${id},${s}" value="${o[s]||0}" inputmode="numeric" aria-label="보유 수"><button data-iv="${id},${s},1" aria-label="더하기">+</button></span></span>`).join('');
+    return `<div class="ivr ${have?'has':''} ${r.done?'done':''}"><div class="ivtop"><div class="nmc">${face(id,'face sm')}<b onclick="pick(${id})">${esc(nm(id))}</b>${srcTag(id)}<span class="lv">Lv.${lvl(id)}</span></div>${status}</div>
+    ${req}
+    <div class="ivs">${ctrls}${m&&r.left?`<button class="btn sm pri" data-fill="${id}">✓ 남은 ${r.left}개 다 모음</button>`:''}${have?`<button class="btn sm" data-clr="${id}">비우기</button>`:''}${m&&!r.left&&!have?`<span class="lv">✓ 완료</span>`:''}</div></div>`};
+  const leaf=show.filter(r=>r.kind==='leaf'&&r.m).sort((a,b)=>b.left-a.left||b.need-a.need||lvl(b.id)-lvl(a.id));
+  const mix=show.filter(r=>r.kind==='mix'&&r.id!==cur).sort((a,b)=>lvl(b.id)-lvl(a.id));
+  const totHave=Object.values(iv).reduce((a,o)=>a+Object.values(o).reduce((x,y)=>x+y,0),0);
+  p.innerHTML=`<div class="stickbar" id="invBar"><span class="tag drop">남은 <b>${shortN}종 · ${shortM}마리</b></span><span class="lv">총 ${SM.t}마리 · 행동 ${SM.steps}회 · 입력 ${totHave}마리</span><span style="flex:1"></span><button class="btn sm ${only?'pri':''}" id="ivLeft">${only?'남은 것만 ✓':'전체'}</button><button class="btn sm" id="synci">동기화</button><button class="btn sm" id="ivr">전체 초기화</button></div>
+  <p class="hint">사냥으로 얻은 코어를 <b>별별로</b> 넣으세요. 가이드가 바로 다시 계산돼요. <b>아무 별</b>은 ★2~★5 중 아무거나(별 상관없음), <b>★4 이상</b>·<b>★5</b>는 그 별 이상만 됩니다. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요.</p>
+  <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.length?leaf.map(row).join(''):'<div class="empty">아직 모자란 재료가 없어요 🎉</div>'}</div>
+  ${mix.length?`<div class="mgroup"><h3><i style="background:var(--corn)"></i>중간 헨치 (이미 만들어 둔 것) <span class="lv">${mix.length}종</span></h3>${mix.map(row).join('')}</div>`:''}`;
+  const refresh=()=>{const y=window.scrollY;SM=smartAll();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y)};
+  const set=(id,s,v)=>{const o=iv[id]||(iv[id]={});o[s]=Math.max(0,Math.min(999,v));if(!o[s])delete o[s];if(!Object.keys(o).length)delete iv[id];save();refresh()};
   p.querySelectorAll('[data-iv]').forEach(b=>b.onclick=()=>{const[id,s,d]=b.dataset.iv.split(',').map(Number);set(id,s,((iv[id]||{})[s]||0)+d)});
   p.querySelectorAll('[data-ivi]').forEach(i=>i.onchange=()=>{const[id,s]=i.dataset.ivi.split(',').map(Number);set(id,s,+i.value||0)});
+  p.querySelectorAll('[data-fill]').forEach(b=>b.onclick=()=>{const id=b.dataset.fill,A=alloc(mm[id].slots,starsOf(id)),o=iv[id]||(iv[id]={});A.rem.forEach(x=>{const k=Math.max(2,Math.min(5,x));o[k]=(o[k]||0)+1});save();refresh();toast(nm(id)+' 재료를 채웠어요')});
+  p.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{delete iv[b.dataset.clr];save();refresh()});
+  $('#ivLeft').onclick=()=>{S.ivLeft=!(S.ivLeft!==false);save();renderInv()};
+  const rst=()=>{if(confirm('이 목표의 보유 코어 입력을 모두 지울까요?')){delete S.inv[cur];save();render();}};
+  if($('#synci'))$('#synci').onclick=()=>syncOpen();
   $('#ivr').onclick=()=>{if(confirm('이 목표의 보유 코어 입력을 모두 지울까요?')){delete S.inv[cur];save();render()}}}
 /* ───── 믹스 순서 ───── */
-const hn=(id,g,L)=>`<span class="hn">${face(id,'face sm')}<span>${L?`<span class="lv">Lv.${L}</span> `:''}${esc(nm(id))}${g>0?`<span class="gr">(${g})</span>`:''}</span></span>`;
+const hn=(id,g,L)=>`<span class="hn">${face(id,'face sm')}<span>${L?`<span class="lv">Lv.${L}</span> `:''}${esc(nm(id))}${g>0?`<span class="gr">${g}단</span>`:''}</span></span>`;
 function renderSteps(){const p=$('#p-steps'),dk=cur+'|'+S.mode,done=S.done[dk]||{},n=R.steps.length;
-  p.innerHTML=`<div class="bar">${modeBar()}</div><div class="bar"><button class="btn" id="cps">순서 복사</button><button class="btn" id="rss">완료 초기화</button><span class="lv" id="prog"></span></div>
-  <p class="hint">1번부터 차례로 믹스하세요. 끝낸 단계는 눌러서 완료 표시합니다. 괄호 숫자는 공식의 등급 조건이에요. 레벨까지 맞춘 순서는 <b>레벨 플래너</b> 탭에서 볼 수 있어요.</p>
+  p.innerHTML=`<div class="bar"><button class="btn" id="cps">순서 복사</button><button class="btn" id="rss">완료 초기화</button><span class="lv" id="prog"></span></div>
+  <p class="hint">1번부터 차례로 믹스하세요. 끝낸 단계는 눌러서 완료 표시합니다. 괄호 숫자는 그 재료의 단(바르는 재료 티어)이에요. 레벨까지 맞춘 순서는 <b>레벨 플래너</b> 탭에서 볼 수 있어요.</p>
   ${n?R.steps.map((s,i)=>{const k=s.n.path;return `<div class="step ${done[k]?'done':''} ${i===n-1?'final':''}" data-k="${k}" data-i="${i+1}"><div class="no">${done[k]?'✓':i+1}</div><div><div class="formula">${hn(s.n.main.id,s.n.mg)}<span class="op">+</span>${hn(s.n.sub.id,s.n.sg)}<span class="op">→</span><span class="res">${esc(s.n.name)}</span><span class="lv">Lv.${s.n.lvl}</span></div>
   <div class="need">5성 결과 <b>${s.five}</b>마리${s.junk?` · 잡성 결과 <b>${s.junk}</b>마리`:''} · ${s.drops?'5+5 믹스 시 4성으로 하락':'5+5 믹스 시 5성 유지'}</div></div></div>`}).join(''):'<div class="empty">이 헨치는 믹스 공식이 없어요. 직접 구해야 합니다.</div>'}`;
-  bindMode(p);const prog=()=>{const d=R.steps.filter(s=>done[s.n.path]).length;$('#prog').textContent=n?`진행 ${d}/${n}`:''};prog();
+  const prog=()=>{const d=R.steps.filter(s=>done[s.n.path]).length;$('#prog').textContent=n?`진행 ${d}/${n}`:''};prog();
   p.querySelectorAll('.step').forEach(el=>el.onclick=()=>{const k=el.dataset.k;done[k]=!done[k];if(!done[k])delete done[k];S.done[dk]=done;save();el.classList.toggle('done',!!done[k]);el.querySelector('.no').textContent=done[k]?'✓':el.dataset.i;prog()});
   $('#cps').onclick=()=>copy(stepsText());$('#rss').onclick=()=>{delete S.done[dk];save();renderSteps()}}
-const stepsText=()=>`[${nm(cur)}] 믹스 순서 (${MODES.find(m=>m[1]===S.mode)[0]})\n`+R.steps.map((s,i)=>`${i+1}. ${s.n.main.name}${s.n.mg?`(${s.n.mg})`:''} + ${s.n.sub.name}${s.n.sg?`(${s.n.sg})`:''} → ${s.n.name}  [5성 ${s.five}${s.junk?`, 잡성 ${s.junk}`:''}]`).join('\n');
+const stepsText=()=>`[${nm(cur)}] 믹스 순서 (스마트)\n`+R.steps.map((s,i)=>`${i+1}. ${s.n.main.name}${s.n.mg?`${s.n.mg}단`:''} + ${s.n.sub.name}${s.n.sg?`${s.n.sg}단`:''} → ${s.n.name}  [5성 ${s.five}${s.junk?`, 잡성 ${s.junk}`:''}]`).join('\n');
 /* ───── 레벨 플래너 ───── */
 let PLAN=null;
 function renderPlan(){const p=$('#p-plan');const tg=S.tgt[cur]||maxLv(cur);
@@ -748,7 +996,7 @@ const planText=()=>`[${nm(cur)}] 레벨 플랜 → Lv.${PLAN.L} (육성 합계 $
 const opened=new Set(),closed=new Set();let allOpen=false;
 const isClosed=p=>closed.has(p)||(!allOpen&&!opened.has(p)&&(p.split('_').length-1)>=2);
 function findNode(n,p){if(!n)return null;if(n.path===p)return n;return findNode(n.main,p)||findNode(n.sub,p)}
-function renderTree(){const p=$('#p-tree');
+function renderTree(){const p=$('#treeBox');if(!p)return;
   p.innerHTML=`<div class="bar"><button class="btn" id="rst">공식·상태 초기화</button><button class="btn" id="exa">모두 펼치기</button><button class="btn" id="cla">2단계만 보기</button></div>
   <p class="hint"><b style="color:var(--corn)">믹스</b> = 직접 만듦 · <b style="color:var(--need)">구함</b> = 재료로 구해서 씀 · <b style="color:var(--own)">보유</b> = 이미 있음(재료·비용에서 빠지고, 플래너는 입력한 보유 레벨로 계산). 공식은 드롭다운으로 바꿔요(같은 헨치 전체에 적용).</p>
   <div class="tree">${node(ROOT,'',0,0)}</div>`;
@@ -760,9 +1008,9 @@ function renderTree(){const p=$('#p-tree');
   $('#exa').onclick=()=>{allOpen=true;closed.clear();renderTree()};$('#cla').onclick=()=>{allOpen=false;opened.clear();closed.clear();renderTree()}}
 function node(n,role,mg,sg){const fs=X[n.id]||[],kids=!n.leaf&&n.state==='mix',c=isClosed(n.path),g=role==='m'?mg:role==='s'?sg:0;
   const st=`<span class="st" data-p="${n.path}">${n.canMix?`<button data-v="mix" class="${n.state==='mix'?'on':''}">믹스</button>`:''}<button data-v="get" class="${n.state==='get'?'on':''}">구함</button>${n.path!=='root'?`<button data-v="own" class="${n.state==='own'?'on':''}">보유</button>`:''}</span>`;
-  const sel=n.canMix&&fs.length>1&&n.state==='mix'?`<select data-id="${n.id}" aria-label="공식 선택">${fs.map((f,i)=>validF(f)?`<option value="${i}" ${i===n.idx?'selected':''}>${i+1}. ${esc(nm(f[0]))}${f[1]?`(${f[1]})`:''} + ${esc(nm(f[2]))}${f[3]?`(${f[3]})`:''}${selectableF(f)?'':' ·드랍재료'}</option>`:'').join('')}</select>`:'';
+  const sel=n.canMix&&fs.length>1&&n.state==='mix'?`<select data-id="${n.id}" aria-label="공식 선택">${fs.map((f,i)=>validF(f)?`<option value="${i}" ${i===n.idx?'selected':''}>${i+1}. ${esc(nm(f[0]))}${f[1]?`${f[1]}단`:''} + ${esc(nm(f[2]))}${f[3]?`${f[3]}단`:''}${selectableF(f)?'':' ·드랍재료'}</option>`:'').join('')}</select>`:'';
   const ol=n.state==='own'?`<span class="lv">보유 Lv</span><input class="olv" data-p="${n.path}" inputmode="numeric" value="${olvOf()[n.path]||''}" placeholder="${n.lvl}">`:'';
-  return `<div class="tn"><div class="row ${n.state==='own'?'owned':''}">${kids?`<button class="tog" data-p="${n.path}" aria-label="펼치기/접기">${c?'▸':'▾'}</button>`:'<span style="width:18px"></span>'}${role?`<span class="role ${role}">${role==='m'?'메인':'서브'}</span>`:''}${face(n.id,'face sm')}<span class="nmx">${esc(n.name)}${g>0?`<span class="gr">(${g})</span>`:''}</span><span class="lv">Lv.${n.lvl}</span>${srcTag(n.id)}${st}${ol}${sel}</div>
+  return `<div class="tn"><div class="row ${n.state==='own'?'owned':''}">${kids?`<button class="tog" data-p="${n.path}" aria-label="펼치기/접기">${c?'▸':'▾'}</button>`:'<span style="width:18px"></span>'}${role?`<span class="role ${role}">${role==='m'?'메인':'서브'}</span>`:''}${face(n.id,'face sm')}<span class="nmx">${esc(n.name)}${g>0?`<span class="gr">${g}단</span>`:''}</span><span class="lv">Lv.${n.lvl}</span>${srcTag(n.id)}${st}${ol}${sel}</div>
   ${kids&&!c?node(n.main,'m',n.mg,n.sg)+node(n.sub,'s',n.mg,n.sg):''}</div>`}
 /* ───── 계산기·시세·설정 ───── */
 function renderTools(){const p=$('#p-tools');const fs=(X[cur]||[]).map((f,i)=>[f,i]).filter(x=>validF(x[0]));const si=selIdx(cur);
@@ -775,8 +1023,10 @@ function renderTools(){const p=$('#p-tools');const fs=(X[cur]||[]).map((f,i)=>[f
   <div class="mgroup"><h3><i style="background:var(--gp)"></i>전체 헨치 시세표 <span class="lv">${Object.keys(PR).length}종</span></h3>
   <div class="bar"><input class="ctl" id="pf" placeholder="이름으로 걸러보기" style="flex:1;min-width:150px"><select class="ctl" id="ps"><option value="p5">5성 포인트 높은순</option><option value="p2">2성 포인트 높은순</option><option value="n">거래 많은순</option><option value="nm">이름순</option></select></div>
   <div class="scroll"><table class="ptbl"><thead><tr><th>헨치</th><th>5성 P</th><th>2~4성 최저 P</th><th>5성 GP</th><th>거래</th><th>최근</th></tr></thead><tbody id="ptb"></tbody></table></div></div>
-  <div class="mgroup"><h3><i style="background:var(--drop)"></i>내 기록 백업</h3><p class="hint">공식 선택, 보유 수량, 완료 표시, 직접 입력 단가, 즐겨찾기는 이 기기 브라우저에만 저장돼요. 다른 기기로 옮기려면 백업 파일을 받아 거기서 불러오세요.</p>
-  <div class="bar"><button class="btn" id="bk">백업 파일 받기</button><button class="btn" id="rs">백업 불러오기</button><button class="btn" id="sh">이 헨치 링크 복사</button><button class="btn" id="pxr">직접 입력 단가 모두 지우기</button></div></div>`;
+  <div class="mgroup"><h3><i style="background:var(--corn)"></i>공식 트리 <span class="lv">공식 선택 · 구함/보유 지정</span></h3><div id="treeBox"></div></div>
+  <div class="mgroup"><h3><i style="background:var(--corn)"></i>동기화 · 불러오기 <span class="lv">기기 간 자동 이어하기</span></h3>
+  <p class="hint">집·회사·노트북에서 같은 기록으로 이어서 하려면 동기화를 켜 두세요. 헤더 위쪽 <b>동기화</b> 버튼으로 언제든 열 수 있어요.</p>
+  <div class="bar"><button class="btn pri" id="syncOpenTools">동기화 창 열기</button><span class="lv" id="syncState2">꺼짐</span></div></div>`;
   if(fs.length){const upd=r=>{const f=X[cur][+$('#cf').value];$('#lm').textContent=`메인 ${nm(f[0])} 레벨 (기본 ${lvl(f[0])})`;$('#ls').textContent=`서브 ${nm(f[2])} 레벨 (기본 ${lvl(f[2])})`;
     if(r){$('#vm').value=lvl(f[0])+25;$('#vs').value=lvl(f[2])+25}const x=mixLevel(cur,f[0],f[2],+$('#vm').value||1,+$('#vs').value||1);
     $('#co').innerHTML=`<div><span class="lv">예상 결과</span><br><b>Lv.${x.level}</b></div><div class="lv">보너스 +${x.bonus}<br>믹스 상한 Lv.${x.max} · 육성 최대 Lv.${x.abs}</div>${x.valid?'':'<div class="tag need">결과가 기본 레벨보다 낮아 믹스 불가</div>'}<div class="lv">5성+5성 결과: ${mixStar(f[0],5,f[2],5,cur,lvl(cur))}성</div>`};
@@ -786,10 +1036,27 @@ function renderTools(){const p=$('#p-tools');const fs=(X[cur]||[]).map((f,i)=>[f
     ids.sort((a,b)=>so==='nm'?nm(a).localeCompare(nm(b)):so==='n'?cnt(b)-cnt(a):so==='p2'?low(b)-low(a):v(b,'p5')-v(a,'p5'));
     $('#ptb').innerHTML=ids.map(id=>`<tr><td><div class="nmc">${face(id,'face sm')}<b onclick="pick(${id})">${esc(nm(id))}</b></div></td><td class="n pt">${v(id,'p5')?fmt(v(id,'p5')):'-'}</td><td class="n pt">${low(id)?fmt(low(id)):'-'}</td><td class="n gp">${v(id,'g5')?fmt(v(id,'g5')):'-'}</td><td class="n">${cnt(id)}</td><td class="lv">${last(id).slice(5)}</td></tr>`).join('')};
   $('#pf').oninput=fill;$('#ps').onchange=fill;fill();
-  $('#bk').onclick=()=>{const b=new Blob([JSON.stringify(S)],{type:'application/json'});dl(b,`콘믹스도우미_백업_${today()}.json`)};
-  $('#rs').onclick=()=>$('#restoreFile').click();
-  $('#sh').onclick=()=>copy(location.href.split('#')[0]+'#h='+cur);
-  $('#pxr').onclick=()=>{if(confirm('직접 입력한 단가를 모두 지울까요?')){S.px={};save();render()}}}
+  renderTree()}
+document.addEventListener('click',async e=>{
+  const t=e.target&&e.target.closest?e.target.closest('#ghon,#synon,#ghnow,#ghpull,#ghoff,#synnow,#synoff,#synrand,#syncopy,#syc,#syl'):null;
+  if(!t)return; e.preventDefault();
+  const id=t.id,g=n=>document.querySelector(n);
+  if(id==='syc'){const k=syncCode();copy(k);toast('동기화 코드를 복사했어요 ('+k.length+'자)');return}
+  if(id==='syl'){const v=g('#syin')?g('#syin').value:'';if(!v){toast('코드를 붙여넣어 주세요');return}if(applyCode(v)){toast('불러왔어요 · 이어서 보세요');render()}else toast('코드가 올바르지 않아요');return}
+  if(id==='synrand'){const i=g('#synin');if(i)i.value=synRand();return}
+  if(id==='synon'){const i=g('#synin'),nm=i?i.value.trim():'';if(!nm){toast('동기화 이름을 넣어 주세요');return}
+    SYN=nm.replace(/[^A-Za-z0-9_-]/g,'');if(!SYN){toast('영문·숫자 이름을 써 주세요');return}if(i)i.value=SYN;synSave();synStatus('연결 중…');
+    const got=await synPull();if(!got)await synPush(1);toast('자동 동기화를 켰어요 · 다른 기기에 같은 이름을 넣으세요');if(cur)render();return}
+  if(id==='synnow'){if(!synOn()){toast('먼저 동기화를 켜 주세요');return}toast(await synPush()?'보냈어요 · 다른 기기에서 받아요':'보내기 실패');return}
+  if(id==='syncopy'){if(!SYN){toast('아직 이름이 없어요');return}copy(SYN);toast('이름을 복사했어요');return}
+  if(id==='synoff'){if(confirm('이 기기에서 자동 동기화를 끌까요?')){SYN='';synSave();const i=g('#synin');if(i)i.value='';synStatus('꺼짐');toast('껐어요')}return}
+  if(id==='ghon'){const i=g('#ghin'),tok=i?i.value.trim():'';if(!tok){toast('토큰 칸이 비어 있어요 · ghp_… 토큰을 붙여넣고 다시 눌러주세요');return}
+    t.disabled=true;ghStatus('GitHub 연결 중…');
+    try{const r=await ghInit(tok);if(r.ok){toast('자동 동기화를 켰어요 (오래 보관)');if(cur)render()}else ghStatus('실패 · '+r.err,1)}catch(x){ghStatus('실패 · '+x.message,1)}finally{t.disabled=false}return}
+  if(id==='ghnow'){if(!ghOn()){toast('먼저 동기화를 켜 주세요');return}toast(await ghPush()?'저장했어요':'저장 실패');return}
+  if(id==='ghpull'){if(!ghOn()){toast('먼저 동기화를 켜 주세요');return}toast(await ghPull()?'불러왔어요':'불러오기 실패');render();return}
+  if(id==='ghoff'){if(confirm('이 기기에서 자동 동기화를 끌까요? (GitHub 저장 내용은 남아요)')){GH={token:'',gist:''};ghSave();const i=g('#ghin');if(i)i.value='';ghStatus('꺼짐');toast('껐어요')}return}
+});
 $('#restoreFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(typeof o!=='object'||!o.sel)throw 0;S=Object.assign(S,o);save();toast('백업을 불러왔어요');if(cur)render();renderWelcome()}catch(x){toast('콘 믹스 도우미 백업 파일이 아니에요')}})};
 function priceBox(id){const e=PR[id];if(!e)return '<div class="empty">최근 3개월 마켓 거래 기록이 없어요.</div>';
   const rows=Object.keys(e).sort().map(k=>{const v=e[k];return `<tr><td>${k[1]}성</td><td class="${k[0]==='p'?'pt':'gp'}">${k[0]==='p'?'포인트':'GP'}</td><td class="n">${fmt(v[0])}</td><td class="n">${fmt(v[1])}</td><td class="n">${fmt(v[2])}</td><td class="n">${fmt(v[5])}</td><td class="n">${v[3]}</td><td class="lv">${v[4]}</td></tr>`}).join('');
@@ -797,14 +1064,14 @@ function priceBox(id){const e=PR[id];if(!e)return '<div class="empty">최근 3�
 /* ───── 내보내기 ───── */
 const today=()=>new Date().toISOString().slice(0,10);
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
-function matText(){const U=curU();let t=`[${nm(cur)}${qty()>1?' ×'+qty():''}] 필요 재료 (스마트 가이드, ${MODES.find(m=>m[1]===S.mode)[0]}, ${BASIS[S.basis][1]})\n`;
+function matText(){const U=curU();let t=`[${nm(cur)}${qty()>1?' ×'+qty():''}] 필요 재료 (스마트 가이드, 스마트, ${BASIS[S.basis][1]})\n`;
   const sec=(title,rs)=>{if(!rs.length)return;t+=`\n■ ${title}\n`;rs.forEach(r=>{t+=`- ${nm(r.id)} Lv.${lvl(r.id)} : `+[r.f?`5성 ${r.hf}/${r.f}`:'',r.j?`잡성 ${r.hj}/${r.j}`:''].filter(Boolean).join(', ')+(r.cost?` · 남은 ${fmt(r.cost)}${U}`:r.miss?' · 시세 없음':'')+'\n'})};
   sec('필드 드랍',ROWS.filter(r=>r.kind==='drop'));sec('직접 구함(드랍 불가)',ROWS.filter(r=>r.kind==='need'));
   t+=`\n남은 비용: ${fmt(COST.cost)} ${U} / 전체 ${fmt(COST.costAll)} ${U}${COST.miss?` (시세 없는 ${COST.miss}종 제외)`:''}\n모은 재료: ${COST.have}/${COST.need} · 믹스·진화 ${SM.steps}회`;return t}
 function copyMat(){copy(matText())}
 function loadXLSX(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=()=>res(window.XLSX);s.onerror=rej;document.head.appendChild(s)})}
 function sheets(){const U=curU();
-  const mat=[[`${nm(cur)}${qty()>1?' ×'+qty():''} 필요 재료`,'',`${MODES.find(m=>m[1]===S.mode)[0]} · ${BASIS[S.basis][1]} · ${today()}`],[],['구분','헨치','기본Lv','5성 필요','5성 보유','5성 남음',`5성 단가(${U})`,'잡성 필요','잡성 보유','잡성 남음',`잡성 단가(${U})`,`남은 금액(${U})`,`전체 금액(${U})`,'출현 맵']];
+  const mat=[[`${nm(cur)}${qty()>1?' ×'+qty():''} 필요 재료`,'',`스마트 · ${BASIS[S.basis][1]} · ${today()}`],[],['구분','헨치','기본Lv','5성 필요','5성 보유','5성 남음',`5성 단가(${U})`,'잡성 필요','잡성 보유','잡성 남음',`잡성 단가(${U})`,`남은 금액(${U})`,`전체 금액(${U})`,'출현 맵']];
   ROWS.forEach(r=>mat.push([r.kind==='drop'?'필드 드랍':'직접 구함',nm(r.id),lvl(r.id),r.f,r.hf,r.rf,r.p5?r.p5.v:'',r.j,r.hj,r.rj,r.pj?r.pj.v:'',r.cost,(r.f&&r.p5?r.f*r.p5.v:0)+(r.j&&r.pj?r.j*r.pj.v:0),(LOCH[r.id]||[]).map(x=>LOCM[x[0]]).join(', ')]));
   mat.push([],['합계','','',ROWS.reduce((a,r)=>a+r.f,0),ROWS.reduce((a,r)=>a+r.hf,0),ROWS.reduce((a,r)=>a+r.rf,0),'',ROWS.reduce((a,r)=>a+r.j,0),ROWS.reduce((a,r)=>a+r.hj,0),ROWS.reduce((a,r)=>a+r.rj,0),'',COST.cost,COST.costAll]);
   if(COST.miss)mat.push([`※ 시세가 없는 재료 ${COST.miss}종은 금액에 포함되지 않았어요.`]);
@@ -817,7 +1084,7 @@ function sheets(){const U=curU();
 function exportXlsx(){toast('엑셀 파일을 만드는 중…');loadXLSX().then(X_=>{const wb=X_.utils.book_new();sheets().forEach(([n,a,w])=>{const ws=X_.utils.aoa_to_sheet(a);ws['!cols']=w.map(x=>({wch:x}));X_.utils.book_append_sheet(wb,ws,n)});
   X_.writeFile(wb,`${nm(cur)}_재료_${today()}.xlsx`);toast('엑셀 파일을 받았어요')}).catch(()=>{
   const csv='\ufeff'+sheets()[0][1].map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');dl(new Blob([csv],{type:'text/csv'}),`${nm(cur)}_재료_${today()}.csv`);toast('인터넷 연결이 없어 CSV(엑셀에서 열림)로 받았어요')})}
-$('#fabCopy').onclick=()=>{if(TAB==='guide')copy(guideText());else if(TAB==='plan'&&PLAN&&PLAN.steps)copy(planText());else copyMat()};$('#fabXlsx').onclick=exportXlsx;
+$('#fabCopy').onclick=()=>{if(TAB==='plan'&&PLAN&&PLAN.steps)copy(planText());else copy(guideText())};
 /* ───── 시작 화면 ───── */
 function renderWelcome(){const chip=id=>`<button class="chip" onclick="pick(${id})">${face(id)}${esc(nm(id))} <span class="lv">Lv.${lvl(id)}</span></button>`;
   const prog=Object.keys(S.have).filter(id=>M[id]&&Object.keys(S.have[id]).length);
@@ -827,8 +1094,11 @@ function renderWelcome(){const chip=id=>`<button class="chip" onclick="pick(${id
   <div style="margin-top:14px" class="lv">${S.recent.length?'최근 검색':'예시'}</div><div class="chips">${(S.recent.length?S.recent:[41,1550]).filter(id=>M[id]).map(chip).join('')}</div>`}
 $('#cntM').textContent=Object.keys(M).length;$('#cntX').textContent=Object.values(X).reduce((a,b)=>a+b.length,0);$('#cntP').textContent=Object.keys(PR).length;$('#dstamp').textContent=DATA_DATE;
 renderWelcome();
+initSyncUI();
+try{const sp=new URLSearchParams(location.hash.slice(1)).get('s');if(sp&&applyCode(sp)){toast('불러왔어요 · 이어서 보세요')}}catch(e){}
+if(synOn()){synStatus('동기화 켜짐');synPull().then(ok=>{if(ok){if(cur)render()}else synPush(1)})}
+if(ghOn()){ghStatus('자동 동기화 켜짐');ghPull().then(ok=>{if(ok&&cur)render()})}
 const hp=new URLSearchParams(location.hash.slice(1)).get('h');if(hp&&M[hp])pick(+hp);
 document.addEventListener('keydown',e=>{if(e.altKey&&e.key==='ArrowLeft'){e.preventDefault();goBack()}});
 
-</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
-</body></html>
+</script></body></html>
