@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v47</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v48</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -790,7 +790,7 @@ function setTab(t){TAB=t;$$('.tabs button').forEach(x=>x.classList.toggle('on',x
 $$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 let R=null,ROOT=null,ROWS=[],COST=null;
 const qty=()=>Math.max(1,+(S.qty[cur]||1));
-function render(){renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();
+function render(){S.hmin=S.gmode==='f';S.w5=S.hmin?6:1;renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();
   renderTarget();renderGuide();renderInv();renderMap();renderTools();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
 let SM=null;
 function buildRows(){const Q=qty();
@@ -918,7 +918,7 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=(
   p.innerHTML=`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'아무 별')} ${G.j}마리 진화로 올림</span></div>
     <div class="sc-cmp"><span class="lv">최소 믹스</span><b>${G.steps}단계</b><span>믹스 ${G.P.mixes} + 진화 ${G.P.evos}</span></div><div class="sc-cmp"><span class="lv">기대 사냥 (별 확률 기준)</span><b>${SM.hunts}회</b><span>남은 ${SM.huntsRem}회</span></div>${SM.base?`<div class="sc-cmp"><span class="lv">보유 재료 반영</span><b>남은 ${SM.remain}마리 · 행동 ${SM.steps}회</b><span>빈손이면 남은 ${SM.base.t}마리 · 행동 ${SM.base.steps}회${SM.base.steps>SM.steps?' → '+(SM.base.steps-SM.steps)+'회 단축':''}</span></div>`:''}${FM?`<div class="sc-cmp"><span class="lv">운 반영(보너스 체크) 재료</span><b>${FM.t}마리</b><span>${SM.t>FM.t?'보장 '+SM.t+' → −'+(SM.t-FM.t)+'마리':'보장과 동일'} · 진화 ${FM.evos}회</span></div>`:''}
 </div>
-  <div class="bar"><div class="seg" id="gmodeSeg"><button data-v="g" class="${S.gmode!=='f'?'on':''}">보장 가이드</button><button data-v="f" class="${S.gmode==='f'?'on':''}">운 반영 가이드</button></div><div class="seg" id="hminSeg"><button data-h="0" class="${!S.hmin?'on':''}">총 단계 최소</button><button data-h="1" class="${S.hmin?'on':''}">고급 헨치 최소 (중간재료 적게)</button></div>${S.gmode==='f'?`<button class="btn sm" id="fxr">보너스 체크 초기화</button>`:''}<button class="btn sm" id="gcp">가이드 복사</button></div>
+  <div class="bar"><div class="seg" id="gmodeSeg"><button data-v="g" class="${S.gmode!=='f'?'on':''}">보장 가이드</button><button data-v="f" class="${S.gmode==='f'?'on':''}">운 반영 가이드</button></div>${S.gmode==='f'?'<span class="tag evo">고급 헨치 최소 적용 (중간재료 적게)</span>':''}${S.gmode==='f'?`<button class="btn sm" id="fxr">보너스 체크 초기화</button>`:''}<button class="btn sm" id="gcp">가이드 복사</button></div>
   <p class="hint"><b>최소 재료 · 최단 믹스 경로</b>예요. 별이 떨어지는 헨치는 낮은 별에서 <b>진화</b>로 올려 재료 마릿수와 믹스 횟수를 함께 줄입니다. 위에서부터 하나씩 하세요. ${sb(5,'5성')}=5성이어야 함 · ${sb(3,'3성 이상')}=3성 이상이면 됨 · ${sb(2,'아무 별')}=별 상관없음. 재료 옆 <b>n단</b>은 발라야 하는 바르는 재료의 단(티어)이에요.</p>
   
   ${qty()>1?`<div class="note">가이드는 1마리 기준이에요. (재료·비용 탭의 수량 ${qty()}마리와 별개)</div>`:''}
@@ -935,7 +935,7 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=(
   <li>이 도구의 판정은 사이트 계산기 코드 기준이에요. 공지 리스트의 <b>칼린엔젤</b>이 코드 목록엔 없고, 코드 목록의 <b>매드오키드·흑피니티</b>는 공지에 없어요 → 게임에서 한 번 확인해 주세요.</li></ul></details>`;
   
   $$('#gmodeSeg button').forEach(b=>b.onclick=()=>{S.gmode=b.dataset.v;save();render()});
-  $$('#hminSeg button').forEach(b=>b.onclick=()=>{S.hmin=b.dataset.h==='1';S.w5=S.hmin?6:1;save();render()});
+  /* 고급 헨치 최소는 운 반영 가이드에서 자동 적용 */
   const fr=$('#fxr');if(fr)fr.onclick=()=>{delete S.fix[cur];save();render()};
   $$('[data-bon]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.bon,f=fixOf();if(f[k])delete f[k];else f[k]=1;save();render()});
   $('#gcp').onclick=()=>copy(guideText());
