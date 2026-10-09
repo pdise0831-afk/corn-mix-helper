@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v36</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v37</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -896,7 +896,7 @@ function jcHtml(jc,n){if(jc.t==='spare')return `보유 중인 ${sb(jc.s)} ${esc(
 function subHtml(jc,key){return `<details class="jsub"><summary>잡성 ${esc(nm(jc.id))} 만드는 법 · ${jc.sub.length}단계</summary>${jc.sub.map((x,i)=>{
   return x.t==='mix'?`<div class="js"><span class="no">${i+1}</span>${hnS(x.n.main.id,x.a,'')}<span class="op">+</span>${hnS(x.n.sub.id,x.b,'')}<span class="op">→</span><span class="res">${esc(x.n.name)}</span> ${sb(x.s)}</div>`
    :`<div class="js"><span class="no">${i+1}</span><span class="res">${esc(x.n.name)}</span> ${sb(x.from)}→${sb(x.to)} 진화 <span class="lv">(${x.jc.t==='mix'?'잡성 '+esc(nm(x.jc.id))+' 하나 더 만들기':x.jc.t==='spare'?'보유분 사용':'잡성 '+esc(nm(x.jc.id))+' '+(x.jc.t==='hunt'?'사냥':'구함')})</span></div>`}).join('')}</details>`}
-function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m');const lvb=(()=>{const a=LVANN&&LVANN[n.path];if(!a)return'';return `<span class="pl ${a.L>a.from?'up':''}">${a.from!=null&&a.L>a.from?`육성 Lv.${a.from}→${a.L}`:`Lv.${a.L}`}</span>`+(a.hw?`<span class="pl hw">성수 ${a.hw}</span>`:'')})();
+function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m');const lvb=(()=>{const a=LVANN&&LVANN[n.path];if(!a)return'';const t=(x.t==='mix'&&a.lm!=null)?`재료 Lv.${a.lm}·${a.ls} → Lv.${a.L}`:(a.L>a.from?`육성 Lv.${a.from}→${a.L}`:`Lv.${a.L}`);return `<span class="pl ${a.L>a.from?'up':''}">${t}</span>`+(a.hw?`<span class="pl hw">성수 ${a.hw}</span>`:'')})();
   const nu=nextUse(n),use=last?'<span class="tag mix">최종 목표</span>':nu?`<span class="lv">→ ${esc(nu.n.name)} 재료로</span>`:'';
   if(x.t==='mix'){const fixed=mixStar(n.main.id,5,n.sub.id,5,n.id,n.lvl)===5,p=x.s<5?bonusP(n.lvl):0;
     return `<div class="gstep ${i===0?'now':''} ${last?'final':''}"><div class="no">${i===0?'▶':i+1}</div><div class="gb">
@@ -990,6 +990,12 @@ const stepsText=()=>`[${nm(cur)}] 믹스 순서 (스마트)\n`+R.steps.map((s,i)
 let PLAN=null;
 function renderPlan(){const p=$('#p-plan');const tg=S.tgt[cur]||maxLv(cur);
   p.innerHTML=`<p class="hint">가이드의 <b>최소 재료·최단 믹스</b> 경로 그대로, <b>원하는 최종 레벨</b>까지 맞추는 순서예요. 하위 기본 재료는 순서에서 빼고 아래 <b>모을 재료</b>로 모아 보여 줍니다. <b>보너스 +10 우선</b>=실제 +10 보너스를 받는 쪽 우선, <b>육성 레벨 최소</b>=사냥 육성 부담 최소.</p>
+  <details class="rules"><summary>레벨 계산 공식 (게임·사이트 코드와 동일)</summary><ul>
+  <li>평균값 = ⌊(메인 현재렙 + 서브 현재렙) ÷ 2⌋</li>
+  <li>x = ⌊100 × 메인 현재렙 ÷ 메인최대렙⌋ (최대 100) · y = ⌊100 × 서브 현재렙 ÷ 서브최대렙⌋ (최대 100)</li>
+  <li><b>결과 렙 = 평균값 + ⌊(x + y) ÷ 20⌋</b> (최대 = 결과 헨치 기본렙 + 25)</li>
+  <li>메인·서브 최대렙은 <b>진화의성수 미적용 기본값</b>(기본렙+25). 성수·<b>믹스레벨(시도 누적)</b>·인챗은 결과 렙에 영향 없어요.</li>
+  <li>진화의성수는 <b>최대렙만 +80</b> 올려 더 높은 렙까지 육성할 수 있게 해요(성수 개수 = 기본렙+25 초과분 10렙당 1, 최대 8).</li></ul></details>
   <div class="grid2"><div class="field"><label>최종 목표 레벨 (Lv.${lvl(cur)} ~ ${maxLv(cur)})</label><input id="pt" type="number" inputmode="numeric" value="${tg}" min="${lvl(cur)}" max="${maxLv(cur)}"></div>
   <div class="field"><label>직접 육성 최대 레벨 (이 레벨 넘게는 사냥으로 안 올림)</label><input id="pc" type="number" inputmode="numeric" value="${S.cap}"></div>
   <div class="field"><label>성수 가중치 (0 = 성수 개수 무시, 높을수록 성수 아끼는 쪽)</label><input id="pw" type="number" inputmode="decimal" value="${S.hw}" step="0.5" min="0"></div>
@@ -1013,7 +1019,7 @@ function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').valu
     else{L=reachMax;note=`현재 설정으로는 최대 Lv.${reachMax}까지만 가능해요. 직접 육성 최대 레벨을 올리거나 공식을 바꿔 보세요.`}}
   if(L<0){$('#pout').innerHTML='<div class="empty">가능한 플랜이 없어요.</div>';PLAN=null;LVANN=null;return}
   const steps=planSteps(tree,L,res.table,[]);const ms=performance.now()-t0;
-  const lm={};steps.forEach(s=>{lm[s.n.path]={L:s.L,from:s.from,hw:s.hw,bonus:s.bonus,src:s.src}});
+  const lm={};steps.forEach(s=>{lm[s.n.path]={L:s.L,from:s.from,hw:s.hw,bonus:s.bonus,src:s.src,lm:s.lm,ls:s.ls}});
   const ups=T.ups[L],hwT=steps.reduce((a,s)=>a+s.hw,0),mixes=steps.filter(s=>s.src==='mix').length,perfect=steps.filter(s=>s.src==='mix'&&s.bonus===10).length;
   const G=SM||smartAll();GS=G;const gst=(G&&G.P)?G.P.steps:[];
   PLAN={L,tg,steps,lm,ups,hw:hwT,mixes,reachMax,note,gst};LVANN=lm;
