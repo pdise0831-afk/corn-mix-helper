@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v50</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v51</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -915,15 +915,17 @@ function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m'
     <div class="need">${jcHtml(x.jc,n)}</div>${x.jc.t==='mix'?subHtml(x.jc,key):''}
     </div></div>`}
 function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=SM.F||null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
+  const recTxt=(ROOT&&ROOT.main&&(X[cur]||[]).length)?'위 <b>믹스 공식</b>으로 만들 수 있어요. (사냥 코어가 있어 기본은 사냥이에요.)':'이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다.';
+  const rec=(ROOT&&ROOT.main&&ROOT.sub&&(X[cur]||[]).length)?(()=>{const M=nm(ROOT.main.id),U=nm(ROOT.sub.id),R=mixStar(ROOT.main.id,5,ROOT.sub.id,5,cur,lvl(cur));return `<div class="note"><b>믹스 공식(5성 기준)</b> — ${esc(M)} <b>★5</b> + ${esc(U)} <b>★5</b> → <b>${esc(nm(cur))} ★${R}</b>${R<5?` <span class="lv">(같은 헨치 1마리로 진화 ★${R}→★${R+1})</span>`:''}</div>`})():'';
   p.innerHTML=`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'아무 별')} ${G.j}마리 진화로 올림</span></div>
     <div class="sc-cmp"><span class="lv">최소 믹스</span><b>${G.steps}단계</b><span>믹스 ${G.P.mixes} + 진화 ${G.P.evos}</span></div><div class="sc-cmp"><span class="lv">기대 사냥 (별 확률 기준)</span><b>${SM.hunts}회</b><span>남은 ${SM.huntsRem}회</span></div>${SM.base?`<div class="sc-cmp"><span class="lv">보유 재료 반영</span><b>남은 ${SM.remain}마리 · 행동 ${SM.steps}회</b><span>빈손이면 남은 ${SM.base.t}마리 · 행동 ${SM.base.steps}회${SM.base.steps>SM.steps?' → '+(SM.base.steps-SM.steps)+'회 단축':''}</span></div>`:''}${FM?`<div class="sc-cmp"><span class="lv">운 반영(보너스 체크) 재료</span><b>${FM.t}마리</b><span>${SM.t>FM.t?'보장 '+SM.t+' → −'+(SM.t-FM.t)+'마리':'보장과 동일'} · 진화 ${FM.evos}회</span></div>`:''}
 </div>
-  <div class="bar">${Object.keys(fx).length?`<span class="tag evo">운(별+1) ${Object.keys(fx).length}건 반영</span><button class="btn sm" id="fxr">보너스 체크 초기화</button>`:""}${(X[cur]||[]).length&&core(cur)>0?`<button class="btn sm ${ovOf().root==='mix'?'pri':''}" id="mxo">${ovOf().root==='mix'?'믹스법 보기 중 ✓':'믹스법 보기(사냥 대신)'}</button>`:''}<button class="btn sm" id="gcp">가이드 복사</button></div>
+  <div class="bar">${Object.keys(fx).length?`<span class="tag evo">운(별+1) ${Object.keys(fx).length}건 반영</span><button class="btn sm" id="fxr">보너스 체크 초기화</button>`:""}<button class="btn sm" id="gcp">가이드 복사</button></div>${rec}
   <p class="hint"><b>최소 재료 · 최단 믹스 경로</b>예요. 별이 떨어지는 헨치는 낮은 별에서 <b>진화</b>로 올려 재료 마릿수와 믹스 횟수를 함께 줄입니다. 위에서부터 하나씩 하세요. ${sb(5,'5성')}=5성이어야 함 · ${sb(3,'3성 이상')}=3성 이상이면 됨 · ${sb(2,'아무 별')}=별 상관없음. 재료 옆 <b>n단</b>은 발라야 하는 바르는 재료의 단(티어)이에요.</p>
   
   ${qty()>1?`<div class="note">가이드는 1마리 기준이에요. (재료·비용 탭의 수량 ${qty()}마리와 별개)</div>`:''}
   ${G.P.fail?'<div class="empty">현재 설정으로는 5성까지 만들 수 없어요.</div>':''}
-  ${st.length?`<div class="glist">${st.map((x,i)=>stepCard(x,i,i===st.length-1)).join('')}</div>`:'<div class="empty">이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다. (이 헨치는 사냥 코어가 있어 기본은 사냥이지만, 믹스 공식도 있어요. 위 <b>믹스법 보기</b>를 누르면 믹스 경로를 보여줘요.)</div>'}
+  ${st.length?`<div class="glist">${st.map((x,i)=>stepCard(x,i,i===st.length-1)).join('')}</div>`:'<div class="empty">'+recTxt+'</div>'}
   <details class="rules"><summary>별(성급) 규칙 자세히 보기</summary><ul>
   <li><b>5+5=5</b> 조건(둘 중 하나): 결과 헨치 기본 Lv.192 이상 · 확정 리스트 · 메인 재료가 에보 코어. 이때만 <code>★5+★5 → ★5</code>.</li>
   <li>일반 헨치는 <code>결과 별 = ⌊(메인 별 + 서브 별) ÷ 2⌋ − 1</code> → <b>5+5=★4</b>, 4+4=★3, <b>3+4=★2</b>, 4+5=★3, 3+5=★3. (실게임 실측 4점 기준 · 확정 리스트의 5+5만 ★5) 믹스 성공 <b>보너스(운)</b>로 ★+1이 뜰 수 있어요.</li>
@@ -936,7 +938,6 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=S
   
   const fr=$('#fxr');if(fr)fr.onclick=()=>{delete S.fix[cur];save();render()};
   $$('[data-bon]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.bon,f=fixOf();if(f[k])delete f[k];else f[k]=1;save();render()});
-  const mxo=$('#mxo');if(mxo)mxo.onclick=()=>{const o=ovOf();if(o.root==='mix')delete o.root;else o.root='mix';save();render()};
   $('#gcp').onclick=()=>copy(guideText());
 }
 const starW=s=>s>=5?'5성':'잡성';
@@ -1038,7 +1039,7 @@ function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').valu
   <div class="tot"><span>믹스 횟수</span><b>${mixes}</b><span>+10 보너스 ${perfect}/${mixes}회 · 계산 ${ms<1000?Math.round(ms)+'ms':(ms/1000).toFixed(1)+'초'}</span></div></div>
   <p class="hint">가이드와 같은 <b>최소 재료·최단 믹스</b> 순서예요. 위에서 아래로 진행하세요. <b>성급(별)</b>은 가이드 탭 경로 그대로, 여기서는 <b>레벨</b>을 맞춥니다.</p>
   ${base.length?planMats(base):''}
-  ${gst.length?`<div class="glist">${gst.map((x,i)=>stepCard(x,i,i===gst.length-1)).join('')}</div>`:'<div class="empty">이 헨치는 믹스 단계가 없어요. 재료를 직접 구해야 합니다. (이 헨치는 사냥 코어가 있어 기본은 사냥이지만, 믹스 공식도 있어요. 위 <b>믹스법 보기</b>를 누르면 믹스 경로를 보여줘요.)</div>'}`}
+  ${gst.length?`<div class="glist">${gst.map((x,i)=>stepCard(x,i,i===gst.length-1)).join('')}</div>`:'<div class="empty">이 헨치는 믹스 단계가 없어요. 재료를 직접 구해야 합니다. (사냥 코어가 있어 기본은 사냥이에요. 위 <b>믹스 공식</b>으로도 만들 수 있어요.)</div>'}`}
 const planText=()=>{if(!PLAN)return'';let t=`[${nm(cur)}] 레벨 플랜 (가이드 경로) → Lv.${PLAN.L} (육성 합계 ${PLAN.ups}레벨, 성수 ${PLAN.hw}개, 믹스 ${PLAN.mixes}회)\n`;
   const base=PLAN.steps.filter(s=>s.src!=='mix');
   if(base.length){t+='\n■ 먼저 모을 기본 재료\n';const g={};base.forEach(s=>{const o=g[s.n.id]||(g[s.n.id]={id:s.n.id,cnt:0,from:s.from,to:s.L});o.cnt++;o.from=Math.min(o.from,s.from);o.to=Math.max(o.to,s.L)});
