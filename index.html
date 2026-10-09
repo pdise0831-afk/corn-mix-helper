@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v52</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v53</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -620,7 +620,7 @@ function planSteps(n,L,table,out,role,parent){const T=table(n);
 const BONUS=[[120,30],[130,28],[140,25],[150,20],[160,15],[170,10],[180,5],[190,3]];
 const bonusP=l=>{for(const[h,p]of BONUS)if(l<=h)return p;return 0};
 const MIXW=0.25,NEEDF=2;
-if(S.hmin==null)S.hmin=true;if(S.w5==null)S.w5=S.hmin?6:1;S.strat='smart';if(S.mode==null)S.mode=0;if(!S.inv)S.inv={};if(S.inv&&!S.mig2){Object.keys(S.inv).forEach(k=>{const o=S.inv[k];if(!o)return;const a=(o[3]||0)+(o[4]||0);if(a)o[2]=(o[2]||0)+a;delete o[3];delete o[4]});S.mig2=1;}if(S.ivLeft==null)S.ivLeft=true;if(!S.hist)S.hist={};if(!S.jd)S.jd={};if(!S.fix)S.fix={};if(S.gmode==null)S.gmode='g';
+if(S.hmin==null)S.hmin=true;if(!S.def53){S.hmin=true;S.def53=1}if(S.w5==null)S.w5=S.hmin?6:1;S.strat='smart';if(S.mode==null)S.mode=0;if(!S.inv)S.inv={};if(S.inv&&!S.mig2){Object.keys(S.inv).forEach(k=>{const o=S.inv[k];if(!o)return;const a=(o[3]||0)+(o[4]||0);if(a)o[2]=(o[2]||0)+a;delete o[3];delete o[4]});S.mig2=1;}if(S.ivLeft==null)S.ivLeft=true;if(!S.hist)S.hist={};if(!S.jd)S.jd={};if(!S.fix)S.fix={};if(S.gmode==null)S.gmode='g';
 const baseK=(id,s)=>(1+(S.w5-1)*(Math.max(1,s)-1)/4+0.002*(s-1))*(core(id)>0?1:NEEDF);
 const invOf=()=>S.inv[cur]||(S.inv[cur]={});
 const histOf=()=>S.hist[cur]||(S.hist[cur]={});
