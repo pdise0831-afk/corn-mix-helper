@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v48</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v49</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -620,7 +620,7 @@ function planSteps(n,L,table,out,role,parent){const T=table(n);
 const BONUS=[[120,30],[130,28],[140,25],[150,20],[160,15],[170,10],[180,5],[190,3]];
 const bonusP=l=>{for(const[h,p]of BONUS)if(l<=h)return p;return 0};
 const MIXW=0.25,NEEDF=2;
-if(S.w5==null)S.w5=1;if(S.hmin==null)S.hmin=false;S.strat='smart';if(S.mode==null)S.mode=0;if(!S.inv)S.inv={};if(S.ivLeft==null)S.ivLeft=true;if(!S.hist)S.hist={};if(!S.jd)S.jd={};if(!S.fix)S.fix={};if(S.gmode==null)S.gmode='g';
+if(S.w5==null)S.w5=1;if(S.hmin==null)S.hmin=false;S.strat='smart';if(S.mode==null)S.mode=0;if(!S.inv)S.inv={};if(S.inv&&!S.mig2){Object.keys(S.inv).forEach(k=>{const o=S.inv[k];if(!o)return;const a=(o[3]||0)+(o[4]||0);if(a)o[2]=(o[2]||0)+a;delete o[3];delete o[4]});S.mig2=1;}if(S.ivLeft==null)S.ivLeft=true;if(!S.hist)S.hist={};if(!S.jd)S.jd={};if(!S.fix)S.fix={};if(S.gmode==null)S.gmode='g';
 const baseK=(id,s)=>(1+(S.w5-1)*(Math.max(1,s)-1)/4+0.002*(s-1))*(core(id)>0?1:NEEDF);
 const invOf=()=>S.inv[cur]||(S.inv[cur]={});
 const histOf=()=>S.hist[cur]||(S.hist[cur]={});
@@ -699,11 +699,11 @@ function starPlan(root,opt={}){const act=opt.act||{},lk=opt.lk||baseK,spare=opt.
   if(top.e[5]<Infinity)realC(root,5,out.steps,'A');else out.fail=true;
   return out}
 /* 보유 코어(별별 수량)를 필요 칸에 배정 (높은 별 칸부터, 조건을 만족하는 가장 낮은 별 코어 사용) */
-function alloc(slots,poolArr){const pool=[...(poolArr||[])].sort((a,b)=>a-b),need=[...slots].sort((a,b)=>b-a),rem=[];let used=0;
-  for(const r of need){const i=pool.findIndex(s=>s>=r);if(i>=0){pool.splice(i,1);used++}else rem.push(r)}
+function alloc(slots,poolArr){const pool=[...(poolArr||[])].map(s=>s>=5?5:2).sort((a,b)=>a-b),need=(slots||[]).map(s=>[s>=5?5:2,s]).sort((a,b)=>b[0]-a[0]),rem=[];let used=0;
+  for(const [r,orig] of need){const i=pool.findIndex(s=>s>=r);if(i>=0){pool.splice(i,1);used++}else rem.push(orig)}
   return{rem,left:pool,used}}
-const starTxt=s=>s>=5?'5성':s<=2?'아무 별':s+'성 이상';
-function groupSlots(a){const g={};a.forEach(s=>{const k=s>=5?5:s<=2?2:s;g[k]=(g[k]||0)+1});return Object.keys(g).map(Number).sort((x,y)=>y-x).map(s=>[s,g[s]])}
+const starTxt=s=>s>=5?'5성':'잡성';
+function groupSlots(a){const g={};a.forEach(s=>{const k=s>=5?5:2;g[k]=(g[k]||0)+1});return Object.keys(g).map(Number).sort((x,y)=>y-x).map(s=>[s,g[s]])}
 const clonePool=p=>{const o={};Object.keys(p).forEach(k=>o[k]=[...p[k]]);return o};
 function packPlan(P,lpool){const mats=Object.keys(P.mats).map(id=>{const a=alloc(P.mats[id],lpool[id]);return{id:+id,slots:P.mats[id],...a,kind:core(id)>0?'drop':'need'}});
   mats.sort((x,y)=>(x.kind>y.kind?1:x.kind<y.kind?-1:0)||(y.rem.length>0)-(x.rem.length>0)||y.slots.length-x.slots.length||lvl(x.id)-lvl(y.id));
@@ -720,7 +720,7 @@ function smartAll(clean){const root=build(cur,'root',[],0);markEff(root,S.mode);
     mm.sort((x,y)=>(x.kind>y.kind?1:x.kind<y.kind?-1:0)||(y.rem.length>0)-(x.rem.length>0)||y.slots.length-x.slots.length||lvl(x.id)-lvl(y.id));
     let ff=0,jj=0;mm.forEach(m=>m.slots.forEach(s=>s>=5?ff++:jj++));
     return{P:Q,mats:mm,f:ff,j:jj,t:ff+jj,steps:Q.steps.length+Q.steps.reduce((a,s)=>a+(s.jc&&s.jc.sub?s.jc.sub.length:0),0),remain:mm.reduce((a,m)=>a+m.rem.length,0)}};
-  const ownedAt=(id,s)=>{const o=invOf()[id];return o?Object.keys(o).filter(k=>+k>=s).reduce((a,k)=>a+(o[k]||0),0):0};
+  const ownedAt=(id,s)=>{const o=invOf()[id];if(!o)return 0;const w=s>=5;return Object.keys(o).filter(k=>w?(+k>=5):true).reduce((a,k)=>a+(o[k]||0),0)};
   const lkOwn=(id,s)=>ownedAt(id,s)>0?baseK(id,s)*0.45:baseK(id,s);
   let C=mkPlan({act,spare:clonePool(spare)});
   if(Object.keys(invOf()).length){const C2=mkPlan({act,lk:lkOwn,spare:clonePool(spare)});if(C2.remain<C.remain||(C2.remain===C.remain&&C2.steps<C.steps))C=C2}
@@ -790,7 +790,7 @@ function setTab(t){TAB=t;$$('.tabs button').forEach(x=>x.classList.toggle('on',x
 $$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 let R=null,ROOT=null,ROWS=[],COST=null;
 const qty=()=>Math.max(1,+(S.qty[cur]||1));
-function render(){S.hmin=S.gmode==='f';S.w5=S.hmin?6:1;renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();
+function render(){S.hmin=false;S.w5=1;renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();
   renderTarget();renderGuide();renderInv();renderMap();renderTools();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
 let SM=null;
 function buildRows(){const Q=qty();
@@ -908,17 +908,17 @@ function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m'
   if(x.t==='mix'){const fixed=mixStar(n.main.id,5,n.sub.id,5,n.id,n.lvl)===5,p=x.s<5?bonusP(n.lvl):0;
     return `<div class="gstep ${i===0?'now':''} ${last?'final':''}"><div class="no">${i===0?'▶':i+1}</div><div class="gb">
     <div class="formula">${hnS(n.main.id)}${need5(x.a)}${n.mg>0?`<span class="lv">${n.mg}단</span>`:''}<span class="op">+</span>${hnS(n.sub.id)}${need5(x.b)}${n.sg>0?`<span class="lv">${n.sg}단</span>`:''}<span class="op">→</span><span class="res">${esc(n.name)}</span>${sb(x.s)}${lvb}${use}</div>${lvRangeRow(n)}
-    <div class="need">${fixed?'<span class="tag f5">5+5=5 헨치</span> ':''}${x.a>=5&&x.b>=5&&!fixed?'5성+5성이어도 ★4로 떨어지는 헨치예요. ':''}${p?`믹스 성공 시 ${p}% 확률로 ★${x.s+1} 보너스`:""}</div>${S.gmode==="f"?`<div class="gact">${x.bon?"<span class=\"tag evo\">운 +1 반영</span>":""}<button class="btn sm ${fixOf()[n.path]?"pri":""}" data-bon="${n.path}">${fixOf()[n.path]?"★+1 떴음 ✓":"★+1 떴으면 누르기"}</button></div>`:""}
+    <div class="need">${fixed?'<span class="tag f5">5+5=5 헨치</span> ':''}${x.a>=5&&x.b>=5&&!fixed?'5성+5성이어도 ★4로 떨어지는 헨치예요. ':''}${p?`믹스 성공 시 ${p}% 확률로 ★${x.s+1} 보너스`:""}</div><div class="gact">${x.bon?"<span class=\"tag evo\">운 +1 반영</span>":""}<button class="btn sm ${fixOf()[n.path]?"pri":""}" data-bon="${n.path}">${fixOf()[n.path]?"★+1 떴음 ✓":"★+1 떴으면 누르기"}</button></div>
     </div></div>`}
   return `<div class="gstep evo ${i===0?'now':''} ${last?'final':''}"><div class="no">${i===0?'▶':i+1}</div><div class="gb">
     <div class="formula"><span class="tag evo">진화</span>${hnS(n.id)}${sb(x.from)}<span class="op">→</span>${sb(x.to)}${lvb}${use}</div>${lvRangeRow(n)}
     <div class="need">${jcHtml(x.jc,n)}</div>${x.jc.t==='mix'?subHtml(x.jc,key):''}
     </div></div>`}
-function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=(S.gmode==='f'&&SM.F)?SM.F:null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
+function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=SM.F||null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
   p.innerHTML=`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'아무 별')} ${G.j}마리 진화로 올림</span></div>
     <div class="sc-cmp"><span class="lv">최소 믹스</span><b>${G.steps}단계</b><span>믹스 ${G.P.mixes} + 진화 ${G.P.evos}</span></div><div class="sc-cmp"><span class="lv">기대 사냥 (별 확률 기준)</span><b>${SM.hunts}회</b><span>남은 ${SM.huntsRem}회</span></div>${SM.base?`<div class="sc-cmp"><span class="lv">보유 재료 반영</span><b>남은 ${SM.remain}마리 · 행동 ${SM.steps}회</b><span>빈손이면 남은 ${SM.base.t}마리 · 행동 ${SM.base.steps}회${SM.base.steps>SM.steps?' → '+(SM.base.steps-SM.steps)+'회 단축':''}</span></div>`:''}${FM?`<div class="sc-cmp"><span class="lv">운 반영(보너스 체크) 재료</span><b>${FM.t}마리</b><span>${SM.t>FM.t?'보장 '+SM.t+' → −'+(SM.t-FM.t)+'마리':'보장과 동일'} · 진화 ${FM.evos}회</span></div>`:''}
 </div>
-  <div class="bar"><div class="seg" id="gmodeSeg"><button data-v="g" class="${S.gmode!=='f'?'on':''}">보장 가이드</button><button data-v="f" class="${S.gmode==='f'?'on':''}">운 반영 가이드</button></div>${S.gmode==='f'?'<span class="tag evo">고급 헨치 최소 적용 (중간재료 적게)</span>':''}${S.gmode==='f'?`<button class="btn sm" id="fxr">보너스 체크 초기화</button>`:''}<button class="btn sm" id="gcp">가이드 복사</button></div>
+  <div class="bar">${Object.keys(fx).length?`<span class="tag evo">운(별+1) ${Object.keys(fx).length}건 반영</span><button class="btn sm" id="fxr">보너스 체크 초기화</button>`:""}<button class="btn sm" id="gcp">가이드 복사</button></div>
   <p class="hint"><b>최소 재료 · 최단 믹스 경로</b>예요. 별이 떨어지는 헨치는 낮은 별에서 <b>진화</b>로 올려 재료 마릿수와 믹스 횟수를 함께 줄입니다. 위에서부터 하나씩 하세요. ${sb(5,'5성')}=5성이어야 함 · ${sb(3,'3성 이상')}=3성 이상이면 됨 · ${sb(2,'아무 별')}=별 상관없음. 재료 옆 <b>n단</b>은 발라야 하는 바르는 재료의 단(티어)이에요.</p>
   
   ${qty()>1?`<div class="note">가이드는 1마리 기준이에요. (재료·비용 탭의 수량 ${qty()}마리와 별개)</div>`:''}
@@ -934,13 +934,11 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=(
   <li><b>5+5=5 확정 리스트</b>: 블루가루곤·아그네스·뉴가루곤 / 닌자걸·히나인형·뉴닌자걸 / 큐티캣·머메이드·뉴큐티캣·폭주아기산타늑대 / 칼린엔젤·블루버드·뉴페르소나소울·뉴칼린엔젤 / 메가혼즈·비틀나이츠·티타니스·뉴집게마왕 / 덤블러머·블루덤블·뉴블루덤블 / 롱팔아이·슈퍼매직·뉴롱팔아이·뉴소울이터 / 메탈탱크·핑크메탈탱크·뉴메탈탱크</li>
   <li>이 도구의 판정은 사이트 계산기 코드 기준이에요. 공지 리스트의 <b>칼린엔젤</b>이 코드 목록엔 없고, 코드 목록의 <b>매드오키드·흑피니티</b>는 공지에 없어요 → 게임에서 한 번 확인해 주세요.</li></ul></details>`;
   
-  $$('#gmodeSeg button').forEach(b=>b.onclick=()=>{S.gmode=b.dataset.v;save();render()});
-  /* 고급 헨치 최소는 운 반영 가이드에서 자동 적용 */
   const fr=$('#fxr');if(fr)fr.onclick=()=>{delete S.fix[cur];save();render()};
   $$('[data-bon]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.bon,f=fixOf();if(f[k])delete f[k];else f[k]=1;save();render()});
   $('#gcp').onclick=()=>copy(guideText());
 }
-const starW=s=>s>=5?'5성':s<=2?'잡성':s+'성이상';
+const starW=s=>s>=5?'5성':'잡성';
 function guideText(){const g=GS||SM;const st=g.P.steps;let t=`[${nm(cur)}] 스마트(최소재료) 가이드 — 재료 ${g.t}마리 (5성 ${g.f}, 잡성 ${g.j})\n`;
   st.forEach((x,i)=>{if(x.t==='mix')t+=`${i+1}. ${x.n.main.name}(${starW(x.a)}${x.n.mg>0?'/'+x.n.mg+'단':''}) + ${x.n.sub.name}(${starW(x.b)}${x.n.sg>0?'/'+x.n.sg+'단':''}) → ${x.n.name} ★${x.s}\n`;
     else{t+=`${i+1}. [진화] ${x.n.name} ★${x.from}→★${x.to} : 잡성 ${x.n.name} ${x.jc.t==='mix'?'만들어 넣기':x.jc.t==='spare'?'(보유분)':x.jc.t==='hunt'?'사냥':'구함'}\n`;
@@ -950,7 +948,7 @@ function guideText(){const g=GS||SM;const st=g.P.steps;let t=`[${nm(cur)}] 스�
 function treeIds(){const ids=new Map();(function w(n){if(!n)return;if(!ids.has(n.id))ids.set(n.id,n.eff==='mix'?'mix':'leaf');if(n.eff==='mix'){w(n.main);w(n.sub)}})(SM.root);return ids}
 function renderInv(){const p=$('#p-inv');if(!SM)return;const iv=invOf(),ids=treeIds(),mm={};SM.mats.forEach(m=>mm[m.id]=m);
   const starsOf=id=>{const o=iv[id]||{},a=[];for(let s=5;s>=2;s--)for(let k=0;k<(o[s]||0);k++)a.push(s);return a};
-  const lbl=s=>s>=5?'5성':s===4?'4성 이상':s===3?'3성 이상':'아무 별';
+  const lbl=s=>s>=5?'5성':'잡성';
   const reqChips=slots=>groupSlots(slots).map(([s,c])=>`<span class="nch">${lbl(s)} <b>×${c}</b></span>`).join('');
   const rows=[...ids].map(([id,k])=>({id,kind:k,m:mm[id]}));
   let shortN=0,shortM=0;
@@ -958,7 +956,7 @@ function renderInv(){const p=$('#p-inv');if(!SM)return;const iv=invOf(),ids=tree
   const only=S.ivLeft!==false;
   const show=rows.filter(r=>!only||r.left>0||r.kind==='mix'||r.have>0);
   const row=r=>{const id=r.id,o=iv[id]||{},m=r.m;
-    const lvls=m?[...new Set([...groupSlots(m.slots).map(([s])=>s),...Object.keys(o).map(Number).filter(s=>s>=2&&s<=5)])].sort((a,b)=>b-a):[5,4,3,2];
+    const lvls=[5,2];
     const have=Object.keys(o).reduce((a,s)=>a+(o[s]||0),0);
     const status=m?`<span class="ivstat ${r.done?'ok':''}">필요 <b>${r.need}</b> · 모음 ${r.have} · <b>남음 ${r.left}</b></span>`:'<span class="ivstat">중간 헨치 · 갖고 있으면 넣어두세요</span>';
     const req=m?`<div class="ivreq">${reqChips(m.slots)}</div>`:'';
@@ -970,14 +968,14 @@ function renderInv(){const p=$('#p-inv');if(!SM)return;const iv=invOf(),ids=tree
   const mix=show.filter(r=>r.kind==='mix'&&r.id!==cur).sort((a,b)=>lvl(b.id)-lvl(a.id));
   const totHave=Object.values(iv).reduce((a,o)=>a+Object.values(o).reduce((x,y)=>x+y,0),0);
   p.innerHTML=`<div class="stickbar" id="invBar"><span class="tag drop">남은 <b>${shortN}종 · ${shortM}마리</b></span><span class="lv">총 ${SM.t}마리 · 행동 ${SM.steps}회 · 입력 ${totHave}마리</span><span style="flex:1"></span><button class="btn sm ${only?'pri':''}" id="ivLeft">${only?'남은 것만 ✓':'전체'}</button><button class="btn sm" id="synci">동기화</button><button class="btn sm" id="ivr">전체 초기화</button></div>
-  <p class="hint">사냥으로 얻은 코어를 <b>별별로</b> 넣으세요. 가이드가 바로 다시 계산돼요. <b>아무 별</b>은 ★2~★5 중 아무거나(별 상관없음), <b>★4 이상</b>·<b>★5</b>는 그 별 이상만 됩니다. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요.</p>
+  <p class="hint">사냥으로 얻은 코어를 <b>5성</b>과 <b>잡성</b> 두 칸에만 넣으세요. 5성 이하는 모두 <b>잡성</b>으로 취급해요. 가이드가 바로 다시 계산돼요. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요.</p>
   <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.length?leaf.map(row).join(''):'<div class="empty">아직 모자란 재료가 없어요 🎉</div>'}</div>
   ${mix.length?`<div class="mgroup"><h3><i style="background:var(--corn)"></i>중간 헨치 (이미 만들어 둔 것) <span class="lv">${mix.length}종</span></h3>${mix.map(row).join('')}</div>`:''}`;
   const refresh=()=>{const y=window.scrollY;SM=smartAll();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y)};
   const set=(id,s,v)=>{const o=iv[id]||(iv[id]={});o[s]=Math.max(0,Math.min(999,v));if(!o[s])delete o[s];if(!Object.keys(o).length)delete iv[id];save();refresh()};
   p.querySelectorAll('[data-iv]').forEach(b=>b.onclick=()=>{const[id,s,d]=b.dataset.iv.split(',').map(Number);set(id,s,((iv[id]||{})[s]||0)+d)});
   p.querySelectorAll('[data-ivi]').forEach(i=>i.onchange=()=>{const[id,s]=i.dataset.ivi.split(',').map(Number);set(id,s,+i.value||0)});
-  p.querySelectorAll('[data-fill]').forEach(b=>b.onclick=()=>{const id=b.dataset.fill,A=alloc(mm[id].slots,starsOf(id)),o=iv[id]||(iv[id]={});A.rem.forEach(x=>{const k=Math.max(2,Math.min(5,x));o[k]=(o[k]||0)+1});save();refresh();toast(nm(id)+' 재료를 채웠어요')});
+  p.querySelectorAll('[data-fill]').forEach(b=>b.onclick=()=>{const id=b.dataset.fill,A=alloc(mm[id].slots,starsOf(id)),o=iv[id]||(iv[id]={});A.rem.forEach(x=>{const k=x>=5?5:2;o[k]=(o[k]||0)+1});save();refresh();toast(nm(id)+' 재료를 채웠어요')});
   p.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{delete iv[b.dataset.clr];save();refresh()});
   $('#ivLeft').onclick=()=>{S.ivLeft=!(S.ivLeft!==false);save();renderInv()};
   const rst=()=>{if(confirm('이 목표의 보유 코어 입력을 모두 지울까요?')){delete S.inv[cur];save();render();}};
