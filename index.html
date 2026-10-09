@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v40</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v41</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -404,7 +404,9 @@ const maxLv=id=>isFixedLv(id)?lvl(id):lvl(id)+105;
 const mxN=id=>isFixedLv(id)?lvl(id):lvl(id)+25;
 const isLowDrop=id=>M[id]&&lvl(id)<79&&core(id)>0&&!isException(nm(id));
 function mixStar(mt,g1,st,g2,rt,rl){g1=Math.min(5,g1||1);g2=Math.min(5,g2||1);
-  if(g1===5&&g2===5&&([1129,1137,1145,1153,1161].includes(+mt)||isHenchFix(rt)||rl>=192))return 5;return Math.ceil((g1+g2)/3)}
+  if(g1===5&&g2===5&&([1129,1137,1145,1153,1161].includes(+mt)||isHenchFix(rt)||rl>=192))return 5;
+  if(g1===5&&g2===5)return 4;
+  return Math.max(1,Math.floor((g1+g2)/3))}
 const ratioOf=(id,L)=>{const f=isFixedLv(id),b=lvl(id),E=f?b:L,cap=f?b:b+25;return Math.min(100,Math.floor(100*E/cap))};
 function mixLevel(r,a,b,la,lb){if(isFixedLv(a))la=lvl(a);if(isFixedLv(b))lb=lvl(b);
   const bonus=Math.floor((ratioOf(a,la)+ratioOf(b,lb))/20),base=lvl(r),max=isFixedLv(r)?base:base+25;
@@ -923,7 +925,7 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=(
   ${st.length?`<div class="glist">${st.map((x,i)=>stepCard(x,i,i===st.length-1)).join('')}</div>`:'<div class="empty">이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다.</div>'}
   <details class="rules"><summary>별(성급) 규칙 자세히 보기</summary><ul>
   <li><b>5+5=5</b> 조건(둘 중 하나): 결과 헨치 기본 Lv.192 이상 · 확정 리스트 · 메인 재료가 에보 코어. 이때만 <code>★5+★5 → ★5</code>.</li>
-  <li>일반 헨치는 <code>결과 별 = (메인 별 + 서브 별) ÷ 3 올림</code> → 5+5=★4, 5+4=★3, 4+4=★3.</li>
+  <li>일반 헨치는 <code>결과 별 = ⌊(메인 별 + 서브 별) ÷ 3⌋</code>(내림) → <b>3+4=★2</b>, 4+4=★2, 4+5=★3, 5+5=★4. (게임 실측 3+4→2 기준, 이전 '올림'은 과대평가였습니다)</li>
   <li><b>진화</b>: 같은 헨치 1마리(별 등급 무관)를 넣으면 별 +1. ★2 한 마리에 아무 별 3마리를 붙이면 ★5가 돼요(총 4마리). 이 도구는 중간 재료를 ★5로 맞추지 않고 낮은 별 그대로 믹스한 뒤 <b>진화로만</b> 별을 올려, 재료 마릿수와 믹스 횟수를 함께 최소로 만듭니다.</li>
   <li>공식 옆 괄호 숫자는 <b>별이 아니라 '단(티어)'</b>이에요. 예: <code>골든피기(3)</code> = 3단 골든피기. 각 재료는 사냥/드랍으로 얻는 <b>바르는 재료</b>를 발라 그 단을 맞춰야 믹스가 돼요(예: 골든피기 = 블루피기(2단) + 뉴부메이더(2단)).</li>
   <li><b>확률 보너스</b>(믹스 성공 시 별 +1, 운빨): Lv.1~120 30% · 121~130 28% · 131~140 25% · 141~150 20% · 151~160 15% · 161~170 10% · 171~180 5% · 181~190 3%.</li>
