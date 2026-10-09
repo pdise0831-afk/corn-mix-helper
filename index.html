@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v38</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v39</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -401,6 +401,7 @@ const FIXLV=[1173,1174,1175,1176,1177,1178,1179,1180];
 const isFixedLv=id=>FIXLV.includes(+id);
 const nm=id=>M[id]?M[id][0]:'알수없음',lvl=id=>M[id]?M[id][1]:1,core=id=>M[id]?M[id][3]:0;
 const maxLv=id=>isFixedLv(id)?lvl(id):lvl(id)+105;
+const mxN=id=>isFixedLv(id)?lvl(id):lvl(id)+25;
 const isLowDrop=id=>M[id]&&lvl(id)<79&&core(id)>0&&!isException(nm(id));
 function mixStar(mt,g1,st,g2,rt,rl){g1=Math.min(5,g1||1);g2=Math.min(5,g2||1);
   if(g1===5&&g2===5&&([1129,1137,1145,1153,1161].includes(+mt)||isHenchFix(rt)||rl>=192))return 5;return Math.ceil((g1+g2)/3)}
@@ -896,15 +897,18 @@ function jcHtml(jc,n){if(jc.t==='spare')return `보유 중인 ${sb(jc.s)} ${esc(
 function subHtml(jc,key){return `<details class="jsub"><summary>잡성 ${esc(nm(jc.id))} 만드는 법 · ${jc.sub.length}단계</summary>${jc.sub.map((x,i)=>{
   return x.t==='mix'?`<div class="js"><span class="no">${i+1}</span>${hnS(x.n.main.id,x.a,'')}<span class="op">+</span>${hnS(x.n.sub.id,x.b,'')}<span class="op">→</span><span class="res">${esc(x.n.name)}</span> ${sb(x.s)}</div>`
    :`<div class="js"><span class="no">${i+1}</span><span class="res">${esc(x.n.name)}</span> ${sb(x.from)}→${sb(x.to)} 진화 <span class="lv">(${x.jc.t==='mix'?'잡성 '+esc(nm(x.jc.id))+' 하나 더 만들기':x.jc.t==='spare'?'보유분 사용':'잡성 '+esc(nm(x.jc.id))+' '+(x.jc.t==='hunt'?'사냥':'구함')})</span></div>`}).join('')}</details>`}
+function lvRng(id){return `${esc(nm(id))} <b>${lvl(id)}~${mxN(id)}</b>`}
+function lvRangeRow(n){const p=n.main?` · 메인 ${lvRng(n.main.id)} · 서브 ${lvRng(n.sub.id)}`:'';
+  return `<div style="font-size:12px;color:var(--mute);margin-top:3px;line-height:1.6">기본~최대${p} · 결과 ${lvRng(n.id)}</div>`}
 function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m');const lvb=(()=>{const a=LVANN&&LVANN[n.path];if(!a)return'';let t,h='';if(x.t==='mix'&&a.lm!=null){t=`재료 Lv.${a.lm}·${a.ls} → <b>믹스 Lv.${a.from}</b>`;if(a.L>a.from)h=`<span class="pl up">→ 육성 Lv.${a.L}</span>`}else{t=(a.L>a.from)?`육성 Lv.${a.from}→${a.L}`:`Lv.${a.L}`}return `<span class="pl">${t}</span>`+h+(a.hw?`<span class="pl hw">성수 ${a.hw}</span>`:'')})();
   const nu=nextUse(n),use=last?'<span class="tag mix">최종 목표</span>':nu?`<span class="lv">→ ${esc(nu.n.name)} 재료로</span>`:'';
   if(x.t==='mix'){const fixed=mixStar(n.main.id,5,n.sub.id,5,n.id,n.lvl)===5,p=x.s<5?bonusP(n.lvl):0;
     return `<div class="gstep ${i===0?'now':''} ${last?'final':''}"><div class="no">${i===0?'▶':i+1}</div><div class="gb">
-    <div class="formula">${hnS(n.main.id)}${need5(x.a)}${n.mg>0?`<span class="lv">${n.mg}단</span>`:''}<span class="op">+</span>${hnS(n.sub.id)}${need5(x.b)}${n.sg>0?`<span class="lv">${n.sg}단</span>`:''}<span class="op">→</span><span class="res">${esc(n.name)}</span>${sb(x.s)}${lvb}${use}</div>
+    <div class="formula">${hnS(n.main.id)}${need5(x.a)}${n.mg>0?`<span class="lv">${n.mg}단</span>`:''}<span class="op">+</span>${hnS(n.sub.id)}${need5(x.b)}${n.sg>0?`<span class="lv">${n.sg}단</span>`:''}<span class="op">→</span><span class="res">${esc(n.name)}</span>${sb(x.s)}${lvb}${use}</div>${lvRangeRow(n)}
     <div class="need">${fixed?'<span class="tag f5">5+5=5 헨치</span> ':''}${x.a>=5&&x.b>=5&&!fixed?'5성+5성이어도 ★4로 떨어지는 헨치예요. ':''}${p?`믹스 성공 시 ${p}% 확률로 ★${x.s+1} 보너스`:""}</div>${S.gmode==="f"?`<div class="gact">${x.bon?"<span class=\"tag evo\">운 +1 반영</span>":""}<button class="btn sm ${fixOf()[n.path]?"pri":""}" data-bon="${n.path}">${fixOf()[n.path]?"★+1 떴음 ✓":"★+1 떴으면 누르기"}</button></div>`:""}
     </div></div>`}
   return `<div class="gstep evo ${i===0?'now':''} ${last?'final':''}"><div class="no">${i===0?'▶':i+1}</div><div class="gb">
-    <div class="formula"><span class="tag evo">진화</span>${hnS(n.id)}${sb(x.from)}<span class="op">→</span>${sb(x.to)}${lvb}${use}</div>
+    <div class="formula"><span class="tag evo">진화</span>${hnS(n.id)}${sb(x.from)}<span class="op">→</span>${sb(x.to)}${lvb}${use}</div>${lvRangeRow(n)}
     <div class="need">${jcHtml(x.jc,n)}</div>${x.jc.t==='mix'?subHtml(x.jc,key):''}
     </div></div>`}
 function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=(S.gmode==='f'&&SM.F)?SM.F:null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
@@ -995,7 +999,7 @@ function renderPlan(){const p=$('#p-plan');const tg=S.tgt[cur]||maxLv(cur);
   <li>x = ⌊100 × 메인 현재렙 ÷ 메인최대렙⌋ (최대 100) · y = ⌊100 × 서브 현재렙 ÷ 서브최대렙⌋ (최대 100)</li>
   <li><b>결과 렙 = 평균값 + ⌊(x + y) ÷ 20⌋</b> (최대 = 결과 헨치 기본렙 + 25)</li>
   <li>메인·서브 최대렙은 <b>진화의성수 미적용 기본값</b>(기본렙+25). 성수·<b>믹스레벨(시도 누적)</b>·인챗은 결과 렙에 영향 없어요.</li>
-  <li>진화의성수는 <b>최대렙만 +80</b> 올려 더 높은 렙까지 육성할 수 있게 해요(성수 개수 = 기본렙+25 초과분 10렙당 1, 최대 8).</li></ul></details>
+  <li><b>진화의성수(성수)</b>는 <b>기본+25를 넘길 때만</b> 필요해요(초과 10렙당 1개, 최대 8). 최대렙(기본+25)까지는 <b>성수 0개</b>. 예: 건스매쉬 기본117 → 최대142는 성수 불필요, 143부터 성수 1개. 각 단계·기본재료 옆 <b>기본~최대</b>·<b>성수</b> 표기 참고.</li></ul></details>
   <div class="grid2"><div class="field"><label>최종 목표 레벨 (Lv.${lvl(cur)} ~ ${maxLv(cur)})</label><input id="pt" type="number" inputmode="numeric" value="${tg}" min="${lvl(cur)}" max="${maxLv(cur)}"></div>
   <div class="field"><label>직접 육성 최대 레벨 (이 레벨 넘게는 사냥으로 안 올림)</label><input id="pc" type="number" inputmode="numeric" value="${S.cap}"></div>
   <div class="field"><label>성수 가중치 (0 = 성수 개수 무시, 높을수록 성수 아끼는 쪽)</label><input id="pw" type="number" inputmode="decimal" value="${S.hw}" step="0.5" min="0"></div>
@@ -1007,7 +1011,7 @@ function renderPlan(){const p=$('#p-plan');const tg=S.tgt[cur]||maxLv(cur);
 function planMats(bs){const g={};
   bs.forEach(s=>{const o=g[s.n.id]||(g[s.n.id]={id:s.n.id,core:s.n.core,cnt:0,from:s.from,to:s.L,hw:0});o.cnt++;o.from=Math.min(o.from,s.from);o.to=Math.max(o.to,s.L);o.hw+=s.hw||0});
   const rows=Object.values(g).sort((a,b)=>lvl(b.id)-lvl(a.id));
-  return `<div class="mgroup"><h3><i style="background:var(--drop)"></i>먼저 모을 기본 재료 <span class="lv">${rows.length}종 · ${bs.length}마리</span></h3><div class="chips">${rows.map(o=>`<span class="chip">${face(o.id)}${esc(nm(o.id))} <span class="tag ${o.core>0?'drop':'need'}">${o.core>0?'사냥':'구함'}</span> <span class="lv">${o.from>lvl(o.id)?`Lv.${lvl(o.id)}→${o.to}`:`Lv.${o.to}`}</span> ×${o.cnt}${o.hw?` · 성수 ${o.hw}`:''}</span>`).join('')}</div></div>`}
+  return `<div class="mgroup"><h3><i style="background:var(--drop)"></i>먼저 모을 기본 재료 <span class="lv">${rows.length}종 · ${bs.length}마리</span></h3><div class="chips">${rows.map(o=>`<span class="chip">${face(o.id)}${esc(nm(o.id))} <span class="tag ${o.core>0?'drop':'need'}">${o.core>0?'사냥':'구함'}</span> <span class="lv">${o.from>lvl(o.id)?`Lv.${lvl(o.id)}→${o.to}`:`Lv.${o.to}`}</span> ×${o.cnt} <span class="lv">기본${lvl(o.id)}~최대${mxN(o.id)}</span>${o.hw?` · 성수 ${o.hw}`:''}</span>`).join('')}</div></div>`}
 function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').value||maxLv(cur))),cap=Math.max(1,Math.min(2000,+$('#pc').value||180)),hw=Math.max(0,+$('#pw').value||0);
   S.tgt[cur]=tg;S.cap=cap;S.hw=hw;save();
   const t0=performance.now();const tree=build(cur,'root',[],0);let res;
