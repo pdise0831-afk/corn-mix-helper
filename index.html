@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v39</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v40</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -584,7 +584,7 @@ const curU=()=>S.cur==='p'?'P':'GP';
 let PREFIX=null;
 function prefix(){if(PREFIX)return PREFIX;const mx=2100;PREFIX=new Float64Array(mx+1);for(let l=1;l<=mx;l++)PREFIX[l]=PREFIX[l-1]+1+Math.pow(Math.max(0,l-100)/80,1.55);return PREFIX}
 const burden=(a,b)=>b<=a?0:prefix()[b]-prefix()[a];
-function plan(root,cap,hwW,bonusFirst){
+function plan(root,cap,hwW,bonusFirst,postW){postW=postW||1;
   const memo=new Map();let ops=0;const PEN=bonusFirst?1e6:0;
   function sig(n){if(n._sig)return n._sig;let s=n.id+':'+n.state;if(n.state==='own')s+='@'+ownLv(n);if(n.state==='mix')s+='('+sig(n.main)+','+sig(n.sub)+')';return n._sig=s}
   function table(n){const k=sig(n);if(memo.has(k))return memo.get(k);
@@ -604,7 +604,7 @@ function plan(root,cap,hwW,bonusFirst){
           const c=A.cost[i]+B.cost[j],h=A.hw[i]+B.hw[j],u=A.ups[i]+B.ups[j],m=A.miss[i]+B.miss[j]+(eff===10?0:1),sc=score(c,h,m),bal=Math.abs(i-j);
           const o=best.get(L);if(!o||sc<o.sc-1e-9||(Math.abs(sc-o.sc)<1e-9&&(u<o.u||(u===o.u&&bal<o.bal))))best.set(L,{sc,c,h,u,m,i,j,bal,eff})}}
       for(const[ML,o]of best){const reach=fixed?ML:Math.min(top,Math.max(ML,cap));
-        for(let L=ML;L<=reach;L++)set(L,o.c+burden(ML,L),o.h+hwCost(L,b,fixed),o.u+(L-ML),o.m,ML,o.i,o.j,o.eff)}}
+        for(let L=ML;L<=reach;L++)set(L,o.c+burden(ML,L)*postW,o.h+hwCost(L,b,fixed),o.u+(L-ML),o.m,ML,o.i,o.j,o.eff)}}
     memo.set(k,T);return T}
   const T=table(root);return{T,table,ops}}
 function ownLv(n){const v=+olvOf()[n.path];return v>0?v:n.lvl}
@@ -900,7 +900,7 @@ function subHtml(jc,key){return `<details class="jsub"><summary>잡성 ${esc(nm(
 function lvRng(id){return `${esc(nm(id))} <b>${lvl(id)}~${mxN(id)}</b>`}
 function lvRangeRow(n){const p=n.main?` · 메인 ${lvRng(n.main.id)} · 서브 ${lvRng(n.sub.id)}`:'';
   return `<div style="font-size:12px;color:var(--mute);margin-top:3px;line-height:1.6">기본~최대${p} · 결과 ${lvRng(n.id)}</div>`}
-function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m');const lvb=(()=>{const a=LVANN&&LVANN[n.path];if(!a)return'';let t,h='';if(x.t==='mix'&&a.lm!=null){t=`재료 Lv.${a.lm}·${a.ls} → <b>믹스 Lv.${a.from}</b>`;if(a.L>a.from)h=`<span class="pl up">→ 육성 Lv.${a.L}</span>`}else{t=(a.L>a.from)?`육성 Lv.${a.from}→${a.L}`:`Lv.${a.L}`}return `<span class="pl">${t}</span>`+h+(a.hw?`<span class="pl hw">성수 ${a.hw}</span>`:'')})();
+function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m');const lvb=(()=>{const a=LVANN&&LVANN[n.path];if(!a)return'';let t,h='';if(x.t==='mix'&&a.lm!=null){t=`재료 Lv.${a.lm}·${a.ls} → <b>믹스 Lv.${a.from}</b>`;if(a.L>a.from)h=`<span class="pl up">→ 믹스 후 육성 Lv.${a.L}</span>`}else{t=(a.L>a.from)?`재료 육성 Lv.${a.from}→${a.L}`:`Lv.${a.L}`}return `<span class="pl">${t}</span>`+h+(a.hw?`<span class="pl hw">성수 ${a.hw}</span>`:'')})();
   const nu=nextUse(n),use=last?'<span class="tag mix">최종 목표</span>':nu?`<span class="lv">→ ${esc(nu.n.name)} 재료로</span>`:'';
   if(x.t==='mix'){const fixed=mixStar(n.main.id,5,n.sub.id,5,n.id,n.lvl)===5,p=x.s<5?bonusP(n.lvl):0;
     return `<div class="gstep ${i===0?'now':''} ${last?'final':''}"><div class="no">${i===0?'▶':i+1}</div><div class="gb">
@@ -993,7 +993,7 @@ const stepsText=()=>`[${nm(cur)}] 믹스 순서 (스마트)\n`+R.steps.map((s,i)
 /* ───── 레벨 플래너 (가이드 경로 + 목표 레벨) ───── */
 let PLAN=null;
 function renderPlan(){const p=$('#p-plan');const tg=S.tgt[cur]||maxLv(cur);
-  p.innerHTML=`<p class="hint">가이드의 <b>최소 재료·최단 믹스</b> 경로 그대로, <b>원하는 최종 레벨</b>까지 맞추는 순서예요. 하위 기본 재료는 순서에서 빼고 아래 <b>모을 재료</b>로 모아 보여 줍니다. <b>보너스 +10 우선</b>=실제 +10 보너스를 받는 쪽 우선, <b>육성 레벨 최소</b>=사냥 육성 부담 최소. 각 단계의 <b>믹스 Lv.</b>는 두 재료의 현재 렙과 각 재료 최대 렙(기본+25, 성수 미적용)으로 계산한 <b>실제 믹스 결과</b>예요(예: 150+146 → 158). 목표보다 낮으면 옆에 <b>육성 Lv.</b>로 얼마나 더 올려야 하는지 표시해요.</p>
+  p.innerHTML=`<p class="hint">가이드의 <b>최소 재료·최단 믹스</b> 경로 그대로, <b>원하는 최종 레벨</b>까지 맞추는 순서예요. 하위 기본 재료는 순서에서 빼고 아래 <b>모을 재료</b>로 모아 보여 줍니다. <b>보너스 +10 우선</b>=실제 +10 보너스를 받는 쪽 우선, <b>육성 레벨 최소</b>=사냥 육성 부담 최소, <b>빠른 믹스</b>=고레벨 '믹스 후 육성'을 줄이고 <b>재료 단계에서 레벨을 올려</b>(성수 적극 사용) +10 보너스로 목표를 맞춰요. 각 단계의 <b>믹스 Lv.</b>는 두 재료의 현재 렙과 각 재료 최대 렙(기본+25, 성수 미적용)으로 계산한 <b>실제 믹스 결과</b>예요(예: 150+146 → 158). 목표보다 낮으면 옆에 <b>육성 Lv.</b>로 얼마나 더 올려야 하는지 표시해요.</p>
   <details class="rules"><summary>레벨 계산 공식 (게임·사이트 코드와 동일)</summary><ul>
   <li>평균값 = ⌊(메인 현재렙 + 서브 현재렙) ÷ 2⌋</li>
   <li>x = ⌊100 × 메인 현재렙 ÷ 메인최대렙⌋ (최대 100) · y = ⌊100 × 서브 현재렙 ÷ 서브최대렙⌋ (최대 100)</li>
@@ -1003,10 +1003,10 @@ function renderPlan(){const p=$('#p-plan');const tg=S.tgt[cur]||maxLv(cur);
   <div class="grid2"><div class="field"><label>최종 목표 레벨 (Lv.${lvl(cur)} ~ ${maxLv(cur)})</label><input id="pt" type="number" inputmode="numeric" value="${tg}" min="${lvl(cur)}" max="${maxLv(cur)}"></div>
   <div class="field"><label>직접 육성 최대 레벨 (이 레벨 넘게는 사냥으로 안 올림)</label><input id="pc" type="number" inputmode="numeric" value="${S.cap}"></div>
   <div class="field"><label>성수 가중치 (0 = 성수 개수 무시, 높을수록 성수 아끼는 쪽)</label><input id="pw" type="number" inputmode="decimal" value="${S.hw}" step="0.5" min="0"></div>
-  <div class="field"><label>계산 기준</label><div class="seg" id="pmode"><button data-v="1" class="${S.bf!==false?'on':''}">보너스 +10 우선</button><button data-v="0" class="${S.bf===false?'on':''}">육성 레벨 최소</button></div></div>
+  <div class="field"><label>계산 기준</label><div class="seg" id="pmode"><button data-v="1" class="${S.bf!==false&&(S.postW||1)<=1?'on':''}">보너스 +10 우선</button><button data-v="0" class="${S.bf===false&&(S.postW||1)<=1?'on':''}">육성 레벨 최소</button><button data-v="f" class="${S.bf!==false&&(S.postW||1)>1?'on':''}">빠른 믹스 (성수·보너스)</button></div></div>
   <div class="field" style="display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap;grid-column:1/-1"><button class="btn pri" id="prun">플랜 계산</button><button class="btn" id="pmax">최대 레벨로</button><button class="btn" id="pcopy">플랜 복사</button></div></div>
   <div id="pout" style="margin-top:12px"></div>`;
-  $('#prun').onclick=runPlan;$$('#pmode button').forEach(b=>b.onclick=()=>{S.bf=b.dataset.v==='1';save();$$('#pmode button').forEach(x=>x.classList.toggle('on',x===b));runPlan()});$('#pmax').onclick=()=>{$('#pt').value=maxLv(cur);runPlan()};$('#pcopy').onclick=()=>{if(PLAN&&PLAN.steps)copy(planText());else toast('먼저 플랜을 계산하세요')};
+  $('#prun').onclick=runPlan;$$('#pmode button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='f'){S.bf=true;S.postW=3}else{S.bf=v==='1';S.postW=1}save();$$('#pmode button').forEach(x=>x.classList.toggle('on',x===b));runPlan()});$('#pmax').onclick=()=>{$('#pt').value=maxLv(cur);runPlan()};$('#pcopy').onclick=()=>{if(PLAN&&PLAN.steps)copy(planText());else toast('먼저 플랜을 계산하세요')};
   ['pt','pc','pw'].forEach(i=>$('#'+i).addEventListener('keydown',e=>{if(e.key==='Enter')runPlan()}));runPlan()}
 function planMats(bs){const g={};
   bs.forEach(s=>{const o=g[s.n.id]||(g[s.n.id]={id:s.n.id,core:s.n.core,cnt:0,from:s.from,to:s.L,hw:0});o.cnt++;o.from=Math.min(o.from,s.from);o.to=Math.max(o.to,s.L);o.hw+=s.hw||0});
@@ -1015,7 +1015,7 @@ function planMats(bs){const g={};
 function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').value||maxLv(cur))),cap=Math.max(1,Math.min(2000,+$('#pc').value||180)),hw=Math.max(0,+$('#pw').value||0);
   S.tgt[cur]=tg;S.cap=cap;S.hw=hw;save();
   const t0=performance.now();const tree=build(cur,'root',[],0);let res;
-  try{res=plan(tree,cap,hw,S.bf!==false)}catch(e){$('#pout').innerHTML=`<div class="empty">계산 중 오류가 났어요: <code>${esc(e.message)}</code></div>`;return}
+  try{res=plan(tree,cap,hw,S.bf!==false,S.postW||1)}catch(e){$('#pout').innerHTML=`<div class="empty">계산 중 오류가 났어요: <code>${esc(e.message)}</code></div>`;return}
   const T=res.T;let reachMax=-1;for(let L=T.max;L>=T.min;L--)if(T.cost[L]<Infinity){reachMax=L;break}
   let L=tg,note='';
   if(!(T.cost[L]<Infinity)){let up=-1;for(let x=tg+1;x<=T.max;x++)if(T.cost[x]<Infinity){up=x;break}
