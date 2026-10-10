@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v56</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v57</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -1029,7 +1029,7 @@ function renderPlan(){const p=$('#p-plan');const tg=S.tgt[cur]||maxLv(cur);
 function planMats(bs){const g={};
   bs.forEach(s=>{const o=g[s.n.id]||(g[s.n.id]={id:s.n.id,core:s.n.core,cnt:0,from:s.from,to:s.L,hw:0});o.cnt++;o.from=Math.min(o.from,s.from);o.to=Math.max(o.to,s.L);o.hw+=s.hw||0});
   const rows=Object.values(g).sort((a,b)=>lvl(b.id)-lvl(a.id));
-  return `<div class="mgroup"><h3><i style="background:var(--drop)"></i>먼저 모을 기본 재료 <span class="lv">${rows.length}종 · ${bs.length}마리</span></h3><div class="chips">${rows.map(o=>`<span class="chip">${face(o.id)}${esc(nm(o.id))} <span class="tag ${o.core>0?'drop':'need'}">${o.core>0?'사냥':'구함'}</span> <span class="lv">${o.from>lvl(o.id)?`Lv.${lvl(o.id)}→${o.to}`:`Lv.${o.to}`}</span> ×${o.cnt} <span class="lv">기본${lvl(o.id)}~최대${mxN(o.id)}</span>${o.hw?` · 성수 ${o.hw}`:''}</span>`).join('')}</div></div>`}
+  return `<div class="mgroup"><h3><i style="background:var(--drop)"></i>먼저 모을 기본 재료 <span class="lv">${rows.length}종 · ${bs.length}마리</span></h3><div class="chips">${rows.map(o=>`<span class="chip">${face(o.id)}${esc(nm(o.id))} <span class="tag ${o.core>0?'drop':'need'}">${o.core>0?'사냥':'구함'}</span> <span class="lv">${o.from>lvl(o.id)?`Lv.${lvl(o.id)}→${o.to}`:`Lv.${o.to}`}</span> ×${o.cnt} <span class="lv">기본${lvl(o.id)}~최대${mxN(o.id)}</span>${o.hw?` · Lv.${o.to}까지 <b>성수 ${o.hw}개</b>`:''}</span>`).join('')}</div></div>`}
 function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').value||maxLv(cur))),cap=Math.max(1,Math.min(2000,+$('#pc').value||180)),hw=Math.max(0,+$('#pw').value||0);
   S.tgt[cur]=tg;S.cap=cap;S.hw=hw;save();
   const t0=performance.now();const tree=build(cur,'root',[],0);let res;
@@ -1049,7 +1049,7 @@ function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').valu
   $('#pout').innerHTML=`${note?`<div class="note">${note}</div>`:''}
   <div class="totals"><div class="tot"><span>최종 결과</span><b style="color:var(--corn)">Lv.${L}</b><span>이 설정의 최고 도달 Lv.${reachMax}</span></div>
   <div class="tot"><span>직접 올릴 레벨 합계</span><b>${fmt(ups)}</b><span>${trainList.length}마리 육성</span></div>
-  <div class="tot"><span>필요 성수</span><b style="color:var(--drop)">${hwT}개</b><span>기본Lv+25 초과분 10레벨당 1개 (최대 8)</span></div>
+  <div class="tot"><span>필요 성수</span><b style="color:var(--drop)">${hwT}개</b><span>최대렙(기본+25) 초과분 10레벨당 1개 · 초과 못 하면 0개 (최대 8)</span></div>
   <div class="tot"><span>믹스 횟수</span><b>${mixes}</b><span>+10 보너스 ${perfect}/${mixes}회 · 계산 ${ms<1000?Math.round(ms)+'ms':(ms/1000).toFixed(1)+'초'}</span></div></div>
   <p class="hint">가이드와 같은 <b>최소 재료·최단 믹스</b> 순서예요. 위에서 아래로 진행하세요. <b>성급(별)</b>은 가이드 탭 경로 그대로, 여기서는 <b>레벨</b>을 맞춥니다.</p>
   ${base.length?planMats(base):''}
