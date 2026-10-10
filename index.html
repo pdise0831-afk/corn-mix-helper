@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v55</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v56</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -710,7 +710,21 @@ function packPlan(P,lpool){const mats=Object.keys(P.mats).map(id=>{const a=alloc
   let f=0,j=0;mats.forEach(m=>m.slots.forEach(s=>s>=5?f++:j++));
   return{mats,f,j,t:f+j,steps:P.steps.length+P.steps.reduce((a,s)=>a+(s.jc&&s.jc.sub?s.jc.sub.length:0),0),mixes:P.mixes,evos:P.evos,
     remain:mats.reduce((a,m)=>a+m.rem.length,0),hunts:Math.round(mats.reduce((a,m)=>a+huntOf(m.slots),0)),huntsRem:Math.round(mats.reduce((a,m)=>a+m.rem.reduce((x,s)=>x+huntsFor(s),0),0)),P}}
-/* 전체 스마트 계산: 완료·보유 반영 → 보유 재료 할인 → 재계산 → 배정 */
+/* ── 사이트(corn.hprag.site) 알고리즘 그대로: 모든 믹스 자식=5성, 결과<5성(drops)이면 잡성 누적 ── */
+function siteMats(root){const five={},junk={};
+ (function w(n,m5,mJ){
+   if(n.eff!=='mix'||!n.main||!n.sub){const k=nm(n.id);if(m5>0)five[k]=(five[k]||0)+m5;if(mJ>0)junk[k]=(junk[k]||0)+mJ;return}
+   const r=mixStar(n.main.id,5,n.sub.id,5,n.id,lvl(n.id));const nj=mJ+(r<5?m5:0);
+   w(n.main,m5,nj);w(n.sub,m5,nj);
+ })(root,1,0);
+ const idOf={};Object.keys(M).forEach(k=>{idOf[M[k][0]]=+k});
+ const names=[...new Set([...Object.keys(five),...Object.keys(junk)])];
+ const inv=invOf();const mats=names.map(k=>{const id=idOf[k];const slots=[];for(let i=0;i<(five[k]||0);i++)slots.push(5);for(let i=0;i<(junk[k]||0);i++)slots.push(2);const o=inv[id]||{};const pool=[];for(let st=5;st>=1;st--)for(let i=0;i<(o[st]||0);i++)pool.push(st);const A=alloc(slots,pool);return{id,slots,kind:core(id)>0?'drop':'need',rem:A.rem,used:A.used}});
+ mats.sort((a,b)=>(a.kind>b.kind?1:a.kind<b.kind?-1:0)||b.slots.length-a.slots.length||lvl(a.id)-lvl(b.id));
+ let f=0,j=0;mats.forEach(m=>m.slots.forEach(x=>x>=5?f++:j++));
+ return{mats,f,j,t:f+j};
+}
+/* 전체 스마트 계산 */
 function smartAll(clean){const root=build(cur,'root',[],0);markEff(root,S.mode);
   const {act,pool}=assignOwned(root,clean?{}:invOf(),clean?{}:histOf());
   const mixIds=new Set();(function w(n){if(n.eff==='mix'){mixIds.add(n.id);w(n.main);w(n.sub)}})(root);
@@ -790,7 +804,7 @@ function setTab(t){TAB=t;$$('.tabs button').forEach(x=>x.classList.toggle('on',x
 $$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 let R=null,ROOT=null,ROWS=[],COST=null;
 const qty=()=>Math.max(1,+(S.qty[cur]||1));
-function render(){S.hmin=true;S.w5=6;renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();
+function render(){S.hmin=true;S.w5=6;renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();{const SP=siteMats(SM.root);SM.mats=SP.mats;SM.f=SP.f;SM.j=SP.j;SM.t=SP.t;SM.total=SP.t;SM.site=SP;}
   renderTarget();renderGuide();renderInv();renderMap();renderTools();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
 let SM=null;
 function buildRows(){const Q=qty();
@@ -917,7 +931,7 @@ function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m'
 function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=SM.F||null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
   const recTxt=(ROOT&&ROOT.main&&(X[cur]||[]).length)?'위 <b>믹스 공식</b>으로 만들 수 있어요. (사냥 코어가 있어 기본은 사냥이에요.)':'이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다.';
   const rec=(ROOT&&ROOT.main&&ROOT.sub&&(X[cur]||[]).length)?(()=>{const M=nm(ROOT.main.id),U=nm(ROOT.sub.id),R=mixStar(ROOT.main.id,5,ROOT.sub.id,5,cur,lvl(cur));return `<div class="note"><b>믹스 공식(5성 기준)</b> — ${esc(M)} <b>★5</b> + ${esc(U)} <b>★5</b> → <b>${esc(nm(cur))} ★${R}</b>${R<5?` <span class="lv">(같은 헨치 1마리로 진화 ★${R}→★${R+1})</span>`:''}</div>`})():'';
-  p.innerHTML=`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'잡성')} ${G.j}마리 진화로 올림</span></div>
+  p.innerHTML=`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료 (사이트 기준)</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'잡성')} ${G.j}마리 진화로 올림</span></div>
     <div class="sc-cmp"><span class="lv">최소 믹스</span><b>${G.steps}단계</b><span>믹스 ${G.P.mixes} + 진화 ${G.P.evos}</span></div><div class="sc-cmp"><span class="lv">기대 사냥 (별 확률 기준)</span><b>${SM.hunts}회</b><span>남은 ${SM.huntsRem}회</span></div>${SM.base?`<div class="sc-cmp"><span class="lv">보유 재료 반영</span><b>남은 ${SM.remain}마리 · 행동 ${SM.steps}회</b><span>빈손이면 남은 ${SM.base.t}마리 · 행동 ${SM.base.steps}회${SM.base.steps>SM.steps?' → '+(SM.base.steps-SM.steps)+'회 단축':''}</span></div>`:''}${FM?`<div class="sc-cmp"><span class="lv">운 반영(보너스 체크) 재료</span><b>${FM.t}마리</b><span>${SM.t>FM.t?'보장 '+SM.t+' → −'+(SM.t-FM.t)+'마리':'보장과 동일'} · 진화 ${FM.evos}회</span></div>`:''}
 </div>
   <div class="bar">${Object.keys(fx).length?`<span class="tag evo">운(별+1) ${Object.keys(fx).length}건 반영</span><button class="btn sm" id="fxr">보너스 체크 초기화</button>`:""}<button class="btn sm" id="gcp">가이드 복사</button></div>${rec}
