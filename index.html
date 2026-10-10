@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v59</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v60</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -711,19 +711,26 @@ function packPlan(P,lpool){const mats=Object.keys(P.mats).map(id=>{const a=alloc
   return{mats,f,j,t:f+j,steps:P.steps.length+P.steps.reduce((a,s)=>a+(s.jc&&s.jc.sub?s.jc.sub.length:0),0),mixes:P.mixes,evos:P.evos,
     remain:mats.reduce((a,m)=>a+m.rem.length,0),hunts:Math.round(mats.reduce((a,m)=>a+huntOf(m.slots),0)),huntsRem:Math.round(mats.reduce((a,m)=>a+m.rem.reduce((x,s)=>x+huntsFor(s),0),0)),P}}
 /* ── 사이트(corn.hprag.site) 알고리즘 그대로: 모든 믹스 자식=5성, 결과<5성(drops)이면 잡성 누적 ── */
-function siteMats(root){const five={},junk={};
+function siteMats(root,ownedMap){const five={},junk={};
+ const ov=ownedMap||invOf();const usedOwn={};
  (function w(n,m5,mJ){
-   if(n.eff!=='mix'||!n.main||!n.sub){const k=nm(n.id);if(m5>0)five[k]=(five[k]||0)+m5;if(mJ>0)junk[k]=(junk[k]||0)+mJ;return}
-   const r=mixStar(n.main.id,5,n.sub.id,5,n.id,lvl(n.id));const nj=mJ+(r<5?m5:0);
-   w(n.main,m5,nj);w(n.sub,m5,nj);
+   let m=m5;
+   if(n.main&&n.sub&&m>0){const o=ov[n.id]||{};let have=Object.keys(o).reduce((a,k)=>a+(o[k]||0),0)-(usedOwn[n.id]||0);if(have>0){const c=Math.min(have,m);usedOwn[n.id]=(usedOwn[n.id]||0)+c;m-=c}if(m<=0)return}
+   if(n.eff!=='mix'||!n.main||!n.sub){const k=nm(n.id);if(m>0)five[k]=(five[k]||0)+m;if(mJ>0)junk[k]=(junk[k]||0)+mJ;return}
+   const r=mixStar(n.main.id,5,n.sub.id,5,n.id,lvl(n.id));const nj=mJ+(r<5?m:0);
+   w(n.main,m,nj);w(n.sub,m,nj);
  })(root,1,0);
  const idOf={};Object.keys(M).forEach(k=>{idOf[M[k][0]]=+k});
  const names=[...new Set([...Object.keys(five),...Object.keys(junk)])];
- const inv=invOf();const mats=names.map(k=>{const id=idOf[k];const slots=[];for(let i=0;i<(five[k]||0);i++)slots.push(5);for(let i=0;i<(junk[k]||0);i++)slots.push(2);const o=inv[id]||{};const pool=[];for(let st=5;st>=1;st--)for(let i=0;i<(o[st]||0);i++)pool.push(st);const A=alloc(slots,pool);return{id,slots,kind:core(id)>0?'drop':'need',rem:A.rem,used:A.used}});
+ const inv=ov;const mats=names.map(k=>{const id=idOf[k];const slots=[];for(let i=0;i<(five[k]||0);i++)slots.push(5);for(let i=0;i<(junk[k]||0);i++)slots.push(2);const o=inv[id]||{};const pool=[];for(let st=5;st>=1;st--)for(let i=0;i<(o[st]||0);i++)pool.push(st);const A=alloc(slots,pool);return{id,slots,kind:core(id)>0?'drop':'need',rem:A.rem,used:A.used}});
  mats.sort((a,b)=>(a.kind>b.kind?1:a.kind<b.kind?-1:0)||b.slots.length-a.slots.length||lvl(a.id)-lvl(b.id));
  let f=0,j=0;mats.forEach(m=>m.slots.forEach(x=>x>=5?f++:j++));
  return{mats,f,j,t:f+j};
 }
+/* 보유 수량까지 반영해서 사이트 기준(5성/잡성) 숫자를 만든다 */
+function computeSM(){const r=smartAll();const SP=siteMats(r.root);r.site=SP;r.mats=SP.mats;r.f=SP.f;r.j=SP.j;r.t=SP.t;r.total=SP.t;
+ r.remain=SP.mats.reduce((a,m)=>a+m.rem.length,0);
+ const hasInv=Object.keys(invOf()).length>0;r.base=hasInv?{t:siteMats(r.root,{}).t,steps:(r.base&&r.base.steps)||r.steps}:null;return r}
 /* 전체 스마트 계산 */
 function smartAll(clean){const root=build(cur,'root',[],0);markEff(root,S.mode);
   const {act,pool}=assignOwned(root,clean?{}:invOf(),clean?{}:histOf());
@@ -804,7 +811,7 @@ function setTab(t){TAB=t;$$('.tabs button').forEach(x=>x.classList.toggle('on',x
 $$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 let R=null,ROOT=null,ROWS=[],COST=null;
 const qty=()=>Math.max(1,+(S.qty[cur]||1));
-function render(){S.hmin=true;S.w5=6;renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=smartAll();{const SP=siteMats(SM.root);SM.mats=SP.mats;SM.f=SP.f;SM.j=SP.j;SM.t=SP.t;SM.total=SP.t;SM.site=SP;}
+function render(){S.hmin=true;S.w5=6;renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=computeSM();
   renderTarget();renderGuide();renderInv();renderMap();renderTools();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
 let SM=null;
 function buildRows(){const Q=qty();
@@ -987,7 +994,7 @@ function renderInv(){const p=$('#p-inv');if(!SM)return;const iv=invOf(),ids=tree
   <p class="hint">사냥으로 얻은 코어를 <b>5성</b>과 <b>잡성</b> 두 칸에만 넣으세요. 5성 이하는 모두 <b>잡성</b>으로 취급해요. 가이드가 바로 다시 계산돼요. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요.</p>
   <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.length?leaf.map(row).join(''):'<div class="empty">아직 모자란 재료가 없어요 🎉</div>'}</div>
   ${mix.length?`<div class="mgroup"><h3><i style="background:var(--corn)"></i>중간 헨치 (이미 만들어 둔 것) <span class="lv">${mix.length}종</span></h3>${mix.map(row).join('')}</div>`:''}`;
-  const refresh=()=>{const y=window.scrollY;SM=smartAll();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y)};
+  const refresh=()=>{const y=window.scrollY;SM=computeSM();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y)};
   const set=(id,s,v)=>{const o=iv[id]||(iv[id]={});o[s]=Math.max(0,Math.min(999,v));if(!o[s])delete o[s];if(!Object.keys(o).length)delete iv[id];save();refresh()};
   p.querySelectorAll('[data-iv]').forEach(b=>b.onclick=()=>{const[id,s,d]=b.dataset.iv.split(',').map(Number);set(id,s,((iv[id]||{})[s]||0)+d)});
   p.querySelectorAll('[data-ivi]').forEach(i=>i.onchange=()=>{const[id,s]=i.dataset.ivi.split(',').map(Number);set(id,s,+i.value||0)});
