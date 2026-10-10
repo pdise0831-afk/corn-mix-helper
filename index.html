@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v54</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v55</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -626,7 +626,7 @@ const invOf=()=>S.inv[cur]||(S.inv[cur]={});
 const histOf=()=>S.hist[cur]||(S.hist[cur]={});
 const jdOf=()=>S.jd[cur]||(S.jd[cur]={});
 const fixOf=()=>S.fix[cur]||(S.fix[cur]={});
-const gReq=g=>2;
+const gReq=g=>5;
 /* ── 운(보너스) 기대값 + 사냥 평균 ── */
 const DEFRATE={2:25,3:25,4:25,5:25};
 if(!S.rate)S.rate=Object.assign({},DEFRATE);
