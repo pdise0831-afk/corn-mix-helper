@@ -319,7 +319,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v60</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v61</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -715,7 +715,7 @@ function siteMats(root,ownedMap){const five={},junk={};
  const ov=ownedMap||invOf();const usedOwn={};
  (function w(n,m5,mJ){
    let m=m5;
-   if(n.main&&n.sub&&m>0){const o=ov[n.id]||{};let have=Object.keys(o).reduce((a,k)=>a+(o[k]||0),0)-(usedOwn[n.id]||0);if(have>0){const c=Math.min(have,m);usedOwn[n.id]=(usedOwn[n.id]||0)+c;m-=c}if(m<=0)return}
+   if(n.eff==='mix'&&n.main&&n.sub&&m>0){const o=ov[n.id]||{};let have=Object.keys(o).reduce((a,k)=>a+(o[k]||0),0)-(usedOwn[n.id]||0);if(have>0){const c=Math.min(have,m);usedOwn[n.id]=(usedOwn[n.id]||0)+c;m-=c}if(m<=0)return}
    if(n.eff!=='mix'||!n.main||!n.sub){const k=nm(n.id);if(m>0)five[k]=(five[k]||0)+m;if(mJ>0)junk[k]=(junk[k]||0)+mJ;return}
    const r=mixStar(n.main.id,5,n.sub.id,5,n.id,lvl(n.id));const nj=mJ+(r<5?m:0);
    w(n.main,m,nj);w(n.sub,m,nj);
@@ -873,7 +873,7 @@ function renderMat(){const p=$('#p-mat');if(!p)return;const drop=ROWS.filter(r=>
   $('#rsh').onclick=()=>{if(confirm('이 목표의 보유 코어 입력을 모두 지울까요?')){delete S.inv[cur];save();render()}};
   $('#fill').onclick=()=>{const iv=invOf();SM.mats.forEach(m=>{const o=iv[m.id]||(iv[m.id]={});m.rem.forEach(s=>o[s]=(o[s]||0)+1)});save();render()}}
 function setHave(id,k,abs,d){const r=ROWS.find(x=>x.id==id);if(!r)return;const cv=k==='f'?r.hf:r.hj;if(abs!==null)d=abs-cv;if(!d)return;
-  const st=k==='f'?5:Math.max(1,...r.slots.filter(x=>x<5));addInv(+id,st,d);SM=smartAll();renderTarget();renderGuide();renderInv();renderMap()}
+  const st=k==='f'?5:Math.max(1,...r.slots.filter(x=>x<5));addInv(+id,st,d);SM=computeSM();buildRows();renderTarget();renderGuide();renderInv();renderMap();renderMat()}
 /* ───── 사냥 맵 (스마트 가이드 기준 남은 재료) ───── */
 const slotTxt=a=>groupSlots(a).map(([s,c])=>`${starTxt(s)}×${c}`).join(' · ');
 function mapAgg(){const need={},det={};SM.mats.forEach(m=>{if(m.kind==='drop'){need[m.id]=m.rem.length;det[m.id]=m.rem}});
@@ -901,7 +901,7 @@ function logBox(id){const iv=invOf()[id]||{},m=SM.mats.find(x=>x.id==id);
   return `<div class="logbox" id="logbox"><div class="lbh">${face(id)}<div><b>${esc(nm(id))}</b> 득템 기록<div class="lv">필요: ${m?slotTxt(m.slots):'-'} · 남음 ${m?m.rem.length:0}마리</div></div><button class="btn sm" data-lid="${id}">닫기</button></div>
   <div class="lbg">${[5,4,3,2,1].map(st=>`<div class="lbc"><span class="sb s${st}">★${st}</span><b>${iv[st]||0}</b><div><button class="btn sm" data-add="${id},${st},-1" aria-label="빼기">−</button><button class="btn sm pri" data-add="${id},${st},1">+1 득템</button></div></div>`).join('')}</div></div>`}
 function addInv(id,st,d){const iv=invOf(),o=iv[id]||(iv[id]={});const before=SM.remain;o[st]=Math.max(0,(o[st]||0)+d);if(!o[st])delete o[st];if(!Object.keys(o).length)delete iv[id];save();
-  const y=window.scrollY;SM=smartAll();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y);
+  const y=window.scrollY;SM=computeSM();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y);
   if(d>0)toast(`${nm(id)} ★${st} 기록 · 남은 재료 ${before} → ${SM.remain}마리`)}
 function calcGain(){const ids=SM.mats.filter(m=>m.kind==='drop'&&m.rem.length>0).map(m=>m.id);if(!ids.length){toast('남은 드랍 재료가 없어요');return}
   toast('계산 중…');const base=SM.remain,res=[],iv=invOf();let i=0;
