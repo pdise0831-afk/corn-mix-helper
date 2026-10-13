@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v65</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v66</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -362,6 +362,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     <button data-t="dex">도감</button>
     <button data-t="plan">레벨 플랜</button>
     <button data-t="tools">공식·도구</button>
+    <button data-t="gskill">길드 스킬</button>
+    <button data-t="skills">스킬</button>
+    <button data-t="info">게임 정보</button>
   </nav>
   <div class="panel on" id="p-guide"></div>
   <div class="panel" id="p-inv"></div>
@@ -369,6 +372,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   <div class="panel" id="p-dex"></div>
   <div class="panel" id="p-plan"></div>
   <div class="panel" id="p-tools"></div>
+  <div class="panel" id="p-gskill"></div>
+  <div class="panel" id="p-skills"></div>
+  <div class="panel" id="p-info"></div>
   <div class="panel" id="p-steps" style="display:none"></div>
 </div>
 </div>
@@ -838,8 +844,10 @@ function setTab(t){TAB=t;$$('.tabs button').forEach(x=>x.classList.toggle('on',x
 $$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 let R=null,ROOT=null,ROWS=[],COST=null;
 const qty=()=>Math.max(1,+(S.qty[cur]||1));
-function render(){S.hmin=true;S.w5=6;renderTrail();ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=computeSM();
-  renderTarget();renderGuide();renderInv();renderMap();renderDex();renderTools();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
+function render(){S.hmin=true;S.w5=6;renderTrail();
+ if(!cur||!M[cur]){$('#target').classList.remove('on');const fb=$('#fab');if(fb)fb.classList.remove('on');renderGuide();renderDex();renderGSkill();renderSkills();renderInfo();$('#p-plan').innerHTML=NEEDSEL;return}
+ ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=computeSM();
+  renderTarget();renderGuide();renderInv();renderMap();renderDex();renderTools();renderGSkill();renderSkills();renderInfo();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
 let SM=null;
 function buildRows(){const Q=qty();
   ROWS=SM.mats.map(m=>{const id=m.id,f=m.slots.filter(x=>x>=5).length*Q,j=m.slots.filter(x=>x<5).length*Q,rf0=m.rem.filter(x=>x>=5).length,rj0=m.rem.filter(x=>x<5).length;
@@ -865,6 +873,57 @@ function renderTarget(){const sum=o=>Object.values(o).reduce((a,b)=>a+b,0);const
   <div class="progress" title="재료 모은 정도 ${pct}%"><i style="width:${pct}%"></i></div>`;
   $('#favBtn').onclick=()=>{S.fav=isFav?S.fav.filter(x=>x!==cur):[cur,...S.fav];save();renderTarget()}}
 
+/* ───── 길드 스킬 · 스킬 도감 · 게임 정보 (플러그인 데이터) ───── */
+const NEEDSEL='<div class="empty" style="margin:14px 0">위 검색창에서 만들 헨치를 먼저 선택하세요. 이 탭은 헨치를 선택하면 계산이 표시돼요.</div>';
+const GSKILL=[["캐릭터 경험치 증가 1","1레벨당 캐릭터 경험치 2% 증가"],["헨치 경험치 증가 1","1레벨당 헨치 경험치 2% 증가"],["캐릭터 경험치 증가 2","1레벨당 캐릭터 경험치 4% 증가"],["헨치 경험치 증가 2","1레벨당 헨치 경험치 4% 증가"],["전체 경험치 증가","1레벨당 전체 경험치 5% 증가"],["코어 드랍률 증가 1","1레벨당 코어 드랍률 1% 증가"],["아이템 드랍률 증가 1","1레벨당 아이템 드랍률 1% 증가"],["코어 드랍률 증가 2","1레벨당 코어 드랍률 2% 증가"],["GP 드랍률 증가","1레벨당 GP 드랍률 1% 증가"],["전체 드랍률 증가","1레벨당 전체 드랍률 1% 증가"],["캐릭터 데미지 증가 1","1레벨당 캐릭터 데미지 10% 증가"],["캐릭터 공격속도 증가 1","1레벨당 캐릭터 공격속도 10% 증가"],["캐릭터 이동속도 증가","1레벨당 캐릭터 이동속도 1% 증가"],["캐릭터 데미지 증가 2","1레벨당 캐릭터 데미지 20% 증가"],["캐릭터 공격속도 증가 2","1레벨당 캐릭터 공격속도 20% 증가"],["믹스 성공률 증가","1레벨당 믹스 성공률 1% 증가"],["헨치 데미지 증가(PVE)","1레벨당 헨치 데미지 1% 증가(PVE)"],["헨치 공격속도 증가(PVE)","1레벨당 헨치 공격속도 1% 증가(PVE)"],["헨치 받는 아킬레스 데미지 감소","1레벨당 헨치가 받는 아킬레스 데미지 1% 감소"],["헨치 받는 데미지 감소","1레벨당 헨치가 받는 데미지 1% 감소"]];
+const SK100=[[1,"Damage 1","Add +1% Atack."],[2,"Damage 2","Add +1% Atack."],[3,"Damage 3","Add +1% Atack."],[4,"Damage 4","Add +1% Atack."],[5,"Damage 5","Add +1% Atack."],[6,"Damage 6","Add +1% Atack."],[7,"Damage 7","Add +1% Atack."],[8,"Damage 8","Add +1% Atack."],[9,"Damage 9","Add +1% Atack."],[10,"Damage 10","Add +1% Atack."],[11,"Damage 11","Add +1% Atack."],[12,"Damage 12","Add +1% Atack."],[13,"Damage 13","Add +1% Atack."],[14,"Damage 14","Add +1% Atack."],[15,"Damage 15","Add +1% Atack."],[16,"Damage 16","Add +1% Atack."],[17,"Damage 17","Add +1% Atack."],[18,"Damage 18","Add +1% Atack."],[19,"Damage 19","Add +1% Atack."],[20,"Damage 20","Add +1% Atack."],[21,"Defense 1","Add +0,5% Defense."],[22,"Defense 2","Add +0,5% Defense."],[23,"Defense 3","Add +0,5% Defense."],[24,"Defense 4","Add +0,5% Defense."],[25,"Defense 5","Add +0,5% Defense."],[26,"Defense 6","Add +0,5% Defense."],[27,"Defense 7","Add +0,5% Defense."],[28,"Defense 8","Add +0,5% Defense."],[29,"Defense 9","Add +0,5% Defense."],[30,"Defense 10","Add +0,5% Defense."],[31,"Defense 11","Add +0,5% Defense."],[32,"Defense 12","Add +0,5% Defense."],[33,"Defense 13","Add +0,5% Defense."],[34,"Defense 14","Add +0,5% Defense."],[35,"Defense 15","Add +0,5% Defense."],[36,"Defense 16","Add +0,5% Defense."],[37,"Defense 17","Add +0,5% Defense."],[38,"Defense 18","Add +0,5% Defense."],[39,"Defense 19","Add +0,5% Defense."],[40,"Defense 20","Add +0,5% Defense."],[41,"Core Drop 1","Add + 10% All Rates."],[42,"Core Drop 2","Add + 10% All Rates."],[43,"Core Drop 3","Add + 10% All Rates."],[44,"Core Drop 4","Add + 10% All Rates."],[45,"Core Drop 5","Add + 10% All Rates."],[46,"Core Drop 6","Add + 10% All Rates."],[47,"Core Drop 7","Add + 10% All Rates."],[48,"Core Drop 8","Add + 10% All Rates."],[49,"Core Drop 9","Add + 10% All Rates."],[50,"Core Drop 10","Add + 10% All Rates."],[51,"Core Drop 11","Add + 10% All Rates."],[52,"Core Drop 12","Add + 10% All Rates."],[53,"Core Drop 13","Add + 10% All Rates."],[54,"Core Drop 14","Add + 10% All Rates."],[55,"Core Drop 15","Add + 10% All Rates."],[56,"Core Drop 16","Add + 10% All Rates."],[57,"Core Drop 17","Add + 10% All Rates."],[58,"Core Drop 18","Add + 10% All Rates."],[59,"Core Drop 19","Add + 10% All Rates."],[60,"Core Drop 20","Add + 10% All Rates."],[61,"Item Drop 1","Add +4% Life Steal."],[62,"Item Drop 2","Add +4% Life Steal."],[63,"Item Drop 3","Add +4% Life Steal."],[64,"Item Drop 4","Add +4% Life Steal."],[65,"Item Drop 5","Add +4% Life Steal."],[66,"Item Drop 6","Add +4% Life Steal."],[67,"Item Drop 7","Add +4% Life Steal."],[68,"Item Drop 8","Add +4% Life Steal."],[69,"Item Drop 9","Add +4% Life Steal."],[70,"Item Drop 10","Add +4% Life Steal."],[71,"Item Drop 11","Add +4% Life Steal."],[72,"Item Drop 12","Add +4% Life Steal."],[73,"Item Drop 13","Add +4% Life Steal."],[74,"Item Drop 14","Add +4% Life Steal."],[75,"Item Drop 15","Add +4% Life Steal."],[76,"Item Drop 16","Add +4% Life Steal."],[77,"Item Drop 17","Add +4% Life Steal."],[78,"Item Drop 18","Add +4% Life Steal."],[79,"Item Drop 19","Add +4% Life Steal."],[80,"Item Drop 20","Add +4% Life Steal."],[81,"All Exp 1","Add +1% Atack Speed."],[82,"All Exp 2","Add +1% Atack Speed."],[83,"All Exp 3","Add +1% Atack Speed."],[84,"All Exp 4","Add +1% Atack Speed."],[85,"All Exp 5","Add +1% Atack Speed."],[86,"All Exp 6","Add +1% Atack Speed."],[87,"All Exp 7","Add +1% Atack Speed."],[88,"All Exp 8","Add +1% Atack Speed."],[89,"All Exp 9","Add +1% Atack Speed."],[90,"All Exp 10","Add +1% Atack Speed."],[91,"All Exp 11","Add +1% Atack Speed."],[92,"All Exp 12","Add +1% Atack Speed."],[93,"All Exp 13","Add +1% Atack Speed."],[94,"All Exp 14","Add +1% Atack Speed."],[95,"All Exp 15","Add +1% Atack Speed."],[96,"All Exp 16","Add +1% Atack Speed."],[97,"All Exp 17","Add +1% Atack Speed."],[98,"All Exp 18","Add +1% Atack Speed."],[99,"All Exp 19","Add +1% Atack Speed."],[100,"All Exp 20","Add +1% Atack Speed."]];
+const homeCard=()=>{const top=Object.keys(M).map(Number).map(id=>({id,u:mixUse(id)})).filter(x=>x.u>0).sort((a,b)=>b.u-a.u).slice(0,14);
+ return `<div class="mgroup"><h3><i style="background:var(--corn)"></i>어떤 헨치를 만들까요?</h3>
+ <p class="hint">위 검색창에 헨치 이름을 넣으면 <b>재료 · 비용 · 사냥 맵 · 믹스 순서</b>가 계산돼요. 아래 탭에서 <b>도감 · 길드 스킬 · 스킬 · 게임 정보</b>는 검색 없이 지금 바로 볼 수 있어요.</p>
+ <div class="lv" style="margin:12px 0 6px">재료로 많이 쓰이는 코어</div><div class="chips">${top.map(x=>`<button class="chip" onclick="pick(${x.id})">${face(x.id)}${esc(nm(x.id))} <span class="lv">×${x.u}</span></button>`).join('')}</div></div>`};
+function renderGSkill(){const p=$('#p-gskill');if(!p)return;
+ p.innerHTML=`<div class="mgroup"><h3><i style="background:var(--corn)"></i>길드 스킬 ${GSKILL.length}종 <span class="lv">plugin_skilltree.dll 기준</span></h3>
+ <div class="scroll" style="max-height:none"><table class="ptbl"><thead><tr><th>스킬</th><th>레벨당 효과</th></tr></thead><tbody>${GSKILL.map(g=>`<tr><td><b>${g[0]}</b></td><td>${g[1]}</td></tr>`).join('')}</tbody></table></div>
+ <p class="hint">스킬을 선택해 레벨을 올리는 방식이에요. 이미 최대 레벨인 스킬은 업글이 안 되고, 스킬 포인트가 부족해도 안 돼요. <b>초기화는 1억 GP</b>를 쓸까요? 확인창이 떠요. (최대 레벨 수치는 데이터에 없어요)</p></div>`}
+function renderSkills(){const p=$('#p-skills');if(!p)return;
+ p.innerHTML=`<div class="mgroup"><h3><i style="background:var(--corn)"></i>스킬 도감 ${SK100.length}종 <span class="lv">skilltree.bin 기준</span></h3>
+ <div class="bar"><input class="ctl" id="skq" placeholder="스킬 이름 검색 (예: Damage)" style="flex:1;min-width:150px" autocomplete="off"></div>
+ <div class="lv" id="skc" style="margin:8px 0"></div><div class="scroll" style="max-height:60vh" id="skb"></div></div>`;
+ const fill=()=>{const q=($('#skq').value||'').trim().toLowerCase();const rows=SK100.filter(s=>!q||s[1].toLowerCase().includes(q)||s[2].toLowerCase().includes(q));
+  $('#skc').textContent=`${rows.length} / ${SK100.length}종`;
+  $('#skb').innerHTML=`<table class="ptbl"><thead><tr><th>ID</th><th>스킬</th><th>효과</th></tr></thead><tbody>${rows.map(s=>`<tr><td class="n">${s[0]}</td><td><b>${esc(s[1])}</b></td><td>${esc(s[2])}</td></tr>`).join('')||'<tr><td colspan="3">검색 결과가 없어요.</td></tr>'}</tbody></table>`};
+ $('#skq').oninput=fill;fill()}
+function renderInfo(){const p=$('#p-info');if(!p)return;
+ p.innerHTML=`
+ <div class="mgroup"><h3><i style="background:var(--drop)"></i>믹스 실패 복구 <span class="lv">plugin_evolve.dll</span></h3>
+ <div class="rules"><ul>
+ <li>믹스 실패 후 <b>24시간 이내</b> 기록만 복구할 수 있어요.</li>
+ <li>같은 헨치는 <b>최신 기록부터</b> 순서대로 복구해야 해요.</li>
+ <li>복구에는 <b>GP</b>가 들어요. 인벤 공간이 부족하면 실패해요.</li>
+ <li>실수로 스핀 창을 꺼버렸다면 <b>!스핀</b> 명령어로 다시 열 수 있어요.</li></ul></div></div>
+ <div class="mgroup"><h3><i style="background:var(--drop)"></i>장비 옵션 이전 (추출·부여) <span class="lv">plugin_evolve.dll</span></h3>
+ <div class="rules"><ul>
+ <li><b>1번 슬롯</b>에 옵션을 추출할 아이템, <b>2번 슬롯</b>에 부여할 아이템을 드래그해서 올려요.</li>
+ <li>장비 아이템만 가능 · 옵션 없는 아이템은 추출 불가 · 옵션이 이미 있는 아이템엔 부여 불가.</li></ul></div></div>
+ <div class="mgroup"><h3><i style="background:var(--corn)"></i>리믹스 옵션 종류 <span class="lv">plugin_remix.dll</span></h3>
+ <div class="rules"><ul><li>캐릭터 경험치 · 헨치 경험치 · 공격력 · 공격속도 · 대미지 감소 (+%)</li></ul>
+ <p class="hint">리믹스에서 나오는 옵션 종류예요. 수치 범위는 인게임에서 확인해 주세요.</p></div></div>
+ <div class="mgroup"><h3><i style="background:var(--corn)"></i>퀘스트 유형·목표 <span class="lv">plugin_quest.dll</span></h3>
+ <div class="rules"><ul><li>유형: <b>메인 · 일일 · 주간 · 기타</b></li>
+ <li>목표 예시: 몬스터 처치 / 플레이어 격파 / 아이템·GP·코어 획득 / 헨치 믹스 성공 / 아이템 사용 / 장비·헨치 장착 / 헨치 레벨 달성 / 아이템 제작</li></ul></div></div>
+ <div class="mgroup"><h3><i style="background:var(--need)"></i>입장 확인 <span class="lv">plugin_maindown.dll</span></h3>
+ <div class="rules"><ul><li><b>점령전 · 깃발전쟁 · 월드보스 대기실</b> 입장 시 확인창이 떠요.</li></ul></div></div>
+ <div class="mgroup"><h3><i style="background:var(--pt)"></i>버프·지급 효과 지표 20종 <span class="lv">plugin_maindown.dll</span></h3>
+ <p class="hint">히어로/헨치 경험치, 아이템 드랍, 히어로/헨치 대미지 증가·감소, 공격속도, 이동속도, <b>믹스 성공률</b>, 히어로/헨치 스킬 성공률, HP·MP 증가율, 몬스터 선공 방지, Sub-Class 경험치, 리콰이어 성수</p></div>
+ <div class="mgroup"><h3><i style="background:var(--gp)"></i>도감 세트효과 안내 <span class="lv">plugin_book.dll</span></h3>
+ <div class="rules"><ul><li>속성별 등록 수 20 / 40 / 60 / 80 / 100개 달성 시 효과가 적용돼요.</li>
+ <li>60개 등록 효과: <b>브레스 / 스트라이크 / 힐링 / 스내쳐 / 실드</b> 보유 시 스킬 사용</li>
+ <li>80개·100개는 <b>준비중</b>이에요.</li></ul>
+ <p class="hint">속성마다 60개 효과가 다르게 배정되는 것으로 보이는데, 배정표는 데이터에 없어서 인게임 확인이 필요해요.</p></div></div>
+ <div class="mgroup"><h3><i style="background:var(--gp)"></i>사냥 효율 지표 <span class="lv">plugin_book.dll · autoplay</span></h3>
+ <p class="hint">시간당 전투 횟수, 아이템·코어·GP·EXP 시간당 획득, 누적 총수익, 보스 생명력 표시, 코어드랍 O/X 판정</p></div>
+ <div class="mgroup"><h3><i style="background:var(--mute)"></i>인게임 전용 플러그인 안내 <span class="lv">데이터 없음</span></h3>
+ <p class="hint">autoplay(자동사냥) · expedition(원정) · latency(핑) · market(장터·가방 정리) · newhp(HP 표시) · partyfinder(파티 찾기) · production(제작) · skillstatus(스킬 상태) · star(별 코어) · skilltree 실행부 · warp_info.bin(맵 워프 데이터 — 형식 미확정)은 게임 클라이언트 안에서만 돌아가는 UI·로직이고, 웹에서 재현할 수 있는 표 형태의 데이터가 없어요.</p></div>`}
 /* ───── 도감 (속성별 전체 코어 · 인게임 도감 스타일) ───── */
 const DEX_TH=[20,40,60,80,100];
 let dexQ='',dexF='all',dexSort='lv';
@@ -948,7 +1007,7 @@ function mapAgg(){const need={},det={};SM.mats.forEach(m=>{if(m.kind==='drop'){n
   Object.keys(need).forEach(id=>{const ls=LOCH[id];if(!ls||!ls.length){nowhere.push(+id);return}ls.forEach(([mi,ml])=>{const m=maps[mi]||(maps[mi]={mi,items:[],rem:0,kinds:0,five:0});m.items.push({id:+id,rem:need[id],ml,det:det[id]});if(need[id]>0){m.rem+=need[id];m.kinds++;m.five+=det[id].filter(x=>x>=5).length}})});
   return{maps:Object.values(maps).sort((a,b)=>b.kinds-a.kinds||b.rem-a.rem),nowhere,need,det}}
 let LOGID=null,GAIN=null;
-function renderMap(){const p=$('#p-map'),A=mapAgg();
+function renderMap(){const p=$('#p-map');if(!SM){p.innerHTML=NEEDSEL;return}const A=mapAgg();
   const left=Object.values(A.need).filter(v=>v>0).length,remN=Object.values(A.need).reduce((a,b)=>a+b,0);
   const lg=LOGID&&A.det[LOGID]!==undefined?LOGID:null;
   p.innerHTML=`<p class="hint">믹스 가이드 기준으로 <b>아직 모자란 드랍 재료</b>가 많이 나오는 맵부터 보여 줘요. 헨치를 누르면 <b>득템 기록</b> 창이 열려요. 사냥하다 코어를 얻으면 별을 눌러 기록하세요. 높은 별 코어가 나오면 가이드가 다시 계산돼서 모을 재료가 줄어들 수 있어요.</p>
@@ -1002,7 +1061,7 @@ function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m'
     <div class="formula"><span class="tag evo">진화</span>${hnS(n.id)}${sb(x.from)}<span class="op">→</span>${sb(x.to)}${lvb}${use}</div>${lvRangeRow(n)}
     <div class="need">${jcHtml(x.jc,n)}</div>${x.jc.t==='mix'?subHtml(x.jc,key):''}
     </div></div>`}
-function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM)return;const FM=SM.F||null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
+function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM){p.innerHTML=homeCard();return}const FM=SM.F||null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
   const recTxt=(ROOT&&ROOT.main&&(X[cur]||[]).length)?'위 <b>믹스 공식</b>으로 만들 수 있어요. (사냥 코어가 있어 기본은 사냥이에요.)':'이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다.';
   const rec=(ROOT&&ROOT.main&&ROOT.sub&&(X[cur]||[]).length)?(()=>{const M=nm(ROOT.main.id),U=nm(ROOT.sub.id),R=mixStar(ROOT.main.id,5,ROOT.sub.id,5,cur,lvl(cur));return `<div class="note"><b>믹스 공식(5성 기준)</b> — ${esc(M)} <b>★5</b> + ${esc(U)} <b>★5</b> → <b>${esc(nm(cur))} ★${R}</b>${R<5?` <span class="lv">(같은 헨치 1마리로 진화 ★${R}→★${R+1})</span>`:''}</div>`})():'';
   p.innerHTML=`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'잡성')} ${G.j}마리 진화로 올림</span></div>
@@ -1036,7 +1095,7 @@ function guideText(){const g=GS||SM;const st=g.P.steps;let t=`[${nm(cur)}] 스�
   t+='\n■ 모을 재료\n'+g.mats.filter(m=>m.rem.length).map(m=>`- ${nm(m.id)}: ${slotTxt(m.rem)}${m.kind==='need'?' (드랍 불가)':''}`).join('\n');return t}
 /* ───── 보유 코어 ───── */
 function treeIds(){const ids=new Map();(function w(n){if(!n)return;if(!ids.has(n.id))ids.set(n.id,n.eff==='mix'?'mix':'leaf');if(n.eff==='mix'){w(n.main);w(n.sub)}})(SM.root);return ids}
-function renderInv(){const p=$('#p-inv');if(!SM)return;const iv=invOf(),ids=treeIds(),mm={};SM.mats.forEach(m=>mm[m.id]=m);
+function renderInv(){const p=$('#p-inv');if(!SM){p.innerHTML=NEEDSEL;return}const iv=invOf(),ids=treeIds(),mm={};SM.mats.forEach(m=>mm[m.id]=m);
   const starsOf=id=>{const o=iv[id]||{},a=[];for(let s=5;s>=2;s--)for(let k=0;k<(o[s]||0);k++)a.push(s);return a};
   const lbl=s=>s>=5?'5성':'잡성';
   const reqChips=slots=>groupSlots(slots).map(([s,c])=>`<span class="nch">${lbl(s)} <b>×${c}</b></span>`).join('');
@@ -1084,7 +1143,7 @@ function renderSteps(){const p=$('#p-steps'),dk=cur+'|'+S.mode,done=S.done[dk]||
 const stepsText=()=>`[${nm(cur)}] 믹스 순서 (스마트)\n`+R.steps.map((s,i)=>`${i+1}. ${s.n.main.name}${s.n.mg?`${s.n.mg}단`:''} + ${s.n.sub.name}${s.n.sg?`${s.n.sg}단`:''} → ${s.n.name}  [5성 ${s.five}${s.junk?`, 잡성 ${s.junk}`:''}]`).join('\n');
 /* ───── 레벨 플래너 (가이드 경로 + 목표 레벨) ───── */
 let PLAN=null;
-function renderPlan(){const p=$('#p-plan');const tg=S.tgt[cur]||maxLv(cur);
+function renderPlan(){const p=$('#p-plan');if(!cur||!SM){p.innerHTML=NEEDSEL;return}const tg=S.tgt[cur]||maxLv(cur);
   p.innerHTML=`<p class="hint">가이드의 <b>최소 재료·최단 믹스</b> 경로 그대로, <b>원하는 최종 레벨</b>까지 맞추는 순서예요. 하위 기본 재료는 순서에서 빼고 아래 <b>모을 재료</b>로 모아 보여 줍니다. <b>보너스 +10 우선</b>=실제 +10 보너스를 받는 쪽 우선, <b>육성 레벨 최소</b>=사냥 육성 부담 최소, <b>빠른 믹스</b>=고레벨 '믹스 후 육성'을 줄이고 재료 단계에서 레벨을 올려 +10 보너스로 목표를 맞춰요. 각 단계의 <b>믹스 Lv.</b>는 두 재료의 현재 렙과 각 재료 최대 렙(기본+25, 성수 미적용)으로 계산한 <b>실제 믹스 결과</b>예요(예: 150+146 → 158). 목표보다 낮으면 옆에 <b>육성 Lv.</b>로 얼마나 더 올려야 하는지 표시해요.</p>
   <details class="rules"><summary>레벨 계산 공식 (게임·사이트 코드와 동일)</summary><ul>
   <li>평균값 = ⌊(메인 현재렙 + 서브 현재렙) ÷ 2⌋</li>
@@ -1233,12 +1292,12 @@ $('#fabCopy').onclick=()=>{if(TAB==='plan'&&PLAN&&PLAN.steps)copy(planText());el
 /* ───── 시작 화면 ───── */
 function renderWelcome(){const chip=id=>`<button class="chip" onclick="pick(${id})">${face(id)}${esc(nm(id))} <span class="lv">Lv.${lvl(id)}</span></button>`;
   const prog=Object.keys(S.have).filter(id=>M[id]&&Object.keys(S.have[id]).length);
-  $('#welcome').innerHTML=`<h3>만들 헨치를 검색하세요</h3>필요한 5성·잡성 재료, 마켓 시세로 계산한 비용, 사냥 맵, 믹스 순서, 목표 레벨 플랜까지 한 번에 보여 줘요. 체크와 보유 수량은 이 기기에 자동 저장됩니다.
+  $('#welcome').innerHTML=`<h3>만들 헨치를 검색하면 바로 계산해요</h3>아래 탭의 <b>도감 · 길드 스킬 · 스킬 · 게임 정보</b>는 검색 없이 지금 볼 수 있어요. 헨치를 고르면 필요한 5성·잡성 재료, 마켓 시세로 계산한 비용, 사냥 맵, 믹스 순서, 목표 레벨 플랜까지 한 번에 보여 줘요. 체크와 보유 수량은 이 기기에 자동 저장됩니다.
   ${S.fav.length?`<div style="margin-top:14px" class="lv">★ 즐겨찾기</div><div class="chips">${S.fav.filter(id=>M[id]).map(chip).join('')}</div>`:''}
   ${prog.length?`<div style="margin-top:14px" class="lv">모으는 중</div><div class="chips">${prog.map(chip).join('')}</div>`:''}
   <div style="margin-top:14px" class="lv">${S.recent.length?'최근 검색':'예시'}</div><div class="chips">${(S.recent.length?S.recent:[41,1550]).filter(id=>M[id]).map(chip).join('')}</div>`}
 setTxt('cntM',Object.keys(M).length);setTxt('cntX',Object.values(X).reduce((a,b)=>a+b.length,0));setTxt('cntP',Object.keys(PR).length);setTxt('dstamp',DATA_DATE);
-renderWelcome();
+$('#main').style.display='block';renderWelcome();render();
 initSyncUI();
 renderSyncBar();
 try{const sp=new URLSearchParams(location.hash.slice(1)).get('s');if(sp&&applyCode(sp)){toast('불러왔어요 · 이어서 보세요')}}catch(e){}
