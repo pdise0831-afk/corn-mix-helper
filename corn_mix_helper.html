@@ -284,6 +284,27 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .ivr.done::after{content:"";display:none}
 @media (max-width:700px){.stickbar{top:44px}}
 
+/* ───── 도감 타일 (속성별 전체 코어) ───── */
+.dexbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.dexbar input{flex:1;min-width:150px;background:var(--card);border:1.5px solid var(--line);color:var(--husk);border-radius:11px;padding:10px 13px;font:inherit;outline:none}
+.dexbar input:focus{border-color:var(--corn)}
+.dexgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.dextile{background:var(--card);border:1.5px solid var(--line);border-radius:13px;padding:9px 6px 7px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.dextile.reg{border-color:var(--gp);background:color-mix(in srgb,var(--gp) 8%,var(--card))}
+.dextile .tico{position:relative;width:52px;height:52px;border-radius:99px;background:var(--bg);border:2px solid var(--line2);cursor:pointer;flex:none;padding:0}
+.dextile.reg .tico{border-color:var(--gp)}
+.dextile .tico img{width:100%;height:100%;border-radius:99px;object-fit:cover}
+.dextile .tico .ck{position:absolute;right:-4px;bottom:-2px;width:18px;height:18px;border-radius:99px;background:var(--gp);color:#03130a;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center}
+.dextile.reg .tico .ck{display:flex}
+.dextile .tnm{background:none;border:0;padding:0;color:var(--husk);font:inherit;font-size:11.5px;font-weight:600;line-height:1.25;text-align:center;cursor:pointer;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.dextile .tnm:hover{color:var(--corn);text-decoration:underline}
+.dextile .tmeta{display:flex;gap:3px;flex-wrap:wrap;justify-content:center}
+.dextile .tb{font-family:"JetBrains Mono";font-size:10px;padding:1px 5px;border-radius:6px;background:var(--bg);color:var(--mute);white-space:nowrap}
+.dextile .tb.use{color:var(--corn)}
+.dextile .tb.need{color:var(--need);font-weight:700}
+.dextile .tb.zl{color:var(--drop)}
+@media (max-width:700px){.dexgrid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}}
+
 /* sync & modal */
 #syncBtn{display:inline-flex;align-items:center;gap:6px}
 .dot{width:8px;height:8px;border-radius:99px;background:var(--mute);display:inline-block;flex:none}
@@ -319,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v62</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v63</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -421,10 +442,10 @@ const validF=f=>f&&M[f[0]]&&M[f[2]];
 const selectableF=f=>validF(f)&&!isLowDrop(f[0])&&!isLowDrop(f[2]);
 /* ───── 저장 상태 ───── */
 const LS='cornMixHelper.v2';
-let S={sel:{},ov:{},olv:{},done:{},have:{},recent:[],fav:[],mode:0,qty:{},cur:'p',basis:'med',px:{},theme:'dark',cap:180,hw:0,tgt:{}};
+let S={sel:{},ov:{},olv:{},done:{},have:{},recent:[],fav:[],mode:0,qty:{},cur:'p',basis:'med',px:{},theme:'dark',cap:180,hw:0,tgt:{},reg:{}};
 try{const old=JSON.parse(localStorage.getItem('cornMixHelper.v1')||'null');if(old)Object.assign(S,{sel:old.sel||{},ov:old.ov||{},done:old.done||{},recent:old.recent||[],mode:old.mode||0})}catch(e){}
 try{Object.assign(S,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
-const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','ivLeft','hmin','w5','hist','jd'];
+const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','ivLeft','hmin','w5','hist','jd','reg'];
 function slimS(){const o={};SYNC_KEYS.forEach(k=>{const v=S[k];if(v===undefined)return;if(v&&typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)return;o[k]=v});return o}
 const b64=e=>btoa(unescape(encodeURIComponent(e))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const ub64=e=>decodeURIComponent(escape(atob(e.replace(/-/g,'+').replace(/_/g,'/'))));
@@ -844,16 +865,45 @@ function renderTarget(){const sum=o=>Object.values(o).reduce((a,b)=>a+b,0);const
   <div class="progress" title="재료 모은 정도 ${pct}%"><i style="width:${pct}%"></i></div>`;
   $('#favBtn').onclick=()=>{S.fav=isFav?S.fav.filter(x=>x!==cur):[cur,...S.fav];save();renderTarget()}}
 
-/* ───── 도감 (종족별 코어) ───── */
+/* ───── 도감 (속성별 전체 코어 · 인게임 도감 스타일) ───── */
+const DEX_TH=[20,40,60,80,100];
+let dexQ='',dexF='all',dexSort='lv';
+function regToggle(id){id=+id;if(!S.reg)S.reg={};if(S.reg[id])delete S.reg[id];else S.reg[id]=1;save();renderDex()}
+window.regToggle=regToggle;
 function renderDex(){const p=$('#p-dex');if(!p)return;
+ if(!S.reg)S.reg={};
  const need={};if(SM&&SM.mats)SM.mats.forEach(m=>{if(m.slots&&m.slots.length)need[m.id]=m.slots.length});
- const g=RACE_NAMES.map((n,i)=>({n,i,use:[]}));
- Object.keys(M).forEach(k=>{const id=+k;if(core(id)<=0)return;const r=raceOf(id);if(r<0||r>7)return;if(id===294)return;const u=mixUse(id),nd=need[id]||0;if(u>0||nd>0)g[r].use.push({id,u,nd,lv:lvl(id)})});
- g.forEach(s=>s.use.sort((a,b)=>b.nd-a.nd||b.u-a.u||a.lv-b.lv));
- const chip=it=>`<button class="chip ${it.nd?'sel':''}" onclick="pick(${it.id})">${face(it.id,'face sm')}${esc(nm(it.id))} <span class="lv">Lv.${it.lv}</span>${it.u?`<span class="lv">×${it.u}</span>`:''}${it.nd?` <b>필요 ${it.nd}</b>`:''}</button>`;
- p.innerHTML=`<div class="totals"><div class="tot"><span>도감 보너스 (종족별 세트효과)</span><b>20 / 40 / 60 / 80 / 100</b><span>등록 수 달성 시 보너스</span></div><div class="tot"><span>질러</span><b>제외</b><span>믹스 재료 목록에서 뺐어요</span></div></div>
- <p class="hint">종족별 코어 도감이에요. <b>믹스 재료로 쓰이는 코어</b>만 모아 <b>사용처 많은 순</b>으로 보여줘요. <b>×N</b>은 그 코어가 들어가는 믹스 수, <b>필요 N</b>은 지금 목표에 필요한 수량이에요. 이름을 누르면 그 헨치로 이동해요.</p>
- ${g.map(s=>`<div class="mgroup"><h3><i style="background:var(--corn)"></i>${s.n} <span class="lv">믹스 재료 코어 ${s.use.length}종</span></h3>${s.use.length?`<div class="chips">${s.use.map(chip).join('')}</div>`:'<div class="empty">믹스 재료로 쓰이는 코어가 없어요.</div>'}</div>`).join('')}`}
+ const g=RACE_NAMES.map((n,i)=>({n,i,all:[]}));
+ let matN=0;
+ Object.keys(M).forEach(k=>{const id=+k;if(core(id)<=0)return;const r=raceOf(id);if(r<0||r>7)return;const u=mixUse(id),nd=need[id]||0;if(u>0)matN++;g[r].all.push({id,u,nd,lv:lvl(id)})});
+ const totN=g.reduce((a,s)=>a+s.all.length,0),totR=Object.keys(S.reg).filter(id=>M[id]&&core(+id)>0).length;
+ const pct=totN?Math.round(100*totR/totN):0;
+ const tile=it=>`<div class="dextile ${S.reg[it.id]?'reg':''}"><button class="tico" onclick="regToggle(${it.id})" aria-label="${esc(nm(it.id))} 등록 체크">${face(it.id)}<span class="ck">✓</span></button>
+ <button class="tnm" onclick="pick(${it.id})" title="${esc(nm(it.id))} 계산으로 이동">${esc(nm(it.id))}</button>
+ <span class="lv">Lv.${it.lv}</span>
+ ${it.u||it.nd||it.id===294?`<div class="tmeta">${it.u?`<span class="tb use">재료 ×${it.u}</span>`:''}${it.nd?`<span class="tb need">필요 ${it.nd}</span>`:''}${it.id===294?'<span class="tb zl">질러</span>':''}</div>`:''}</div>`;
+ const body=()=>{const q=dexQ.toLowerCase();
+  const html=g.map(s=>{const rows=s.all.filter(it=>{
+    if(q&&!nm(it.id).toLowerCase().includes(q))return false;
+    if(dexF==='reg'&&!S.reg[it.id])return false;if(dexF==='unreg'&&S.reg[it.id])return false;return true});
+   rows.sort(dexSort==='use'?(a,b)=>b.u-a.u||b.nd-a.nd||a.lv-b.lv||a.id-b.id:(a,b)=>a.lv-b.lv||a.id-b.id);
+   if(!rows.length)return'';
+   const regN=s.all.reduce((a,it)=>a+(S.reg[it.id]?1:0),0),rn=s.all.length;
+   const ths=DEX_TH.filter(t=>t<=rn),next=ths.find(t=>regN<t);
+   const nx=next?`다음 보너스 ${next}개까지 ${next-regN}개`:(ths.length?'세트 최대 달성':'전부 등록 시 최대');
+   return `<div class="mgroup"><h3><i style="background:var(--corn)"></i>${s.n} <span class="lv">등록 ${regN}/${rn} · ${nx}</span></h3><div class="dexgrid">${rows.map(tile).join('')}</div></div>`}).join('');
+  return html||`<div class="empty">검색 결과가 없어요. 이름을 다시 확인해 주세요.</div>`};
+ p.innerHTML=`<div class="dexbar"><input id="dexq" type="search" placeholder="코어 이름 검색 (예: 드라코)" value="${esc(dexQ)}" autocomplete="off">
+ <div class="seg" id="dexseg">${[['all','전체'],['unreg','미등록'],['reg','등록']].map(([k,l])=>`<button data-f="${k}" class="${dexF===k?'on':''}">${l}</button>`).join('')}</div>
+ <div class="seg" id="dexsort">${[['lv','레벨순'],['use','사용처순']].map(([k,l])=>`<button data-s="${k}" class="${dexSort===k?'on':''}">${l}</button>`).join('')}</div></div>
+ <div class="totals"><div class="tot"><span>전체 등록률</span><b>${totR} / ${totN} (${pct}%)</b><span>코어 ${totN}종 기준</span></div>
+ <div class="tot"><span>도감 보너스 (속성별 세트효과)</span><b>20 / 40 / 60 / 80 / 100</b><span>속성별 등록 수 달성 시 보너스</span></div>
+ <div class="tot"><span>믹스 재료 코어</span><b>${matN}종</b><span>재료 ×N 표시 · 질러 포함 전체 코어를 보여줘요</span></div></div>
+ <p class="hint">인게임 도감처럼 <b>속성(종족)별로 모든 코어</b>를 보여줘요. <b>아이콘을 누르면 등록 체크</b>가 저장되고(동기화 켜면 기기 간에도 같이 감), 이름을 누르면 그 헨치 계산으로 이동해요. <b>재료 ×N</b>은 그 코어가 들어가는 믹스 수, <b>필요 N</b>은 지금 목표에 필요한 수량이에요.</p>
+ <div id="dexbody">${body()}</div>`;
+ const dq=$('#dexq');if(dq)dq.oninput=()=>{dexQ=dq.value.trim();const b=$('#dexbody');if(b)b.innerHTML=body()};
+ $('#dexseg').querySelectorAll('button').forEach(b=>b.onclick=()=>{dexF=b.dataset.f;renderDex()});
+ $('#dexsort').querySelectorAll('button').forEach(b=>b.onclick=()=>{dexSort=b.dataset.s;renderDex()});}
 /* ───── 재료·비용 탭 ───── */
 function pxCell(r,kind){const p=kind==='f'?r.p5:r.pj,n=kind==='f'?r.f:r.j;if(!n)return'';
   const o=S.px[r.id]||{},mv=o[S.cur+(kind==='f'?'5':'j')]||'';
