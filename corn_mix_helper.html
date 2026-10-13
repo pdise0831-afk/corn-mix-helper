@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v63</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v64</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -875,7 +875,7 @@ function renderDex(){const p=$('#p-dex');if(!p)return;
  const need={};if(SM&&SM.mats)SM.mats.forEach(m=>{if(m.slots&&m.slots.length)need[m.id]=m.slots.length});
  const g=RACE_NAMES.map((n,i)=>({n,i,all:[]}));
  let matN=0;
- Object.keys(M).forEach(k=>{const id=+k;if(core(id)<=0)return;const r=raceOf(id);if(r<0||r>7)return;const u=mixUse(id),nd=need[id]||0;if(u>0)matN++;g[r].all.push({id,u,nd,lv:lvl(id)})});
+ Object.keys(M).forEach(k=>{const id=+k;if(core(id)<=0)return;const r=raceOf(id);if(r<0||r>7)return;const sp=LOCH[id]&&LOCH[id].length,cf=X[id]&&X[id].length;if(!sp&&!cf&&id!==294)return;const u=mixUse(id),nd=need[id]||0;if(u>0)matN++;g[r].all.push({id,u,nd,lv:lvl(id)})});
  const totN=g.reduce((a,s)=>a+s.all.length,0),totR=Object.keys(S.reg).filter(id=>M[id]&&core(+id)>0).length;
  const pct=totN?Math.round(100*totR/totN):0;
  const tile=it=>`<div class="dextile ${S.reg[it.id]?'reg':''}"><button class="tico" onclick="regToggle(${it.id})" aria-label="${esc(nm(it.id))} 등록 체크">${face(it.id)}<span class="ck">✓</span></button>
@@ -899,7 +899,7 @@ function renderDex(){const p=$('#p-dex');if(!p)return;
  <div class="totals"><div class="tot"><span>전체 등록률</span><b>${totR} / ${totN} (${pct}%)</b><span>코어 ${totN}종 기준</span></div>
  <div class="tot"><span>도감 보너스 (속성별 세트효과)</span><b>20 / 40 / 60 / 80 / 100</b><span>속성별 등록 수 달성 시 보너스</span></div>
  <div class="tot"><span>믹스 재료 코어</span><b>${matN}종</b><span>재료 ×N 표시 · 질러 포함 전체 코어를 보여줘요</span></div></div>
- <p class="hint">인게임 도감처럼 <b>속성(종족)별로 모든 코어</b>를 보여줘요. <b>아이콘을 누르면 등록 체크</b>가 저장되고(동기화 켜면 기기 간에도 같이 감), 이름을 누르면 그 헨치 계산으로 이동해요. <b>재료 ×N</b>은 그 코어가 들어가는 믹스 수, <b>필요 N</b>은 지금 목표에 필요한 수량이에요.</p>
+ <p class="hint">인게임 도감처럼 <b>속성(종족)별로 획득 가능한 모든 코어</b>(필드 스폰 ∨ 믹스 가능)를 보여줘요. <b>아이콘을 누르면 등록 체크</b>가 저장되고(동기화 켜면 기기 간에도 같이 감), 이름을 누르면 그 헨치 계산으로 이동해요. <b>재료 ×N</b>은 그 코어가 들어가는 믹스 수, <b>필요 N</b>은 지금 목표에 필요한 수량이에요.</p>
  <div id="dexbody">${body()}</div>`;
  const dq=$('#dexq');if(dq)dq.oninput=()=>{dexQ=dq.value.trim();const b=$('#dexbody');if(b)b.innerHTML=body()};
  $('#dexseg').querySelectorAll('button').forEach(b=>b.onclick=()=>{dexF=b.dataset.f;renderDex()});
