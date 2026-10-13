@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v69</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v70</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -353,6 +353,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 </div>
 <div id="trail" class="trail" style="display:none"></div>
 <section id="target" class="target"></section>
+<section id="statc" style="display:none;margin-top:12px"></section>
 <div id="welcome" class="welcome"></div>
 <div id="main" style="display:none">
   <nav class="tabs" role="tablist">
@@ -852,9 +853,9 @@ $$('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 let R=null,ROOT=null,ROWS=[],COST=null;
 const qty=()=>Math.max(1,+(S.qty[cur]||1));
 function render(){S.hmin=true;S.w5=6;renderTrail();
- if(!cur||!M[cur]){$('#target').classList.remove('on');const fb=$('#fab');if(fb)fb.classList.remove('on');renderGuide();renderDex();renderGSkill();renderSkills();renderItems();renderQuest();renderExplore();renderInfo();$('#p-plan').innerHTML=NEEDSEL;return}
+ if(!cur||!M[cur]){$('#target').classList.remove('on');const fb=$('#fab');if(fb)fb.classList.remove('on');renderGuide();renderDex();renderGSkill();renderSkills();renderItems();renderQuest();renderExplore();renderInfo();{const _sc=$('#statc');if(_sc)_sc.style.display='none'}$('#p-plan').innerHTML=NEEDSEL;return}
  ROOT=build(cur,'root',[],0);R=calc(ROOT,S.mode,qty());SM=computeSM();
-  renderTarget();renderGuide();renderInv();renderMap();renderDex();renderTools();renderGSkill();renderSkills();renderItems();renderQuest();renderExplore();renderInfo();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
+  renderTarget();renderStat();renderTarget();renderGuide();renderInv();renderMap();renderDex();renderTools();renderGSkill();renderSkills();renderItems();renderQuest();renderExplore();renderInfo();if(TAB==='plan')renderPlan();else PLAN=null;const fb=$('#fab');if(fb)fb.classList.add('on')}
 let SM=null;
 function buildRows(){const Q=qty();
   ROWS=SM.mats.map(m=>{const id=m.id,f=m.slots.filter(x=>x>=5).length*Q,j=m.slots.filter(x=>x<5).length*Q,rf0=m.rem.filter(x=>x>=5).length,rj0=m.rem.filter(x=>x<5).length;
@@ -934,6 +935,15 @@ function renderExplore(){const p=$('#p-explore');if(!p)return;
   $('#exc').textContent=`${keys.length} / ${Object.keys(byMap).length}개 맵`;
   $('#exb').innerHTML=`<table class="ptbl"><thead><tr><th>맵</th><th class="n">NPC</th><th>워프</th><th>NPC 목록</th></tr></thead><tbody>${keys.map(mi=>{const ns=byMap[mi];return `<tr><td><b>${esc(LOCM[mi]||('?'+mi))}</b></td><td class="n">${ns.length}</td><td>${ns.some(warpName)?'있음':''}</td><td class="lv">${esc(ns.slice(0,8).map(n=>n[4]).join(', '))}${ns.length>8?' 외':''}</td></tr>`}).join('')||'<tr><td colspan="4">검색 결과가 없어요.</td></tr>'}</tbody></table>`};
  $('#exq').oninput=fill;fill()}
+/* ───── 헨치 상세 스탯 카드 (클라이언트 몬스터 테이블) ───── */
+function renderStat(){const el=$('#statc');if(!el)return;const st=MSTAT[cur];
+ if(!st){el.style.display='none';return}
+ const lvA=M[cur]?M[cur][1]:null,same=lvA===st[0];
+ el.style.display='block';
+ el.innerHTML=`<div class="totals"><div class="tot"><span>몬스터 테이블 레벨</span><b>Lv.${st[0]}</b><span>${same?'앱 기본 레벨과 일치':'앱 기본 레벨은 Lv.'+lvA+' — 테이블과 달라요'}</span></div>
+ <div class="tot"><span>종족</span><b>${RN_LABEL[st[1]]||'?'}</b><span>클라이언트 몬스터 테이블 ${Object.keys(MSTAT).length}종 기준</span></div>
+ <div class="tot"><span>HP (추정)</span><b style="color:var(--drop)">${fmt(st[2])}</b><span>컬럼명이 없어 레벨 비례 값으로 추정</span></div></div>
+ <p class="hint">헨치를 선택하면 몬스터 테이블의 스탯이 여기 표시돼요. 나머지 컬럼(모델 번호 등)은 뜻이 확인 안 되어 카드에 넣지 않았어요.</p>`}
 function renderInfo(){const p=$('#p-info');if(!p)return;
  p.innerHTML=`
  <div class="mgroup"><h3><i style="background:var(--drop)"></i>정복 칭호 ${CONQUER.length}종 <span class="lv">conquer.bin 기준</span></h3>
