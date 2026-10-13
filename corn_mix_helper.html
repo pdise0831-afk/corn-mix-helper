@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v64</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v65</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -875,7 +875,7 @@ function renderDex(){const p=$('#p-dex');if(!p)return;
  const need={};if(SM&&SM.mats)SM.mats.forEach(m=>{if(m.slots&&m.slots.length)need[m.id]=m.slots.length});
  const g=RACE_NAMES.map((n,i)=>({n,i,all:[]}));
  let matN=0;
- Object.keys(M).forEach(k=>{const id=+k;if(core(id)<=0)return;const r=raceOf(id);if(r<0||r>7)return;const sp=LOCH[id]&&LOCH[id].length,cf=X[id]&&X[id].length;if(!sp&&!cf&&id!==294)return;const u=mixUse(id),nd=need[id]||0;if(u>0)matN++;g[r].all.push({id,u,nd,lv:lvl(id)})});
+ Object.keys(M).forEach(k=>{const id=+k;const r=raceOf(id);if(r<0||r>7)return;const sp=LOCH[id]&&LOCH[id].length,cf=X[id]&&X[id].length;if(!sp&&!cf&&id!==294)return;const u=mixUse(id),nd=need[id]||0;if(u>0)matN++;g[r].all.push({id,u,nd,lv:lvl(id)})});
  const totN=g.reduce((a,s)=>a+s.all.length,0),totR=Object.keys(S.reg).filter(id=>M[id]&&core(+id)>0).length;
  const pct=totN?Math.round(100*totR/totN):0;
  const tile=it=>`<div class="dextile ${S.reg[it.id]?'reg':''}"><button class="tico" onclick="regToggle(${it.id})" aria-label="${esc(nm(it.id))} 등록 체크">${face(it.id)}<span class="ck">✓</span></button>
