@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v80</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v81</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -460,11 +460,11 @@ const DEPTH={};
 (function(){const STK={};const dep=id=>{if(DEPTH[id]!=null)return DEPTH[id];if(STK[id])return 99;STK[id]=1;let d=(LOCH[id]&&LOCH[id].length)?0:99;const fs=X[id]||[];for(const f of fs){if(!validF(f))continue;d=Math.min(d,1+Math.max(dep(f[0]),dep(f[2])))}STK[id]=0;DEPTH[id]=d;return d};Object.keys(M).forEach(k=>dep(+k))})();
 /* ───── 저장 상태 ───── */
 const LS='cornMixHelper.v2';
-let S={sel:{},ov:{},olv:{},done:{},have:{},recent:[],fav:[],mode:0,qty:{},cur:'p',basis:'med',px:{},theme:'dark',cap:180,hw:0,tgt:{},reg:{},det:{},csets:[]};
+let S={sel:{},ov:{},olv:{},done:{},have:{},recent:[],fav:[],mode:0,qty:{},cur:'p',basis:'med',px:{},theme:'dark',cap:180,hw:0,tgt:{},reg:{},det:{},csets:[],cxf:{}};
 try{const old=JSON.parse(localStorage.getItem('cornMixHelper.v1')||'null');if(old)Object.assign(S,{sel:old.sel||{},ov:old.ov||{},done:old.done||{},recent:old.recent||[],mode:old.mode||0})}catch(e){}
 try{Object.assign(S,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
 if(!S.ts)S.ts=1;
-const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','ivLeft','hmin','w5','hist','jd','reg','det','mode','csets','ts'];
+const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','ivLeft','hmin','w5','hist','jd','reg','det','mode','csets','cxf','ts'];
 function slimS(){const o={};SYNC_KEYS.forEach(k=>{const v=S[k];if(v===undefined)return;if(v&&typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)return;o[k]=v});return o}
 const b64=e=>btoa(unescape(encodeURIComponent(e))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const ub64=e=>decodeURIComponent(escape(atob(e.replace(/-/g,'+').replace(/_/g,'/'))));
@@ -670,6 +670,8 @@ const BONUS=[[120,30],[130,28],[140,25],[150,20],[160,15],[170,10],[180,5],[190,
 const bonusP=l=>{for(const[h,p]of BONUS)if(l<=h)return p;return 0};
 const MIXW=0.25,NEEDF=2;
 if(S.hmin==null)S.hmin=true;if(S.w5==null)S.w5=6;if(S.strat==null)S.strat='smart';if(S.mode==null)S.mode=0;if(!S.inv)S.inv={};if(S.inv&&!S.mig2){Object.keys(S.inv).forEach(k=>{const o=S.inv[k];if(!o)return;const a=(o[3]||0)+(o[4]||0);if(a)o[2]=(o[2]||0)+a;delete o[3];delete o[4]});S.mig2=1;}if(S.ivLeft==null)S.ivLeft=true;if(!S.hist)S.hist={};if(!S.jd)S.jd={};if(!S.fix)S.fix={};if(S.gmode==null)S.gmode='g';
+const X0={};(function(){if(!S.cxf)S.cxf={};Object.keys(S.cxf).forEach(k=>{const v=S.cxf[k];if(M[k]&&Array.isArray(v)&&v.length&&v.every(f=>Array.isArray(f)&&M[f[0]]&&M[f[2]])){X0[k]=X[k]||null;X[k]=v}else delete S.cxf[k]})})();
+const NMID={};Object.keys(M).forEach(k=>{const n=M[k][0].trim();if(!(n in NMID))NMID[n]=+k});
 const baseK=(id,s)=>(1+(S.w5-1)*(Math.max(1,s)-1)/4+0.002*(s-1))*(core(id)>0?1:NEEDF);
 const invOf=()=>S.inv[cur]||(S.inv[cur]={});
 const histOf=()=>S.hist[cur]||(S.hist[cur]={});
@@ -989,6 +991,14 @@ function craftSets(HN){const IT={};ITEMS.forEach(x=>{if(!IT[x[1]])IT[x[1]]=x});
  <div class="bar"><textarea id="csM" class="ctl" rows="2" placeholder="재료x수량 을 쉼표나 줄바꿈으로 구분 (예: 흙색 돌x150, 미스릴x65, 드릴드라x1)" style="width:100%"></textarea></div>
  <div class="bar"><button class="btn pri" onclick="craftSaveSet()">세트 추가</button></div>
  ${ALLSET().map((sc,i)=>`<div class="mapc"><div class="bar" style="justify-content:space-between;margin-bottom:6px"><b>${esc(sc.n)}</b><span><button class="btn sm" onclick="craftCopySet(${i})">복사</button>${i>=CSET0.length?`<button class="btn sm" onclick="craftDelSet(${i})">삭제</button>`:''}</span></div><details class="rules"><summary>재료 ${sc.m.length}종 보기${sc.src?` <span class="lv">· ${esc(sc.src)}</span>`:''}</summary><div class="scroll" style="max-height:none;margin-top:8px"><table class="ptbl"><thead><tr><th>재료</th><th class="n">수량</th><th>참고</th></tr></thead><tbody>${rows(sc)}</tbody></table></div>${sc.note?`<p class="hint">${esc(sc.note)}</p>`:''}</details></div>`).join('')}</div>`}
+function cxBind(){const b=$('#cxSave');if(b)b.onclick=cxSave;const r=$('#cxReset');if(r)r.onclick=cxResetFn;const now=$('#cxNow');if(now)now.textContent=cxNow()}
+function cxSave(){const n1=$('#cxN1').value.trim(),n2=$('#cxN2').value.trim(),g1=Math.max(0,+$('#cxG1').value||0),g2=Math.max(0,+$('#cxG2').value||0);
+ const i1=NMID[n1],i2=NMID[n2];
+ if(!i1||!i2){toast('헨치 이름을 정확히 입력하세요 (예: 뉴큐피트)');return}
+ if(i1===+cur||i2===+cur){toast('결과 헨치 자신은 재료가 될 수 없어요');return}
+ if(!S.cxf)S.cxf={};S.cxf[cur]=[[i1,g1,i2,g2]];X0[cur]=X0[cur]||X[cur]||null;X[cur]=S.cxf[cur];save();render();toast(nm(cur)+' 믹스법을 정정했어요')}
+function cxResetFn(){if(!S.cxf||!S.cxf[cur])return;if(X0[cur])X[cur]=X0[cur];else delete X[cur];delete S.cxf[cur];save();render();toast('원래 공식으로 되돌렸어요')}
+function cxNow(){return (X[cur]||[]).map(f=>nm(f[0])+(f[1]?f[1]+'단':'')+' + '+nm(f[2])+(f[3]?f[3]+'단':'')).join(' / ')||'공식 없음'}
 function renderCraft(){const p=$('#p-craft');if(!p)return;
  const parts={};EQUIP.forEach(e=>{parts[e[3]]=(parts[e[3]]||0)+1});
  const HN={};Object.keys(M).forEach(k=>{const n=String(M[k][0]).trim();if(!HN[n])HN[n]=+k});
@@ -1209,7 +1219,7 @@ function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m'
 function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM){p.innerHTML=homeCard();return}const FM=SM.F||null;const G=FM||SM;GS=G;const st=bup(G.P.steps);const fx=fixOf();
   const recTxt=(ROOT&&ROOT.main&&(X[cur]||[]).length)?'위 <b>믹스 공식</b>으로 만들 수 있어요. (사냥 코어가 있어 기본은 사냥이에요.)':'이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다.';
   const rec=(ROOT&&ROOT.main&&ROOT.sub&&(X[cur]||[]).length)?(()=>{const M=nm(ROOT.main.id),U=nm(ROOT.sub.id),R=mixStar(ROOT.main.id,5,ROOT.sub.id,5,cur,lvl(cur));return `<div class="note"><b>믹스 공식(5성 기준)</b> — ${esc(M)} <b>★5</b> + ${esc(U)} <b>★5</b> → <b>${esc(nm(cur))} ★${R}</b>${R<5?` <span class="lv">(같은 헨치 1마리로 진화 ★${R}→★${R+1})</span>`:''}</div>`})():'';
-  p.innerHTML=modeBar()+`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'잡성')} ${G.j}마리 진화로 올림</span></div>
+  p.innerHTML=modeBar()+(S.cxf&&S.cxf[cur]?`<div class="bar"><span class="tag evo">내가 정정한 믹스법 사용 중</span><button class="btn sm" id="cxReset">원래 공식으로</button></div>`:'')+`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'잡성')} ${G.j}마리 진화로 올림</span></div>
     <div class="sc-cmp"><span class="lv">최소 믹스</span><b>${G.steps}단계</b><span>믹스 ${G.P.mixes} + 진화 ${G.P.evos}</span></div><div class="sc-cmp"><span class="lv">기대 사냥 (별 확률 기준)</span><b>${SM.hunts}회</b><span>남은 ${SM.huntsRem}회</span></div>${SM.base?`<div class="sc-cmp"><span class="lv">보유 재료 반영</span><b>남은 ${SM.remain}마리 · 행동 ${SM.steps}회</b><span>빈손이면 남은 ${SM.base.t}마리 · 행동 ${SM.base.steps}회${SM.base.steps>SM.steps?' → '+(SM.base.steps-SM.steps)+'회 단축':''}</span></div>`:''}${FM?`<div class="sc-cmp"><span class="lv">운 반영(보너스 체크) 재료</span><b>${FM.t}마리</b><span>${SM.t>FM.t?'보장 '+SM.t+' → −'+(SM.t-FM.t)+'마리':'보장과 동일'} · 진화 ${FM.evos}회</span></div>`:''}
 </div>
   <div class="bar">${Object.keys(fx).length?`<span class="tag evo">운(별+1) ${Object.keys(fx).length}건 반영</span><button class="btn sm" id="fxr">보너스 체크 초기화</button>`:""}<button class="btn sm" id="gcp">가이드 복사</button></div>${rec}
@@ -1230,6 +1240,7 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM){p.innerHTML=home
   
   const fr=$('#fxr');if(fr)fr.onclick=()=>{delete S.fix[cur];save();render()};
   p.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>{const v=+b.dataset.sm-1;if((+S.mode||0)!==v){S.mode=v;save();render()}});
+  const cxr=$('#cxReset');if(cxr)cxr.onclick=cxResetFn;
   $$('[data-bon]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.bon,f=fixOf();if(f[k])delete f[k];else f[k]=1;save();render()});
   $('#gcp').onclick=()=>copy(guideText());
 }
@@ -1373,6 +1384,9 @@ function renderTools(){const p=$('#p-tools');const fs=(X[cur]||[]).map((f,i)=>[f
   <div class="mgroup"><h3><i style="background:var(--gp)"></i>전체 헨치 시세표 <span class="lv">${Object.keys(PR).length}종</span></h3>
   <div class="bar"><input class="ctl" id="pf" value="${esc(S.pfq||'')}" placeholder="이름으로 걸러보기" style="flex:1;min-width:150px"><select class="ctl" id="ps"><option value="p5">5성 포인트 높은순</option><option value="p2">2성 포인트 높은순</option><option value="n">거래 많은순</option><option value="nm">이름순</option></select></div>
   <div class="scroll"><table class="ptbl"><thead><tr><th>헨치</th><th>5성 P</th><th>2~4성 최저 P</th><th>5성 GP</th><th>거래</th><th>최근</th></tr></thead><tbody id="ptb"></tbody></table></div></div>
+  <div class="mgroup"><h3><i style="background:var(--need)"></i>믹스법 정정 <span class="lv">${esc(nm(cur))} · 현재: <b id="cxNow"></b></span></h3>
+  <p class="hint">옥수수페이지 DB가 틀린 헨치는 여기서 <b>내가 아는 조합</b>으로 고칠 수 있어요. 게임에서 확인한 메인·서브 헨치 이름과 단(티어)을 넣고 저장하세요. 가이드·모은 것·사냥·레벨 플랜이 전부 새 공식으로 다시 계산되고, 기기 동기화에도 저장돼요.</p>
+  <div class="bar"><input class="ctl" id="cxN1" placeholder="메인 헨치 이름" style="flex:1;min-width:120px"><input class="ctl" id="cxG1" placeholder="단" style="width:58px" inputmode="numeric"><span class="op">+</span><input class="ctl" id="cxN2" placeholder="서브 헨치 이름" style="flex:1;min-width:120px"><input class="ctl" id="cxG2" placeholder="단" style="width:58px" inputmode="numeric"><button class="btn pri" id="cxSave">정정 저장</button></div></div>
   <div class="mgroup"><h3><i style="background:var(--corn)"></i>공식 트리 <span class="lv">공식 선택 · 구함/보유 지정</span></h3><div id="treeBox"></div></div>
   <div class="mgroup"><h3><i style="background:var(--corn)"></i>동기화 · 불러오기 <span class="lv">기기 간 자동 이어하기</span></h3>
   <p class="hint">집·회사·노트북에서 같은 기록으로 이어서 하려면 동기화를 켜 두세요. 헤더 위쪽 <b>동기화</b> 버튼으로 언제든 열 수 있어요.</p>
@@ -1386,7 +1400,7 @@ function renderTools(){const p=$('#p-tools');const fs=(X[cur]||[]).map((f,i)=>[f
     ids.sort((a,b)=>so==='nm'?nm(a).localeCompare(nm(b)):so==='n'?cnt(b)-cnt(a):so==='p2'?low(b)-low(a):v(b,'p5')-v(a,'p5'));
     $('#ptb').innerHTML=ids.map(id=>`<tr><td><div class="nmc">${face(id,'face sm')}<b onclick="pick(${id})">${esc(nm(id))}</b></div></td><td class="n pt">${v(id,'p5')?fmt(v(id,'p5')):'-'}</td><td class="n pt">${low(id)?fmt(low(id)):'-'}</td><td class="n gp">${v(id,'g5')?fmt(v(id,'g5')):'-'}</td><td class="n">${cnt(id)}</td><td class="lv">${last(id).slice(5)}</td></tr>`).join('')};
   $('#pf').oninput=()=>{S.pfq=$('#pf').value;uiSave();fill()};$('#ps').onchange=()=>{S.ps=$('#ps').value;save();fill()};if(S.ps)$('#ps').value=S.ps;fill();
-  renderTree()}
+  renderTree();cxBind()}
 document.addEventListener('click',async e=>{
   const t=e.target&&e.target.closest?e.target.closest('#ghon,#synon,#ghnow,#ghpull,#ghoff,#synnow,#synoff,#synrand,#syncopy,#syc,#syl'):null;
   if(!t)return; e.preventDefault();
