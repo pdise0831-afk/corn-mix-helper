@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v78</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v79</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -669,7 +669,7 @@ function planSteps(n,L,table,out,role,parent){const T=table(n);
 const BONUS=[[120,30],[130,28],[140,25],[150,20],[160,15],[170,10],[180,5],[190,3]];
 const bonusP=l=>{for(const[h,p]of BONUS)if(l<=h)return p;return 0};
 const MIXW=0.25,NEEDF=2;
-if(S.hmin==null)S.hmin=true;if(S.w5==null)S.w5=6;if(S.strat==null)S.strat='smart';if(S.mode==null||S.mode<1)S.mode=1;if(!S.inv)S.inv={};if(S.inv&&!S.mig2){Object.keys(S.inv).forEach(k=>{const o=S.inv[k];if(!o)return;const a=(o[3]||0)+(o[4]||0);if(a)o[2]=(o[2]||0)+a;delete o[3];delete o[4]});S.mig2=1;}if(S.ivLeft==null)S.ivLeft=true;if(!S.hist)S.hist={};if(!S.jd)S.jd={};if(!S.fix)S.fix={};if(S.gmode==null)S.gmode='g';
+if(S.hmin==null)S.hmin=true;if(S.w5==null)S.w5=6;if(S.strat==null)S.strat='smart';if(S.mode==null)S.mode=0;if(!S.inv)S.inv={};if(S.inv&&!S.mig2){Object.keys(S.inv).forEach(k=>{const o=S.inv[k];if(!o)return;const a=(o[3]||0)+(o[4]||0);if(a)o[2]=(o[2]||0)+a;delete o[3];delete o[4]});S.mig2=1;}if(S.ivLeft==null)S.ivLeft=true;if(!S.hist)S.hist={};if(!S.jd)S.jd={};if(!S.fix)S.fix={};if(S.gmode==null)S.gmode='g';
 const baseK=(id,s)=>(1+(S.w5-1)*(Math.max(1,s)-1)/4+0.002*(s-1))*(core(id)>0?1:NEEDF);
 const invOf=()=>S.inv[cur]||(S.inv[cur]={});
 const histOf=()=>S.hist[cur]||(S.hist[cur]={});
@@ -1131,7 +1131,7 @@ let LOGID=null,GAIN=null;
 function renderMap(){const p=$('#p-map');if(!SM){p.innerHTML=NEEDSEL;return}const A=mapAgg();
   const left=Object.values(A.need).filter(v=>v>0).length,remN=Object.values(A.need).reduce((a,b)=>a+b,0);
   const lg=LOGID&&A.det[LOGID]!==undefined?LOGID:null;
-  p.innerHTML=`<p class="hint">믹스 가이드 기준으로 <b>아직 모자란 드랍 재료</b>가 많이 나오는 맵부터 보여 줘요. 헨치를 누르면 <b>득템 기록</b> 창이 열려요. 사냥하다 코어를 얻으면 별을 눌러 기록하세요. 높은 별 코어가 나오면 가이드가 다시 계산돼서 모을 재료가 줄어들 수 있어요. 출현 맵·레벨은 <b>옥수수페이지 기준</b>(2026-10-14 수집 · 174곳)이에요. 계산 방식은 <b>스마트${+S.mode||1}</b> (가이드 탭에서 변경)이에요.</p>
+  p.innerHTML=`<p class="hint">믹스 가이드 기준으로 <b>아직 모자란 드랍 재료</b>가 많이 나오는 맵부터 보여 줘요. 헨치를 누르면 <b>득템 기록</b> 창이 열려요. 사냥하다 코어를 얻으면 별을 눌러 기록하세요. 높은 별 코어가 나오면 가이드가 다시 계산돼서 모을 재료가 줄어들 수 있어요. 출현 맵·레벨은 <b>옥수수페이지 기준</b>(2026-10-14 수집 · 174곳)이에요. 계산 방식은 <b>스마트${(+S.mode||0)+1}</b> (가이드 탭에서 변경)이에요.</p>
   <div class="bar rates"><span class="lv">별 드랍 확률(%)</span>${[2,3,4,5].map(s=>`<label class="rt">★${s}<input data-rate="${s}" value="${S.rate[s]}" inputmode="numeric"></label>`).join('')}<span style="flex:1"></span><span class="lv">남은 기대 사냥 <b>${SM.huntsRem}회</b></span></div>
   <div class="bar"><span class="tag drop">남은 드랍 재료 ${left}종 · ${remN}마리</span><button class="btn sm" id="cpMap">사냥 동선 복사</button><button class="btn sm" id="gainBtn">5성 득템 효과 보기</button></div>
   ${lg?logBox(lg):''}
@@ -1158,7 +1158,7 @@ function gainBox(){return `<div class="mgroup gainbox"><h3><i style="background:
 document.addEventListener('click',e=>{if(e.target&&e.target.id==='gainX'){GAIN=null;renderMap()}});
 /* ───── 믹스 가이드 (메인) ───── */
 const SMODES={1:'재료를 사냥·구매로 직접 모아요 (믹스 최소 · 기본)',2:'재료를 한 단계 더 믹스해서 만들어요',3:'재료를 두 단계 더 믹스해요 (직접 모을 재료 최소)'};
-const modeBar=()=>{const m=+S.mode||1;return `<div class="bar" style="margin-bottom:9px"><span class="lv">계산 방식</span><div class="seg" id="smSeg">${[1,2,3].map(x=>`<button data-sm="${x}" class="${m===x?'on':''}">스마트${x}</button>`).join('')}</div><span class="lv" style="flex:1;min-width:130px">${SMODES[m]}</span></div>`};
+const modeBar=()=>{const m=(+S.mode||0)+1;return `<div class="bar" style="margin-bottom:9px"><span class="lv">계산 방식</span><div class="seg" id="smSeg">${[1,2,3].map(x=>`<button data-sm="${x}" class="${m===x?'on':''}">스마트${x}</button>`).join('')}</div><span class="lv" style="flex:1;min-width:130px">${SMODES[m]}</span></div>`};
 const stDp=x=>(x.n.path.split('_').length-1);
 const bup=a=>a.map((x,i)=>[x,i]).sort((p,q)=>stDp(q[0])-stDp(p[0])||p[1]-q[1]).map(x=>x[0]);
 const sb=(s,t)=>`<span class="sb s${Math.min(5,Math.max(1,s))}">${t||('★'+s)}</span>`;
@@ -1209,7 +1209,7 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM){p.innerHTML=home
   <li>이 도구의 판정은 사이트 계산기 코드 기준이에요. 공지 리스트의 <b>칼린엔젤</b>이 코드 목록엔 없고, 코드 목록의 <b>매드오키드·흑피니티</b>는 공지에 없어요 → 게임에서 한 번 확인해 주세요.</li></ul></details>`;
   
   const fr=$('#fxr');if(fr)fr.onclick=()=>{delete S.fix[cur];save();render()};
-  p.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>{if((+S.mode||1)!==+b.dataset.sm){S.mode=+b.dataset.sm;save();render()}});
+  p.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>{const v=+b.dataset.sm-1;if((+S.mode||0)!==v){S.mode=v;save();render()}});
   $$('[data-bon]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.bon,f=fixOf();if(f[k])delete f[k];else f[k]=1;save();render()});
   $('#gcp').onclick=()=>copy(guideText());
 }
@@ -1270,7 +1270,7 @@ const stepsText=()=>`[${nm(cur)}] 믹스 순서 (스마트)\n`+R.steps.map((s,i)
 /* ───── 레벨 플래너 (가이드 경로 + 목표 레벨) ───── */
 let PLAN=null;
 function renderPlan(){const p=$('#p-plan');if(!cur||!SM){p.innerHTML=NEEDSEL;return}const tg=S.tgt[cur]||maxLv(cur);
-  p.innerHTML=`<p class="hint">가이드(<b>스마트${+S.mode||1}</b>)의 <b>최소 재료·최단 믹스</b> 경로 그대로, <b>원하는 최종 레벨</b>까지 맞추는 순서예요. 하위 기본 재료는 순서에서 빼고 아래 <b>모을 재료</b>로 모아 보여 줍니다. <b>보너스 +10 우선</b>=실제 +10 보너스를 받는 쪽 우선, <b>육성 레벨 최소</b>=사냥 육성 부담 최소, <b>빠른 믹스</b>=고레벨 '믹스 후 육성'을 줄이고 재료 단계에서 레벨을 올려 +10 보너스로 목표를 맞춰요. 각 단계의 <b>믹스 Lv.</b>는 두 재료의 현재 렙과 각 재료 최대 렙(기본+25, 성수 미적용)으로 계산한 <b>실제 믹스 결과</b>예요(예: 150+146 → 158). 목표보다 낮으면 옆에 <b>육성 Lv.</b>로 얼마나 더 올려야 하는지 표시해요.</p>
+  p.innerHTML=`<p class="hint">가이드(<b>스마트${(+S.mode||0)+1}</b>)의 <b>최소 재료·최단 믹스</b> 경로 그대로, <b>원하는 최종 레벨</b>까지 맞추는 순서예요. 하위 기본 재료는 순서에서 빼고 아래 <b>모을 재료</b>로 모아 보여 줍니다. <b>보너스 +10 우선</b>=실제 +10 보너스를 받는 쪽 우선, <b>육성 레벨 최소</b>=사냥 육성 부담 최소, <b>빠른 믹스</b>=고레벨 '믹스 후 육성'을 줄이고 재료 단계에서 레벨을 올려 +10 보너스로 목표를 맞춰요. 각 단계의 <b>믹스 Lv.</b>는 두 재료의 현재 렙과 각 재료 최대 렙(기본+25, 성수 미적용)으로 계산한 <b>실제 믹스 결과</b>예요(예: 150+146 → 158). 목표보다 낮으면 옆에 <b>육성 Lv.</b>로 얼마나 더 올려야 하는지 표시해요.</p>
   <details class="rules"><summary>레벨 계산 공식 (게임·사이트 코드와 동일)</summary><ul>
   <li>평균값 = ⌊(메인 현재렙 + 서브 현재렙) ÷ 2⌋</li>
   <li>x = ⌊100 × 메인 현재렙 ÷ 메인최대렙⌋ (최대 100) · y = ⌊100 × 서브 현재렙 ÷ 서브최대렙⌋ (최대 100)</li>
@@ -1291,7 +1291,7 @@ function planMats(bs){const g={};
   return `<div class="mgroup"><h3><i style="background:var(--drop)"></i>먼저 모을 기본 재료 <span class="lv">${rows.length}종 · ${bs.length}마리</span></h3><div class="chips">${rows.map(o=>`<span class="chip">${face(o.id)}${esc(nm(o.id))} <span class="tag ${o.core>0?'drop':'need'}">${o.core>0?'사냥':'구함'}</span>${o.core>0?`<span class="lv">${huntTxt(o.id)}</span>`:''} <span class="lv">${o.from>lvl(o.id)?`Lv.${lvl(o.id)}→${o.to}`:`Lv.${o.to}`}</span> ×${o.cnt} <span class="lv">기본${lvl(o.id)}~최대${mxN(o.id)}</span>${o.hw?` · Lv.${o.to}까지 <b>성수 ${o.hw}개</b>`:''}</span>`).join('')}</div></div>`}
 function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').value||maxLv(cur))),cap=Math.max(1,Math.min(2000,+$('#pc').value||180)),hw=Math.max(0,+$('#pw').value||0);
   S.tgt[cur]=tg;S.cap=cap;S.hw=hw;save();
-  const t0=performance.now();const tree=build(cur,'root',[],0);markEff(tree,+S.mode||1);(function gt(n){if(!n)return;if(n.eff!=='mix'){if(n.state==='mix'&&ovOf()[n.path]!=='mix'&&ovOf()[n.path]!=='own')n.state='get';return}gt(n.main);gt(n.sub)})(tree);let res;
+  const t0=performance.now();const tree=build(cur,'root',[],0);markEff(tree,Math.max(0,+S.mode||0));(function gt(n){if(!n)return;if(n.eff!=='mix'){if(n.state==='mix'&&ovOf()[n.path]!=='mix'&&ovOf()[n.path]!=='own')n.state='get';return}gt(n.main);gt(n.sub)})(tree);let res;
   try{res=plan(tree,cap,hw,S.bf!==false,S.postW||1)}catch(e){$('#pout').innerHTML=`<div class="empty">계산 중 오류가 났어요: <code>${esc(e.message)}</code></div>`;return}
   const T=res.T;let reachMax=-1;for(let L=T.max;L>=T.min;L--)if(T.cost[L]<Infinity){reachMax=L;break}
   let L=tg,note='';
@@ -1396,14 +1396,14 @@ function priceBox(id){const e=PR[id];if(!e)return '<div class="empty">최근 3�
 /* ───── 내보내기 ───── */
 const today=()=>new Date().toISOString().slice(0,10);
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
-function matText(){const U=curU();let t=`[${nm(cur)}${qty()>1?' ×'+qty():''}] 필요 재료 (스마트${+S.mode||1} 가이드, ${BASIS[S.basis][1]})\n`;
+function matText(){const U=curU();let t=`[${nm(cur)}${qty()>1?' ×'+qty():''}] 필요 재료 (스마트${(+S.mode||0)+1} 가이드, ${BASIS[S.basis][1]})\n`;
   const sec=(title,rs)=>{if(!rs.length)return;t+=`\n■ ${title}\n`;rs.forEach(r=>{t+=`- ${nm(r.id)} Lv.${lvl(r.id)} : `+[r.f?`5성 ${r.hf}/${r.f}`:'',r.j?`잡성 ${r.hj}/${r.j}`:''].filter(Boolean).join(', ')+(r.cost?` · 남은 ${fmt(r.cost)}${U}`:r.miss?' · 시세 없음':'')+'\n'})};
   sec('필드 드랍',ROWS.filter(r=>r.kind==='drop'));sec('직접 구함(드랍 불가)',ROWS.filter(r=>r.kind==='need'));
   t+=`\n남은 비용: ${fmt(COST.cost)} ${U} / 전체 ${fmt(COST.costAll)} ${U}${COST.miss?` (시세 없는 ${COST.miss}종 제외)`:''}\n모은 재료: ${COST.have}/${COST.need} · 믹스·진화 ${SM.steps}회`;return t}
 function copyMat(){copy(matText())}
 function loadXLSX(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=()=>res(window.XLSX);s.onerror=rej;document.head.appendChild(s)})}
 function sheets(){const U=curU();
-  const mat=[[`${nm(cur)}${qty()>1?' ×'+qty():''} 필요 재료`,'',`스마트${+S.mode||1} · ${BASIS[S.basis][1]} · ${today()}`],[],['구분','헨치','기본Lv','5성 필요','5성 보유','5성 남음',`5성 단가(${U})`,'잡성 필요','잡성 보유','잡성 남음',`잡성 단가(${U})`,`남은 금액(${U})`,`전체 금액(${U})`,'출현 맵']];
+  const mat=[[`${nm(cur)}${qty()>1?' ×'+qty():''} 필요 재료`,'',`스마트${(+S.mode||0)+1} · ${BASIS[S.basis][1]} · ${today()}`],[],['구분','헨치','기본Lv','5성 필요','5성 보유','5성 남음',`5성 단가(${U})`,'잡성 필요','잡성 보유','잡성 남음',`잡성 단가(${U})`,`남은 금액(${U})`,`전체 금액(${U})`,'출현 맵']];
   ROWS.forEach(r=>mat.push([r.kind==='drop'?'필드 드랍':'직접 구함',nm(r.id),lvl(r.id),r.f,r.hf,r.rf,r.p5?r.p5.v:'',r.j,r.hj,r.rj,r.pj?r.pj.v:'',r.cost,(r.f&&r.p5?r.f*r.p5.v:0)+(r.j&&r.pj?r.j*r.pj.v:0),(LOCH[r.id]||[]).map(x=>LOCM[x[0]]).join(', ')]));
   mat.push([],['합계','','',ROWS.reduce((a,r)=>a+r.f,0),ROWS.reduce((a,r)=>a+r.hf,0),ROWS.reduce((a,r)=>a+r.rf,0),'',ROWS.reduce((a,r)=>a+r.j,0),ROWS.reduce((a,r)=>a+r.hj,0),ROWS.reduce((a,r)=>a+r.rj,0),'',COST.cost,COST.costAll]);
   if(COST.miss)mat.push([`※ 시세가 없는 재료 ${COST.miss}종은 금액에 포함되지 않았어요.`]);
