@@ -116,7 +116,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;padding-bot
 .btn:hover{border-color:var(--corn)}
 .btn.pri{background:var(--corn);color:var(--onCorn);border-color:var(--corn);font-weight:700}
 .btn.sm{padding:5px 10px;font-size:12px;border-radius:9px}
-select.ctl,input.ctl{background:var(--card);color:var(--husk);border:1.5px solid var(--line);border-radius:11px;font:inherit;font-size:13px;padding:8px 10px}
+select.ctl,input.ctl,textarea.ctl{background:var(--card);color:var(--husk);border:1.5px solid var(--line);border-radius:11px;font:inherit;font-size:13px;padding:8px 10px}
 .hint{font-size:12.5px;color:var(--mute);margin:4px 0 13px;line-height:1.65}
 .note{border:1.5px solid var(--corn);border-radius:12px;padding:11px 13px;font-size:13px;margin-bottom:12px;background:color-mix(in srgb,var(--corn) 8%,transparent)}
 .mgroup{margin-bottom:20px}
@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v79</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v80</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -460,11 +460,11 @@ const DEPTH={};
 (function(){const STK={};const dep=id=>{if(DEPTH[id]!=null)return DEPTH[id];if(STK[id])return 99;STK[id]=1;let d=(LOCH[id]&&LOCH[id].length)?0:99;const fs=X[id]||[];for(const f of fs){if(!validF(f))continue;d=Math.min(d,1+Math.max(dep(f[0]),dep(f[2])))}STK[id]=0;DEPTH[id]=d;return d};Object.keys(M).forEach(k=>dep(+k))})();
 /* ───── 저장 상태 ───── */
 const LS='cornMixHelper.v2';
-let S={sel:{},ov:{},olv:{},done:{},have:{},recent:[],fav:[],mode:0,qty:{},cur:'p',basis:'med',px:{},theme:'dark',cap:180,hw:0,tgt:{},reg:{},det:{}};
+let S={sel:{},ov:{},olv:{},done:{},have:{},recent:[],fav:[],mode:0,qty:{},cur:'p',basis:'med',px:{},theme:'dark',cap:180,hw:0,tgt:{},reg:{},det:{},csets:[]};
 try{const old=JSON.parse(localStorage.getItem('cornMixHelper.v1')||'null');if(old)Object.assign(S,{sel:old.sel||{},ov:old.ov||{},done:old.done||{},recent:old.recent||[],mode:old.mode||0})}catch(e){}
 try{Object.assign(S,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
 if(!S.ts)S.ts=1;
-const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','ivLeft','hmin','w5','hist','jd','reg','det','mode','ts'];
+const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','ivLeft','hmin','w5','hist','jd','reg','det','mode','csets','ts'];
 function slimS(){const o={};SYNC_KEYS.forEach(k=>{const v=S[k];if(v===undefined)return;if(v&&typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)return;o[k]=v});return o}
 const b64=e=>btoa(unescape(encodeURIComponent(e))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const ub64=e=>decodeURIComponent(escape(atob(e.replace(/-/g,'+').replace(/_/g,'/'))));
@@ -969,11 +969,31 @@ function craftDetail(){const p=$('#cpd');if(!p)return;const id=S.cpick;
  <div style="min-width:0"><b>${esc(e[1])}</b><div class="lv">요구 Lv.${e[2]} · 부위 ${e[3]}${pn[e[3]]?'('+pn[e[3]]+')':''}</div></div></div>
  <div class="rules" style="margin-top:8px">${(()=>{const it=ITMAP[+id];if(!it)return '';const li=it[5]||[];return li.length?'<div class="lv" style="margin-bottom:4px;color:var(--gp)"><b>스탯·효과 (클라이언트 item 테이블)</b></div><ul>'+li.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':''})()}</div>
  <p class="hint"><b>재료(레시피)는 서버가 접속 때 내려주는 데이터</b>라 클라이언트 파일에 없어요(item 테이블 28컬럼 어디에도 재료 필드가 없고, production 플러그인은 접속 시 서버에서 받아요). 인게임에서 <b>Item Builder</b>에게 아이템을 올리면 재료가 표시돼요. 아래 가이드의 140제 재료·소울스톤 배합식은 공략으로 확인된 부분이에요.</p></div>`}
+const CSET0=[
+ {n:'다크 엘리시온 암릿',src:'코른서버 · 인게임 확인(2026-10-14)',m:[['엘리시온 암릿',1],['캐시포인트',1000],['흙색 돌',150],['미스릴',65],['블루아이',40],['맹수의 심볼',100],['활력의 심장',50],['용기의 정',100],['다이아몬드 프리즘',5],['드릴드라',1]]},
+ {n:'블루 소울스톤',src:'믹위키 공략 · 코른서버 동일 여부는 인게임 확인',m:[['블소톤 생산서',1],['140제 부위 장비',1],['다이아몬드 프리즘',1]],note:'성공 80% · 제작비 5천 GP'},
+ {n:'레드 소울스톤',src:'믹위키 공략 · 코른서버 동일 여부는 인게임 확인',m:[['블루 소울스톤',1],['다이아몬드 프리즘',2],['침묵의탑 4층 정수',1],['S 생산서',1]]}];
+function ALLSET(){return CSET0.concat(S.csets||[])}
+function csParse(t){return (t||'').split(/[\n,]/).map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(.+?)\s*[xX×:]\s*(\d+)$/);return m?[m[1].trim(),+m[2]]:[x,1]})}
+function craftSaveSet(){const n=$('#csN').value.trim(),m=csParse($('#csM').value);if(!n||!m.length){toast('세트 이름과 재료를 넣어 주세요');return}if(!S.csets)S.csets=[];S.csets.push({n:n,m:m,src:'직접 입력'});save();render();toast('세트를 저장했어요')}
+function craftDelSet(i){if(confirm('이 세트를 지울까요?')){S.csets.splice(i- CSET0.length,1);save();render()}}
+function craftCopySet(i){const s=ALLSET()[i];copy(s.n+'\n'+s.m.map(x=>'- '+x[0]+' ×'+x[1]).join('\n'))}
+function craftSets(HN){const IT={};ITEMS.forEach(x=>{if(!IT[x[1]])IT[x[1]]=x});
+ const rows=s=>s.m.map(mm=>{const id=HN[mm[0]],it=IT[mm[0]];let ref='';
+  if(id!=null)ref=`<button class="chip" onclick="pick(${id})">${face(id,'face sm')}${esc(mm[0])} <span class="lv">Lv.${lvl(id)}</span></button>${huntTxt(id)?`<span class="lv">${huntTxt(id)}</span>`:''}`;
+  else if(it)ref=`<span class="lv">${esc(it[2]||'')}${it[3]&&+it[3]>0?' · DB가격 '+fmt(+it[3]):''}</span>`;
+  return `<tr><td>${id!=null?`<b style="cursor:pointer" onclick="pick(${id})">${esc(mm[0])}</b>`:esc(mm[0])}</td><td class="n">×${fmt(mm[1])}</td><td>${ref}</td></tr>`}).join('');
+ return `<div class="mgroup"><h3><i style="background:var(--need)"></i>제작 세트 모아보기 <span class="lv">${ALLSET().length}세트 · 인게임 확인 조합을 세트로 저장</span></h3>
+ <p class="hint">클라이언트 어디에도 수량표가 없어요(제작 레시피는 접속 시 서버에서 내려와요). 인게임 Item Builder에서 확인한 조합을 <b>세트 추가</b>로 저장하면 한눈에 모아 보고 기기 간 동기화도 돼요. 헨치 이름은 아이콘·사냥터가 자동으로 붙어요.</p>
+ <div class="bar"><input class="ctl" id="csN" placeholder="세트 이름 (예: 아쿠아 엘리시온 헬멧)" style="flex:1;min-width:150px"></div>
+ <div class="bar"><textarea id="csM" class="ctl" rows="2" placeholder="재료x수량 을 쉼표나 줄바꿈으로 구분 (예: 흙색 돌x150, 미스릴x65, 드릴드라x1)" style="width:100%"></textarea></div>
+ <div class="bar"><button class="btn pri" onclick="craftSaveSet()">세트 추가</button></div>
+ ${ALLSET().map((sc,i)=>`<div class="mapc"><div class="bar" style="justify-content:space-between;margin-bottom:6px"><b>${esc(sc.n)}</b><span><button class="btn sm" onclick="craftCopySet(${i})">복사</button>${i>=CSET0.length?`<button class="btn sm" onclick="craftDelSet(${i})">삭제</button>`:''}</span></div><details class="rules"><summary>재료 ${sc.m.length}종 보기${sc.src?` <span class="lv">· ${esc(sc.src)}</span>`:''}</summary><div class="scroll" style="max-height:none;margin-top:8px"><table class="ptbl"><thead><tr><th>재료</th><th class="n">수량</th><th>참고</th></tr></thead><tbody>${rows(sc)}</tbody></table></div>${sc.note?`<p class="hint">${esc(sc.note)}</p>`:''}</details></div>`).join('')}</div>`}
 function renderCraft(){const p=$('#p-craft');if(!p)return;
  const parts={};EQUIP.forEach(e=>{parts[e[3]]=(parts[e[3]]||0)+1});
  const HN={};Object.keys(M).forEach(k=>{const n=String(M[k][0]).trim();if(!HN[n])HN[n]=+k});
  const hbtn=n=>HN[n]?`<button class="chip" onclick="pick(${HN[n]})">${esc(n)} <span class="lv">Lv.${lvl(HN[n])}</span></button>`:`<span class="chip" style="opacity:.7">${esc(n)}</span>`;
- p.innerHTML=`<div class="mgroup"><h3><i style="background:var(--drop)"></i>제작 아이템 검색 <span class="lv">클릭하면 상세가 열려요</span></h3>
+ p.innerHTML=craftSets(HN)+`<div class="mgroup"><h3><i style="background:var(--drop)"></i>제작 아이템 검색 <span class="lv">클릭하면 상세가 열려요</span></h3>
  <div class="bar"><input class="ctl" id="cpq" value="${esc(S.cpq||'')}" placeholder="장비 이름 검색 (예: 지옥S)" style="flex:1;min-width:130px" autocomplete="off">
  <select class="ctl" id="cpp"><option value="">부위 전체</option>${Object.keys(parts).sort((a,b)=>a-b).map(k=>`<option value="${k}">부위 ${k} (${parts[k]})</option>`).join('')}</select></div>
  <div class="lv" id="cpc" style="margin:8px 0"></div><div class="scroll" style="max-height:45vh" id="cpb"></div>
