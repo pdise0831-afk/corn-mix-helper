@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v82</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v83</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -1216,11 +1216,11 @@ function stepCard(x,i,last){const n=x.n,key=n.path+'|'+(x.t==='evo'?'e'+x.to:'m'
     </div></div>`}
 function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM){p.innerHTML=homeCard();return}const FM=SM.F||null;const G=FM||SM;GS=G;const st=G.P.steps;const fx=fixOf();
   const recTxt=(ROOT&&ROOT.main&&(X[cur]||[]).length)?'위 <b>믹스 공식</b>으로 만들 수 있어요. (사냥 코어가 있어 기본은 사냥이에요.)':'이 헨치는 믹스 단계가 없어요. 재료로 직접 구해야 합니다.';
-  const rec=(ROOT&&ROOT.main&&ROOT.sub&&(X[cur]||[]).length)?(()=>{const M=nm(ROOT.main.id),U=nm(ROOT.sub.id),R=mixStar(ROOT.main.id,5,ROOT.sub.id,5,cur,lvl(cur));return `<div class="note"><b>믹스 공식(5성 기준)</b> — ${esc(M)} <b>★5</b> + ${esc(U)} <b>★5</b> → <b>${esc(nm(cur))} ★${R}</b>${R<5?` <span class="lv">(같은 헨치 1마리로 진화 ★${R}→★${R+1})</span>`:''}</div>`})():'';
+  const rec=(ROOT&&ROOT.main&&ROOT.sub&&(X[cur]||[]).length)?(()=>{const M=nm(ROOT.main.id),U=nm(ROOT.sub.id),R=mixStar(ROOT.main.id,5,ROOT.sub.id,5,cur,lvl(cur));return `<div class="note"><b>믹스 공식(5성 기준)</b> — ${esc(M)} <b>★5</b> + ${esc(U)} <b>★5</b> → <b>${esc(nm(cur))} ★${R}</b>${R<5?` <span class="lv">(같은 헨치 1마리로 진화 ★${R}→★${R+1})</span>`:''} <button class="btn sm pri" id="ovMix">믹스법 단계별로 보기</button><span class="lv">버튼을 누르면 아래에 재료·단계가 전부 표시돼요</span></div>`})():'';
   p.innerHTML=modeBar()+(S.cxf&&S.cxf[cur]?`<div class="bar"><span class="tag evo">내가 정정한 믹스법 사용 중</span><button class="btn sm" id="cxReset">원래 공식으로</button></div>`:'')+`<div class="sumcard"><div class="sc-main"><span class="lv">최종까지 필요한 재료</span><b>${G.t}<small>마리</small></b><span>${sb(5,'5성')} ${G.f}마리 직접 사냥 · ${sb(2,'잡성')} ${G.j}마리 진화로 올림</span></div>
     <div class="sc-cmp"><span class="lv">최소 믹스</span><b>${G.steps}단계</b><span>믹스 ${G.P.mixes} + 진화 ${G.P.evos}</span></div><div class="sc-cmp"><span class="lv">기대 사냥 (별 확률 기준)</span><b>${SM.hunts}회</b><span>남은 ${SM.huntsRem}회</span></div>${SM.base?`<div class="sc-cmp"><span class="lv">보유 재료 반영</span><b>남은 ${SM.remain}마리 · 행동 ${SM.steps}회</b><span>빈손이면 남은 ${SM.base.t}마리 · 행동 ${SM.base.steps}회${SM.base.steps>SM.steps?' → '+(SM.base.steps-SM.steps)+'회 단축':''}</span></div>`:''}${FM?`<div class="sc-cmp"><span class="lv">운 반영(보너스 체크) 재료</span><b>${FM.t}마리</b><span>${SM.t>FM.t?'보장 '+SM.t+' → −'+(SM.t-FM.t)+'마리':'보장과 동일'} · 진화 ${FM.evos}회</span></div>`:''}
 </div>
-  <div class="bar">${Object.keys(fx).length?`<span class="tag evo">운(별+1) ${Object.keys(fx).length}건 반영</span><button class="btn sm" id="fxr">보너스 체크 초기화</button>`:""}<button class="btn sm" id="gcp">가이드 복사</button></div>${rec}
+  <div class="bar">${Object.keys(fx).length?`<span class="tag evo">운(별+1) ${Object.keys(fx).length}건 반영</span><button class="btn sm" id="fxr">보너스 체크 초기화</button>`:""}${core(cur)>0&&ovOf().root==='mix'?'<span class="tag mix">믹스법 기준 사용 중</span><button class="btn sm" id="ovHunt">사냥 기준으로 되돌리기</button>':''}<button class="btn sm" id="gcp">가이드 복사</button></div>${rec}
   <p class="hint"><b>5성+5성 → 4성 → 진화 1회</b> 방식이에요. 중간 헨치는 <b>딱 한 번</b>만 만들고, 같은 헨치 1마리로 진화해 ★5로 올립니다. <b>1번부터 위→아래 순서대로</b> 차례로 진행하세요 — 매 단계는 앞에서 이미 만든 재료만 사용해서, 마지막에 목표 헨치가 완성돼요. <b>들여쓰기가 깊을수록 하위 재료 단계</b>예요(같은 재료를 여러 번 만드는 건 정상이에요 — 각 단계마다 1마리씩 필요해요). ${sb(5,'5성')}=5성이어야 함 · ${sb(2,'잡성')}=5성 이하는 아무거나(별 상관없음). 재료 옆 <b>n단</b>은 발라야 하는 바르는 재료의 단(티어)이에요.</p>
   
   ${qty()>1?`<div class="note">가이드는 1마리 기준이에요. (재료·비용 탭의 수량 ${qty()}마리와 별개)</div>`:''}
@@ -1237,6 +1237,8 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM){p.innerHTML=home
   <li>이 도구의 판정은 사이트 계산기 코드 기준이에요. 공지 리스트의 <b>칼린엔젤</b>이 코드 목록엔 없고, 코드 목록의 <b>매드오키드·흑피니티</b>는 공지에 없어요 → 게임에서 한 번 확인해 주세요.</li></ul></details>`;
   
   const fr=$('#fxr');if(fr)fr.onclick=()=>{delete S.fix[cur];save();render()};
+  const om=$('#ovMix');if(om)om.onclick=()=>{(S.ov[cur]||(S.ov[cur]={})).root='mix';save();render();toast('믹스법 기준으로 다시 계산했어요')};
+  const oh=$('#ovHunt');if(oh)oh.onclick=()=>{const o=ovOf();if(o.root==='mix')delete o.root;if(!Object.keys(o).length)delete S.ov[cur];save();render()};
   p.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>{const v=+b.dataset.sm-1;if((+S.mode||0)!==v){S.mode=v;save();render()}});
   const cxr=$('#cxReset');if(cxr)cxr.onclick=cxResetFn;
   $$('[data-bon]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.bon,f=fixOf();if(f[k])delete f[k];else f[k]=1;save();render()});
