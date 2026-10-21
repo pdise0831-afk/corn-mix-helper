@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v83</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v84</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -636,13 +636,13 @@ function prefix(){if(PREFIX)return PREFIX;const mx=2100;PREFIX=new Float64Array(
 const burden=(a,b)=>b<=a?0:prefix()[b]-prefix()[a];
 function plan(root,cap,hwW,bonusFirst,postW){postW=postW||1;
   const memo=new Map();let ops=0;const PEN=bonusFirst?1e6:0;
-  function sig(n){if(n._sig)return n._sig;let s=n.id+':'+n.state;if(n.state==='own')s+='@'+ownLv(n);if(n.state==='mix')s+='('+sig(n.main)+','+sig(n.sub)+')';return n._sig=s}
+  function sig(n){if(n._sig)return n._sig;const _ov0=+olvOf()[n.path]||0;let s=n.id+':'+n.state+(_ov0?'@'+_ov0:'');if(n.state==='own')s+='@'+ownLv(n);if(n.state==='mix')s+='('+sig(n.main)+','+sig(n.sub)+')';return n._sig=s}
   function table(n){const k=sig(n);if(memo.has(k))return memo.get(k);
     const b=n.lvl,fixed=isFixedLv(n.id),top=maxLv(n.id),N=top+1;
     const T={cost:new Float64Array(N).fill(Infinity),hw:new Int16Array(N),ups:new Int32Array(N),miss:new Int16Array(N),from:new Int16Array(N),lm:new Int16Array(N),ls:new Int16Array(N),bonus:new Int8Array(N),src:n.state,min:Infinity,max:-1};
     const score=(c,h,m)=>c+h*hwW+m*PEN;
     const set=(L,c,h,u,m,fr,lm,ls,bo)=>{const sc=score(c,h,m);const old=score(T.cost[L],T.hw[L],T.miss[L]);if(sc<old-1e-9||(Math.abs(sc-old)<1e-9&&u<T.ups[L])){T.cost[L]=c;T.hw[L]=h;T.ups[L]=u;T.miss[L]=m;T.from[L]=fr;T.lm[L]=lm;T.ls[L]=ls;T.bonus[L]=bo;if(L<T.min)T.min=L;if(L>T.max)T.max=L}};
-    if(n.state==='own'){const L=Math.min(top,Math.max(1,ownLv(n)));set(L,0,0,0,0,L,0,0,0)}
+    const _OV=+olvOf()[n.path]||0;if(_OV>0){const L=Math.min(top,Math.max(1,_OV));set(L,0,0,0,0,L,0,0,0)}else if(n.state==='own'){const L=Math.min(top,Math.max(1,ownLv(n)));set(L,0,0,0,0,L,0,0,0)}
     else if(n.state!=='mix'){const reach=fixed?b:Math.min(top,Math.max(b,cap));for(let L=b;L<=reach;L++)set(L,burden(b,L),hwCost(L,b,fixed),L-b,0,b,0,0,0)}
     else{const A=table(n.main),B=table(n.sub),ma=n.main.id,sb=n.sub.id,mx=fixed?b:b+25;
       const best=new Map();
@@ -659,7 +659,7 @@ function plan(root,cap,hwW,bonusFirst,postW){postW=postW||1;
   const T=table(root);return{T,table,ops}}
 function ownLv(n){const v=+olvOf()[n.path];return v>0?v:n.lvl}
 function planSteps(n,L,table,out,role,parent){const T=table(n);
-  const st={n,L,src:n.state,hw:n.state==='own'?0:hwCost(L,n.lvl,isFixedLv(n.id)),from:T.from[L],bonus:T.bonus[L],role,parent};
+  const _ovs=+olvOf()[n.path]||0;const _src=_ovs>0?'own':n.state;const st={n,L,src:_src,hw:_src==='own'?0:hwCost(L,n.lvl,isFixedLv(n.id)),from:T.from[L],bonus:T.bonus[L],role,parent};
   if(n.state==='mix'){planSteps(n.main,T.lm[L],table,out,'m',n);planSteps(n.sub,T.ls[L],table,out,'s',n);st.lm=T.lm[L];st.ls=T.ls[L]}
   out.push(st);return out}
 /* ───── 스마트 별 플랜 (잡성 최소화) ─────
@@ -1334,7 +1334,11 @@ function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').valu
   const lm={};steps.forEach(s=>{lm[s.n.path]={L:s.L,from:s.from,hw:s.hw,bonus:s.bonus,src:s.src,lm:s.lm,ls:s.ls}});
   const ups=T.ups[L],hwT=steps.reduce((a,s)=>a+s.hw,0),mixes=steps.filter(s=>s.src==='mix').length,perfect=steps.filter(s=>s.src==='mix'&&s.bonus===10).length;
   const G=SM||smartAll();GS=G;const gst=(G&&G.P)?G.P.steps:[];
-  PLAN={L,tg,steps,lm,ups,hw:hwT,mixes,reachMax,note,gst};LVANN=lm;
+  PLAN={L,tg,steps,lm,ups,hw:hwT,mixes,reachMax,note,gst};LVANN=lm;;
+;(function(){const box=$('#pout');if(!box)return;const seen=new Map();steps.forEach(s=>{if(!seen.has(s.n.path))seen.set(s.n.path,s)});const rows=[...seen.values()].sort((a,b)=>lvl(b.n.id)-lvl(a.n.id));
+ box.insertAdjacentHTML('beforeend','<details class="rules" open><summary>재료 현재 레벨 직접 입력 · 지정한 레벨부터 계산</summary><p class="hint">이미 갖고 있거나 이미 올려 둔 <b>현재 레벨</b>을 넣으면 그 지점부터 다시 계산해요. 비우면 기본 레벨부터예요. 예: 해적잭스왤로우를 <b>205</b>로 넣으면 미스키스 목표 레벨이 자동으로 다시 맞춰집니다.</p><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">'+rows.map(s=>'<span style="display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:4px 8px"><b style="font-size:12px">'+esc(nm(s.n.id))+'</b><span class="lv">Lv.'+lvl(s.n.id)+'~'+maxLv(s.n.id)+'</span><input class="olv2" data-p="'+esc(s.n.path)+'" inputmode="numeric" value="'+(olvOf()[s.n.path]||'')+'" placeholder="'+(s.from||lvl(s.n.id))+'" style="width:62px;background:var(--bg);border:1px solid var(--line);color:var(--husk);border-radius:7px;padding:3px 6px"></span>').join('')+'</div></details>');
+ box.querySelectorAll('input.olv2').forEach(i=>{i.onchange=()=>{const v=+String(i.value).replace(/[^0-9]/g,'')||0;const o=olvOf();if(v>0)o[i.dataset.p]=v;else delete o[i.dataset.p];save();runPlan()}});
+})();
   const trainList=steps.filter(s=>s.src!=='own'&&s.L>s.from),base=steps.filter(s=>s.src!=='mix');
   $('#pout').innerHTML=`${note?`<div class="note">${note}</div>`:''}
   <div class="totals"><div class="tot"><span>최종 결과</span><b style="color:var(--corn)">Lv.${L}</b><span>이 설정의 최고 도달 Lv.${reachMax}</span></div>
