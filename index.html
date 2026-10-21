@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v84</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v85</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -1334,11 +1334,7 @@ function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').valu
   const lm={};steps.forEach(s=>{lm[s.n.path]={L:s.L,from:s.from,hw:s.hw,bonus:s.bonus,src:s.src,lm:s.lm,ls:s.ls}});
   const ups=T.ups[L],hwT=steps.reduce((a,s)=>a+s.hw,0),mixes=steps.filter(s=>s.src==='mix').length,perfect=steps.filter(s=>s.src==='mix'&&s.bonus===10).length;
   const G=SM||smartAll();GS=G;const gst=(G&&G.P)?G.P.steps:[];
-  PLAN={L,tg,steps,lm,ups,hw:hwT,mixes,reachMax,note,gst};LVANN=lm;;
-;(function(){const box=$('#pout');if(!box)return;const seen=new Map();steps.forEach(s=>{if(!seen.has(s.n.path))seen.set(s.n.path,s)});const rows=[...seen.values()].sort((a,b)=>lvl(b.n.id)-lvl(a.n.id));
- box.insertAdjacentHTML('beforeend','<details class="rules" open><summary>재료 현재 레벨 직접 입력 · 지정한 레벨부터 계산</summary><p class="hint">이미 갖고 있거나 이미 올려 둔 <b>현재 레벨</b>을 넣으면 그 지점부터 다시 계산해요. 비우면 기본 레벨부터예요. 예: 해적잭스왤로우를 <b>205</b>로 넣으면 미스키스 목표 레벨이 자동으로 다시 맞춰집니다.</p><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">'+rows.map(s=>'<span style="display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:4px 8px"><b style="font-size:12px">'+esc(nm(s.n.id))+'</b><span class="lv">Lv.'+lvl(s.n.id)+'~'+maxLv(s.n.id)+'</span><input class="olv2" data-p="'+esc(s.n.path)+'" inputmode="numeric" value="'+(olvOf()[s.n.path]||'')+'" placeholder="'+(s.from||lvl(s.n.id))+'" style="width:62px;background:var(--bg);border:1px solid var(--line);color:var(--husk);border-radius:7px;padding:3px 6px"></span>').join('')+'</div></details>');
- box.querySelectorAll('input.olv2').forEach(i=>{i.onchange=()=>{const v=+String(i.value).replace(/[^0-9]/g,'')||0;const o=olvOf();if(v>0)o[i.dataset.p]=v;else delete o[i.dataset.p];save();runPlan()}});
-})();
+  PLAN={L,tg,steps,lm,ups,hw:hwT,mixes,reachMax,note,gst};LVANN=lm;
   const trainList=steps.filter(s=>s.src!=='own'&&s.L>s.from),base=steps.filter(s=>s.src!=='mix');
   $('#pout').innerHTML=`${note?`<div class="note">${note}</div>`:''}
   <div class="totals"><div class="tot"><span>최종 결과</span><b style="color:var(--corn)">Lv.${L}</b><span>이 설정의 최고 도달 Lv.${reachMax}</span></div>
@@ -1348,6 +1344,10 @@ function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').valu
   <p class="hint">가이드와 같은 <b>최소 재료·최단 믹스</b> 순서예요. <b>1번부터 차례로</b> 진행하세요. <b>성급(별)</b>은 가이드 탭 경로 그대로, 여기서는 <b>레벨</b>을 맞춥니다.</p>
   ${base.length?planMats(base):''}
   ${gst.length?`<div class="glist">${gst.map((x,i)=>stepCard(x,i,i===gst.length-1)).join('')}</div>`:'<div class="empty">이 헨치는 믹스 단계가 없어요. 재료를 직접 구해야 합니다. (사냥 코어가 있어 기본은 사냥이에요. 위 <b>믹스 공식</b>으로도 만들 수 있어요.)</div>'}`}
+;(function(){const box=$('#pout');if(!box)return;const seen=new Map();steps.forEach(s=>{if(!seen.has(s.n.path))seen.set(s.n.path,s)});const rows=[...seen.values()].sort((a,b)=>lvl(b.n.id)-lvl(a.n.id));
+ box.insertAdjacentHTML('beforeend','<details class="rules" open><summary>재료 현재 레벨 직접 입력 · 지정한 레벨부터 계산</summary><p class="hint">이미 갖고 있거나 이미 올려 둔 <b>현재 레벨</b>을 넣으면 그 지점부터 다시 계산해요. 비우면 기본 레벨부터예요. 예: 해적잭스왤로우를 <b>205</b>로 넣으면 미스키스 목표 레벨이 자동으로 다시 맞춰집니다.</p><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">'+rows.map(s=>'<span style="display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:4px 8px"><b style="font-size:12px">'+esc(nm(s.n.id))+'</b><span class="lv">Lv.'+lvl(s.n.id)+'~'+maxLv(s.n.id)+'</span><input class="olv2" data-p="'+esc(s.n.path)+'" inputmode="numeric" value="'+(olvOf()[s.n.path]||'')+'" placeholder="'+(s.from||lvl(s.n.id))+'" style="width:62px;background:var(--bg);border:1px solid var(--line);color:var(--husk);border-radius:7px;padding:3px 6px"></span>').join('')+'</div></details>');
+ box.querySelectorAll('input.olv2').forEach(i=>{i.onchange=()=>{const v=+String(i.value).replace(/[^0-9]/g,'')||0;const o=olvOf();if(v>0)o[i.dataset.p]=v;else delete o[i.dataset.p];save();runPlan()}});
+})();
 const planText=()=>{if(!PLAN)return'';let t=`[${nm(cur)}] 레벨 플랜 (가이드 경로) → Lv.${PLAN.L} (육성 합계 ${PLAN.ups}레벨, 성수 ${PLAN.hw}개, 믹스 ${PLAN.mixes}회)\n`;
   const base=PLAN.steps.filter(s=>s.src!=='mix');
   if(base.length){t+='\n■ 먼저 모을 기본 재료\n';const g={};base.forEach(s=>{const o=g[s.n.id]||(g[s.n.id]={id:s.n.id,cnt:0,from:s.from,to:s.L});o.cnt++;o.from=Math.min(o.from,s.from);o.to=Math.max(o.to,s.L)});
