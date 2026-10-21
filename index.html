@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v87</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v88</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -632,7 +632,7 @@ const otherHas=id=>{const o=S.cur==='p'?'g':'p';const e=PR[id];return e&&Object.
 const curU=()=>S.cur==='p'?'P':'GP';
 /* ───── 레벨 플래너 (DP: 육성 부담 최소) ───── */
 let PREFIX=null;
-function prefix(){if(PREFIX)return PREFIX;const mx=2100;PREFIX=new Float64Array(mx+1);for(let l=1;l<=mx;l++)PREFIX[l]=PREFIX[l-1]+1+Math.pow(Math.max(0,l-100)/80,1.55);return PREFIX}
+function prefix(){const w=+(S.hd!=null?S.hd:2.5);if(PREFIX&&PREFIX._w===w)return PREFIX;const mx=2100;PREFIX=new Float64Array(mx+1);PREFIX._w=w;for(let l=1;l<=mx;l++)PREFIX[l]=PREFIX[l-1]+1+Math.pow(Math.max(0,l-100)/80,1.55)+w*Math.pow(Math.max(0,l-180)/10,2);return PREFIX}
 const burden=(a,b)=>b<=a?0:prefix()[b]-prefix()[a];
 function plan(root,cap,hwW,bonusFirst,postW){postW=postW||1;
   const memo=new Map();let ops=0;const PEN=bonusFirst?1e6:0;
@@ -1311,16 +1311,17 @@ function renderPlan(){const p=$('#p-plan');if(!cur||!SM){p.innerHTML=NEEDSEL;ret
   <div class="grid2"><div class="field"><label>최종 목표 레벨 (Lv.${lvl(cur)} ~ ${maxLv(cur)})</label><input id="pt" type="number" inputmode="numeric" value="${tg}" min="${lvl(cur)}" max="${maxLv(cur)}"></div>
   <div class="field"><label>직접 육성 최대 레벨 (이 레벨 넘게는 사냥으로 안 올림)</label><input id="pc" type="number" inputmode="numeric" value="${S.cap}"></div>
   <div class="field"><label>성수 가중치 (0 = 성수 개수 무시, 높을수록 성수 아끼는 쪽)</label><input id="pw" type="number" inputmode="decimal" value="${S.hw}" step="0.5" min="0"></div>
+  <div class="field"><label>고렙(180+) 육성 난이도 (높을수록 아랫단계를 채워 보너스로 올림)</label><input id="phd" type="number" inputmode="decimal" value="${S.hd!=null?S.hd:2.5}" step="0.5" min="0"></div>
   <div class="field"><label>계산 기준</label><div class="seg" id="pmode"><button data-v="1" class="${S.bf!==false&&(S.postW||1)<=1?'on':''}">보너스 +10 우선</button><button data-v="0" class="${S.bf===false&&(S.postW||1)<=1?'on':''}">육성 레벨 최소</button><button data-v="f" class="${S.bf!==false&&(S.postW||1)>1&&!S.cmode?'on':''}">빠른 믹스 (성수·보너스)</button><button data-v="c" class="${S.cmode?'on':''}">성수+레벨 합산</button></div></div>
   <div class="field" style="display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap;grid-column:1/-1"><button class="btn pri" id="prun">플랜 계산</button><button class="btn" id="pmax">최대 레벨로</button><button class="btn" id="pcopy">플랜 복사</button></div></div>
   <div id="pout" style="margin-top:12px"></div>`;
   $('#prun').onclick=runPlan;$$('#pmode button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;S.cmode=(v==='c');if(v==='f'){S.bf=true;S.postW=3}else if(v==='c'){S.bf=true;S.postW=1;S.hw=10}else{S.bf=v==='1';S.postW=1}if($('#pw'))$('#pw').value=S.hw;save();$$('#pmode button').forEach(x=>x.classList.toggle('on',x===b));runPlan()});$('#pmax').onclick=()=>{$('#pt').value=maxLv(cur);runPlan()};$('#pcopy').onclick=()=>{if(PLAN&&PLAN.steps)copy(planText());else toast('먼저 플랜을 계산하세요')};
-  ['pt','pc','pw'].forEach(i=>$('#'+i).addEventListener('keydown',e=>{if(e.key==='Enter')runPlan()}));runPlan()}
+  ['pt','pc','pw','phd'].forEach(i=>{const el=$('#'+i);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')runPlan()})});runPlan()}
 function planMats(bs){const g={};
   bs.forEach(s=>{const o=g[s.n.id]||(g[s.n.id]={id:s.n.id,core:s.n.core,cnt:0,from:s.from,to:s.L,hw:0});o.cnt++;o.from=Math.min(o.from,s.from);o.to=Math.max(o.to,s.L);o.hw+=s.hw||0});
   const rows=Object.values(g).sort((a,b)=>lvl(b.id)-lvl(a.id));
   return `<div class="mgroup"><h3><i style="background:var(--drop)"></i>먼저 모을 기본 재료 <span class="lv">${rows.length}종 · ${bs.length}마리</span></h3><div class="chips">${rows.map(o=>`<span class="chip">${face(o.id)}${esc(nm(o.id))} <span class="tag ${o.core>0?'drop':'need'}">${o.core>0?'사냥':'구함'}</span>${o.core>0?`<span class="lv">${huntTxt(o.id)}</span>`:''} <span class="lv">${o.from>lvl(o.id)?`Lv.${lvl(o.id)}→${o.to}`:`Lv.${o.to}`}</span> ×${o.cnt} <span class="lv">기본${lvl(o.id)}~최대${mxN(o.id)}</span>${o.hw?` · Lv.${o.to}까지 <b>성수 ${o.hw}개</b>`:''} <span class="lv">합산 ${(o.to-lvl(o.id))+o.hw*10}</span></span>`).join('')}</div></div>`}
-function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').value||maxLv(cur))),cap=Math.max(1,Math.min(2000,+$('#pc').value||180)),hw=Math.max(0,+$('#pw').value||0);
+function runPlan(){const tg=Math.max(lvl(cur),Math.min(maxLv(cur),+$('#pt').value||maxLv(cur))),cap=Math.max(1,Math.min(2000,+$('#pc').value||180)),hw=Math.max(0,+$('#pw').value||0),hd=Math.max(0,+((($('#phd')||{}).value)||2.5));S.hd=hd;PREFIX=null;
   S.tgt[cur]=tg;S.cap=cap;S.hw=hw;save();
   const t0=performance.now();const tree=build(cur,'root',[],0);markEff(tree,Math.max(0,+S.mode||0));(function gt(n){if(!n)return;if(n.eff!=='mix'){if(n.state==='mix'&&ovOf()[n.path]!=='mix'&&ovOf()[n.path]!=='own')n.state='get';return}gt(n.main);gt(n.sub)})(tree);let res;
   try{res=plan(tree,cap,hw,S.bf!==false,S.postW||1)}catch(e){$('#pout').innerHTML=`<div class="empty">계산 중 오류가 났어요: <code>${esc(e.message)}</code></div>`;return}
