@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v88</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v89</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -464,7 +464,7 @@ let S={sel:{},ov:{},olv:{},done:{},have:{},recent:[],fav:[],mode:0,qty:{},cur:'p
 try{const old=JSON.parse(localStorage.getItem('cornMixHelper.v1')||'null');if(old)Object.assign(S,{sel:old.sel||{},ov:old.ov||{},done:old.done||{},recent:old.recent||[],mode:old.mode||0})}catch(e){}
 try{Object.assign(S,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
 if(!S.ts)S.ts=1;
-const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','ivLeft','hmin','w5','hist','jd','reg','det','mode','csets','cxf','ts'];
+const SYNC_KEYS=['inv','done','fix','sel','ov','olv','fav','recent','px','tgt','rate','ivLeft','lowFirst','hmin','w5','hist','jd','reg','det','mode','csets','cxf','ts'];
 function slimS(){const o={};SYNC_KEYS.forEach(k=>{const v=S[k];if(v===undefined)return;if(v&&typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)return;o[k]=v});return o}
 const b64=e=>btoa(unescape(encodeURIComponent(e))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const ub64=e=>decodeURIComponent(escape(atob(e.replace(/-/g,'+').replace(/_/g,'/'))));
@@ -1161,19 +1161,21 @@ let LOGID=null,GAIN=null;
 function renderMap(){const p=$('#p-map');if(!SM){p.innerHTML=NEEDSEL;return}const A=mapAgg();
   const left=Object.values(A.need).filter(v=>v>0).length,remN=Object.values(A.need).reduce((a,b)=>a+b,0);
   const lg=LOGID&&A.det[LOGID]!==undefined?LOGID:null;
-  p.innerHTML=`<p class="hint">믹스 가이드 기준으로 <b>아직 모자란 드랍 재료</b>가 많이 나오는 맵부터 보여 줘요. 헨치를 누르면 <b>득템 기록</b> 창이 열려요. 사냥하다 코어를 얻으면 별을 눌러 기록하세요. 높은 별 코어가 나오면 가이드가 다시 계산돼서 모을 재료가 줄어들 수 있어요. 출현 맵·레벨은 <b>옥수수페이지 기준</b>(2026-10-14 수집 · 174곳)이에요. 계산 방식은 <b>스마트${(+S.mode||0)+1}</b> (가이드 탭에서 변경)이에요.</p>
+  const ms=A.maps.filter(m=>m.kinds>0);ms.forEach(m=>{const rr=m.items.filter(x=>x.rem>0);m.lvMin=rr.length?Math.min(...rr.map(x=>x.ml||999)):999});if(S.lowFirst!==false)ms.sort((a,b)=>a.lvMin-b.lvMin||b.rem-a.rem);
+  p.innerHTML=`<p class="hint">재료 수급은 <b>낮은 레벨 맵부터</b> 올라가는 방식(기본)이에요 — 로제타 지하 1층(매드테일러 Lv.68~스노균 Lv.84) 급에서 코어를 모아 믹스·진화로 올리세요. 버튼으로 <b>많이 나오는 순</b> 정렬로 바꿀 수 있어요. 헨치를 누르면 <b>득템 기록</b> 창이 열려요. 사냥하다 코어를 얻으면 별을 눌러 기록하세요. 높은 별 코어가 나오면 가이드가 다시 계산돼서 모을 재료가 줄어들 수 있어요. 출현 맵·레벨은 <b>옥수수페이지 기준</b>(2026-10-14 수집 · 174곳)이에요. 계산 방식은 <b>스마트${(+S.mode||0)+1}</b> (가이드 탭에서 변경)이에요.</p>
   <div class="bar rates"><span class="lv">별 드랍 확률(%)</span>${[2,3,4,5].map(s=>`<label class="rt">★${s}<input data-rate="${s}" value="${S.rate[s]}" inputmode="numeric"></label>`).join('')}<span style="flex:1"></span><span class="lv">남은 기대 사냥 <b>${SM.huntsRem}회</b></span></div>
-  <div class="bar"><span class="tag drop">남은 드랍 재료 ${left}종 · ${remN}마리</span><button class="btn sm" id="cpMap">사냥 동선 복사</button><button class="btn sm" id="gainBtn">5성 득템 효과 보기</button></div>
+  <div class="bar"><span class="tag drop">남은 드랍 재료 ${left}종 · ${remN}마리</span><button class="btn sm ${S.lowFirst===false?'':'pri'}" id="lfBtn">${S.lowFirst===false?'기준: 많이 나오는 순':'기준: 낮은 레벨부터'}</button><button class="btn sm" id="cpMap">사냥 동선 복사</button><button class="btn sm" id="gainBtn">5성 득템 효과 보기</button></div>
   ${lg?logBox(lg):''}
   ${GAIN&&GAIN.cur===cur?gainBox():''}
-  ${A.maps.length?A.maps.filter(m=>m.kinds>0).slice(0,40).map((m,i)=>`<div class="mapc"><h4><span class="rk">${i+1}</span>${esc(LOCM[m.mi])}<span class="lv">${m.kinds}종 · 남은 ${m.rem}마리${m.five?` · 5성 필요 ${m.five}`:''}</span></h4><div class="chips">${m.items.sort((a,b)=>b.rem-a.rem).map(it=>`<button class="chip ${it.rem>0?'':'got'} ${lg==it.id?'sel':''}" data-lid="${it.id}">${face(it.id)}${esc(nm(it.id))} <span class="lv">Lv.${it.ml}</span> ${it.rem>0?`<b>×${it.rem}</b>`:'✓'}</button>`).join('')}</div>
+  ${ms.length?ms.slice(0,40).map((m,i)=>`<div class="mapc"><h4><span class="rk">${i+1}</span>${esc(LOCM[m.mi])}<span class="lv">${m.kinds}종 · 남은 ${m.rem}마리${m.five?` · 5성 필요 ${m.five}`:''}</span></h4><div class="chips">${m.items.sort((a,b)=>b.rem-a.rem).map(it=>`<button class="chip ${it.rem>0?'':'got'} ${lg==it.id?'sel':''}" data-lid="${it.id}">${face(it.id)}${esc(nm(it.id))} <span class="lv">Lv.${it.ml}</span> ${it.rem>0?`<b>×${it.rem}</b>`:'✓'}</button>`).join('')}</div>
   <div class="mdet">${m.items.filter(x=>x.rem>0).map(x=>`<span><b>${esc(nm(x.id))}</b> ${slotTxt(x.det)}</span>`).join('')}</div></div>`).join('')||'<div class="empty">드랍 재료를 모두 모았어요.</div>':'<div class="empty">필드 드랍 재료가 없어요.</div>'}
   ${A.nowhere.length?`<div class="mgroup" style="margin-top:14px"><h3><i style="background:var(--mute)"></i>출현 맵 정보가 없는 드랍 헨치</h3><div class="chips">${A.nowhere.map(id=>`<button class="chip" data-lid="${id}">${face(id)}${esc(nm(id))} <b>×${A.need[id]}</b></button>`).join('')}</div></div>`:''}`;
   p.querySelectorAll('[data-lid]').forEach(b=>b.onclick=()=>{LOGID=LOGID==b.dataset.lid?null:+b.dataset.lid;renderMap();const el=$('#logbox');if(el)el.scrollIntoView({block:'nearest',behavior:'smooth'})});
   p.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const[id,st,d]=b.dataset.add.split(',').map(Number);addInv(id,st,d)});
+  const lf=$('#lfBtn');if(lf)lf.onclick=()=>{if(S.lowFirst===false)delete S.lowFirst;else S.lowFirst=false;save();renderMap()};
   const gb=$('#gainBtn');if(gb)gb.onclick=calcGain;
   p.querySelectorAll('[data-rate]').forEach(i=>i.onchange=()=>{S.rate[+i.dataset.rate]=Math.max(0,+i.value||0);save();render()});
-  $('#cpMap').onclick=()=>copy(`[${nm(cur)}] 사냥 동선 (스마트 가이드 기준)\n`+A.maps.filter(m=>m.kinds>0).slice(0,20).map((m,i)=>`${i+1}. ${LOCM[m.mi]} — `+m.items.filter(x=>x.rem>0).map(x=>`${nm(x.id)}(${slotTxt(x.det)})`).join(', ')).join('\n'))}
+  $('#cpMap').onclick=()=>copy(`[${nm(cur)}] 사냥 동선 (스마트 가이드 기준)\n`+ms.slice(0,20).map((m,i)=>`${i+1}. ${LOCM[m.mi]} — `+m.items.filter(x=>x.rem>0).map(x=>`${nm(x.id)}(${slotTxt(x.det)})`).join(', ')).join('\n'))}
 function logBox(id){const iv=invOf()[id]||{},m=SM.mats.find(x=>x.id==id);
   return `<div class="logbox" id="logbox"><div class="lbh">${face(id)}<div><b>${esc(nm(id))}</b> 득템 기록<div class="lv">필요: ${m?slotTxt(m.slots):'-'} · 남음 ${m?m.rem.length:0}마리</div></div><button class="btn sm" data-lid="${id}">닫기</button></div>
   <div class="lbg">${[5,4,3,2,1].map(st=>`<div class="lbc"><span class="sb s${st}">★${st}</span><b>${iv[st]||0}</b><div><button class="btn sm" data-add="${id},${st},-1" aria-label="빼기">−</button><button class="btn sm pri" data-add="${id},${st},1">+1 득템</button></div></div>`).join('')}</div></div>`}
@@ -1222,6 +1224,13 @@ function renderGuide(){LVANN=null;const p=$('#p-guide');if(!SM){p.innerHTML=home
 </div>
   <div class="bar">${Object.keys(fx).length?`<span class="tag evo">운(별+1) ${Object.keys(fx).length}건 반영</span><button class="btn sm" id="fxr">보너스 체크 초기화</button>`:""}${core(cur)>0&&ovOf().root==='mix'?'<span class="tag mix">믹스법 기준 사용 중</span><button class="btn sm" id="ovHunt">사냥 기준으로 되돌리기</button>':''}<button class="btn sm" id="gcp">가이드 복사</button></div>${rec}
   <p class="hint"><b>5성+5성 → 4성 → 진화 1회</b> 방식이에요. 중간 헨치는 <b>딱 한 번</b>만 만들고, 같은 헨치 1마리로 진화해 ★5로 올립니다. <b>1번부터 위→아래 순서대로</b> 차례로 진행하세요 — 매 단계는 앞에서 이미 만든 재료만 사용해서, 마지막에 목표 헨치가 완성돼요. <b>들여쓰기가 깊을수록 하위 재료 단계</b>예요(같은 재료를 여러 번 만드는 건 정상이에요 — 각 단계마다 1마리씩 필요해요). ${sb(5,'5성')}=5성이어야 함 · ${sb(2,'잡성')}=5성 이하는 아무거나(별 상관없음). 재료 옆 <b>n단</b>은 발라야 하는 바르는 재료의 단(티어)이에요.</p>
+  <details class="rules"><summary>재료 수급 로드맵 — 낮은 등급부터 올리기 (로제타 지하 기준)</summary><ul>
+  <li><b>1단계 · 1층 Lv.68~84</b>: 매드테일러68 · 드래고어69 · 민트호냥73 · 호넷74 · 데블윙79 · 이블레이커80 · 뉴천하군81 · 윙스톰레이셔81 · 크로우타샤벨83 · 스노균84 — <b>여기서 코어를 모아 믹스·진화로 상급을 만드는</b> 게 기본 전략이에요.</li>
+  <li><b>2단계 · 2층 Lv.88~101</b>: 오르데빌88 · 캐빗90 · 화뿔소93 · 봄버군98 · 부메이더98 · 로키러쉬98 · 삐에볼101</li>
+  <li><b>3단계 · 3층 Lv.99~100</b> → <b>4층 Lv.113~121</b>: 뉴오르데빌113 · 파이어드래곤115 · 건스매쉬117 · 질러118 · 뉴윙스톰레이셔120 등 (플로워·코뿔소 포함 8종)</li>
+  <li><b>4단계 · 5층 Lv.117~131</b>: 미니발칸 · 페어리드래곤 · 뉴데블스톤 · 잭 · 뉴부메이더 · 뉴지하걸 · 다크퍼프리 · 자이언 → <b>6층 Lv.145~166</b>: 먹쿠르미르 · 블러드쉐도우 · 뉴민트멀 · 큐피트 · 블루사우르프 · 윈드걸 · 고철리카 · 다크피트 등</li>
+  <li><b>7층 Lv.172~182 · 8층 Lv.183~185</b>는 최상위 재료용 — 하위 재료가 충분해진 뒤에 도전하세요.</li>
+  <li>재료는 <b>잡성 코어</b>만 확보돼도 믹스 재료로 쓸 수 있어요. 낮은 층부터 모아두면 사냥 부담이 확 줄어요.</li></ul></details>
   
   ${qty()>1?`<div class="note">가이드는 1마리 기준이에요. (재료·비용 탭의 수량 ${qty()}마리와 별개)</div>`:''}
   ${G.P.fail?'<div class="empty">현재 설정으로는 5성까지 만들 수 없어요.</div>':''}
@@ -1270,11 +1279,11 @@ function renderInv(){const p=$('#p-inv');if(!SM){p.innerHTML=NEEDSEL;return}cons
     return `<div class="ivr ${have?'has':''} ${r.done?'done':''}"><div class="ivtop"><div class="nmc">${face(id,'face sm')}<b onclick="pick(${id})">${esc(nm(id))}</b>${srcTag(id)}<span class="lv">Lv.${lvl(id)}</span></div>${status}</div>
     ${req}
     <div class="ivs">${ctrls}${m&&r.left?`<button class="btn sm pri" data-fill="${id}">✓ 남은 ${r.left}개 다 모음</button>`:''}${have?`<button class="btn sm" data-clr="${id}">비우기</button>`:''}${m&&!r.left&&!have?`<span class="lv">✓ 완료</span>`:''}</div></div>`};
-  const leaf=show.filter(r=>r.kind==='leaf'&&r.m).sort((a,b)=>b.left-a.left||b.need-a.need||lvl(b.id)-lvl(a.id));
+  const leaf=show.filter(r=>r.kind==='leaf'&&r.m).sort((a,b)=>b.left-a.left||b.need-a.need||lvl(a.id)-lvl(b.id));
   const mix=show.filter(r=>r.kind==='mix'&&r.id!==cur).sort((a,b)=>lvl(b.id)-lvl(a.id));
   const totHave=Object.values(iv).reduce((a,o)=>a+Object.values(o).reduce((x,y)=>x+y,0),0);
   p.innerHTML=`<div class="stickbar" id="invBar"><span class="tag drop">남은 <b>${shortN}종 · ${shortM}마리</b></span><span class="lv">총 ${SM.t}마리 · 행동 ${SM.steps}회 · 입력 ${totHave}마리</span><span style="flex:1"></span><button class="btn sm ${only?'pri':''}" id="ivLeft">${only?'남은 것만 ✓':'전체'}</button><button class="btn sm" id="synci">동기화</button><button class="btn sm" id="ivr">전체 초기화</button></div>
-  <p class="hint">사냥으로 얻은 코어를 <b>5성</b>과 <b>잡성</b> 두 칸에만 넣으세요. 5성 이하는 모두 <b>잡성</b>으로 취급해요. 가이드가 바로 다시 계산돼요. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요.</p>
+  <p class="hint">사냥으로 얻은 코어를 <b>5성</b>과 <b>잡성</b> 두 칸에만 넣으세요. 5성 이하는 모두 <b>잡성</b>으로 취급해요. 가이드가 바로 다시 계산돼요. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요. 모으는 순서는 <b>남은 재료 많은 순 → 낮은 레벨</b> 우선이에요(로제타 1층 급부터).</p>
   <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.length?leaf.map(row).join(''):'<div class="empty">아직 모자란 재료가 없어요 🎉</div>'}</div>
   ${mix.length?`<div class="mgroup"><h3><i style="background:var(--corn)"></i>중간 헨치 (이미 만들어 둔 것) <span class="lv">${mix.length}종</span></h3>${mix.map(row).join('')}</div>`:''}`;
   const refresh=()=>{const y=window.scrollY;SM=computeSM();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y)};
