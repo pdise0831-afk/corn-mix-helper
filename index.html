@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v89</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v90</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -1279,12 +1279,13 @@ function renderInv(){const p=$('#p-inv');if(!SM){p.innerHTML=NEEDSEL;return}cons
     return `<div class="ivr ${have?'has':''} ${r.done?'done':''}"><div class="ivtop"><div class="nmc">${face(id,'face sm')}<b onclick="pick(${id})">${esc(nm(id))}</b>${srcTag(id)}<span class="lv">Lv.${lvl(id)}</span></div>${status}</div>
     ${req}
     <div class="ivs">${ctrls}${m&&r.left?`<button class="btn sm pri" data-fill="${id}">✓ 남은 ${r.left}개 다 모음</button>`:''}${have?`<button class="btn sm" data-clr="${id}">비우기</button>`:''}${m&&!r.left&&!have?`<span class="lv">✓ 완료</span>`:''}</div></div>`};
-  const leaf=show.filter(r=>r.kind==='leaf'&&r.m).sort((a,b)=>b.left-a.left||b.need-a.need||lvl(a.id)-lvl(b.id));
+  const grp=id=>{const d=core(id)>0,m=!!(X[id]&&X[id].length);return d&&!m?0:d&&m?1:!d&&m?2:3};
+  const leaf=show.filter(r=>r.kind==='leaf'&&r.m).sort((a,b)=>grp(a.id)-grp(b.id)||b.left-a.left||b.need-a.need||lvl(a.id)-lvl(b.id));
   const mix=show.filter(r=>r.kind==='mix'&&r.id!==cur).sort((a,b)=>lvl(b.id)-lvl(a.id));
   const totHave=Object.values(iv).reduce((a,o)=>a+Object.values(o).reduce((x,y)=>x+y,0),0);
   p.innerHTML=`<div class="stickbar" id="invBar"><span class="tag drop">남은 <b>${shortN}종 · ${shortM}마리</b></span><span class="lv">총 ${SM.t}마리 · 행동 ${SM.steps}회 · 입력 ${totHave}마리</span><span style="flex:1"></span><button class="btn sm ${only?'pri':''}" id="ivLeft">${only?'남은 것만 ✓':'전체'}</button><button class="btn sm" id="synci">동기화</button><button class="btn sm" id="ivr">전체 초기화</button></div>
-  <p class="hint">사냥으로 얻은 코어를 <b>5성</b>과 <b>잡성</b> 두 칸에만 넣으세요. 5성 이하는 모두 <b>잡성</b>으로 취급해요. 가이드가 바로 다시 계산돼요. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요. 모으는 순서는 <b>남은 재료 많은 순 → 낮은 레벨</b> 우선이에요(로제타 1층 급부터).</p>
-  <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.length?leaf.map(row).join(''):'<div class="empty">아직 모자란 재료가 없어요 🎉</div>'}</div>
+  <p class="hint">사냥으로 얻은 코어를 <b>5성</b>과 <b>잡성</b> 두 칸에만 넣으세요. 5성 이하는 모두 <b>잡성</b>으로 취급해요. 가이드가 바로 다시 계산돼요. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요. 재료 코어는 위에서부터 <b>① 드랍 전용(사냥에서 바로) → ② 믹스+드랍 겸용 → ③ 믹스로만 제작</b> 순서예요. 각 묶음 안에서는 <b>남은 재료 많은 순 → 낮은 레벨</b> 우선(로제타 1층 급부터)이에요.</p>
+  <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.length?(()=>{const GN=['드랍 전용 · 사냥에서 바로','믹스+드랍 겸용','믹스로만 제작','구해서 넣기'];const GC=['var(--drop)','var(--corn)','var(--need)','var(--mute)'];let lg=-1;return leaf.map(r=>{const g=grp(r.id),h=g!==lg?`<div style="font-size:12px;font-weight:700;margin:12px 0 6px;color:${GC[g]}">◈ ${GN[g]} <span class="lv">${leaf.filter(x=>grp(x.id)===g).length}종</span></div>`:'';lg=g;return h+row(r)}).join('')})():'<div class="empty">아직 모자란 재료가 없어요 🎉</div>'}</div>
   ${mix.length?`<div class="mgroup"><h3><i style="background:var(--corn)"></i>중간 헨치 (이미 만들어 둔 것) <span class="lv">${mix.length}종</span></h3>${mix.map(row).join('')}</div>`:''}`;
   const refresh=()=>{const y=window.scrollY;SM=computeSM();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y)};
   const set=(id,s,v)=>{const o=iv[id]||(iv[id]={});o[s]=Math.max(0,Math.min(999,v));if(!o[s])delete o[s];if(!Object.keys(o).length)delete iv[id];save();refresh()};
