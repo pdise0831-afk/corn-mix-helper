@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v92</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v93</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -445,6 +445,7 @@ const raceOf=id=>RACE[id]!=null?RACE[id]:-1;
 /* ── 종족별 믹스 인첸트(시약) 표: [1차,2차,3차,4차] · 에보핵 (클라 item.sct 133~156·1258~1265·1276~1283 기준) ── */
 const ENCHS=[["드래곤의 비늘","용의 보옥","용의 피","가루곤의 이빨"],["박쥐 날개","악마의 계약서","악마의 손길","아누비스의 문장"],["날카로운 이빨","맹수의 심볼","활력의 심장","헬파드의 징표"],["바람의 깃털","바람의 결정","불타는 깃털","피닉스의 펜던트"],["달콤한 수액","무지개 벌레의 껍질","천년의 이슬 결정","커터맨티스의 술병"],["생명의 나뭇가지","생명의 나뭇잎","생명 나무의 수액","네펜데스의 줄기"],["미스틱 완드","혼돈의 결정","몽환의 소용돌이","기와장군의 반지"],["붉은 금속","기계생명의 열쇠","미스릴 핵","디스트로이어 드릴"]];
 const EVONUC=["에보드라코의 핵","에보데빌코의 핵","에보비스코의 핵","에보버드코의 핵","에보버그코의 핵","에보플라코의 핵","에보미스코의 핵","에보메타코의 핵"];
+const EVOH=[458,464,470,476,482,488,494,500];const isEvo=id=>EVOH.includes(+id);
 const enchNM=(id,t)=>{const r=raceOf(id);return r>=0&&t>=1&&t<=4?ENCHS[r][t-1]:''};
 const enT=(id,t)=>{const e=enchNM(id,t);return e?'('+e+')':''};
 const enchAgg=g=>{const c={};g.P.steps.forEach(x=>{if(x.t!=='mix')return;[[x.n.main,x.n.mg],[x.n.sub,x.n.sg]].forEach(p=>{if(p[0]&&p[1]>0){const e=enchNM(p[0].id,p[1]);if(e){if(!c[e])c[e]={n:0,r:raceOf(p[0].id),t:p[1]};c[e].n++}}})});return Object.entries(c).sort((a,b)=>a[1].r-b[1].r||a[1].t-b[1].t||b[1].n-a[1].n)};
@@ -827,7 +828,7 @@ function recommend(rootId){const memo=new Map();
 /* ───── UI 공통 ───── */
 const face=(id,cls='face')=>`<img class="${cls}" loading="lazy" src="${IMG}${M[id]?M[id][2]:'000000.png'}" alt="" onerror="this.style.visibility='hidden'">`;
 const huntTxt=id=>{const ls=LOCH[id];if(!ls||!ls.length)return'';const u=[...new Set(ls.map(x=>LOCM[x[0]]))];return '📍 '+esc(u[0])+(u.length>1?` 외 ${u.length-1}곳`:'')};
-const srcTag=id=>core(id)>0?`<span class="tag drop">드랍</span>${LOCH[id]&&LOCH[id].length?` <span class="lv">${huntTxt(id)}</span>`:` <span class="lv">📍 출현맵 미상</span>`}`:(X[id]&&X[id].length?'<span class="tag mix">믹스</span>':'<span class="tag no">드랍 불가</span>');
+const srcTag=id=>(isEvo(id)?'<span class="tag evo">에보</span>':'')+(core(id)>0?`<span class="tag drop">드랍</span>${LOCH[id]&&LOCH[id].length?` <span class="lv">${huntTxt(id)}</span>`:` <span class="lv">📍 출현맵 미상</span>`}`:(X[id]&&X[id].length?'<span class="tag mix">믹스</span>':'<span class="tag no">드랍 불가</span>'));
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
 function copy(t){(navigator.clipboard&&window.isSecureContext?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('복사했어요. 엑셀·메모장·카톡에 붙여넣으세요')).catch(()=>{const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('복사했어요')}catch(e){toast('이 브라우저는 복사를 지원하지 않아요')}a.remove()})}
 document.documentElement.dataset.theme=S.theme;
@@ -1295,13 +1296,13 @@ function renderInv(){const p=$('#p-inv');if(!SM){p.innerHTML=NEEDSEL;return}cons
     return `<div class="ivr ${have?'has':''} ${r.done?'done':''}"><div class="ivtop"><div class="nmc">${face(id,'face sm')}<b onclick="pick(${id})">${esc(nm(id))}</b>${srcTag(id)}<span class="lv">Lv.${lvl(id)}</span></div>${status}</div>
     ${req}${useTxt(id)?`<div style="font-size:12px;color:var(--corn);margin:3px 2px 0">▲ 윗급 용도 · ${useTxt(id)}</div>`:''}
     <div class="ivs">${ctrls}${m&&r.left?`<button class="btn sm pri" data-fill="${id}">✓ 남은 ${r.left}개 다 모음</button>`:''}${have?`<button class="btn sm" data-clr="${id}">비우기</button>`:''}${m&&!r.left&&!have?`<span class="lv">✓ 완료</span>`:''}</div></div>`};
-  const grp=id=>{const d=core(id)>0,m=!!(X[id]&&X[id].length);return d&&!m?0:d&&m?1:!d&&m?2:3};
+  const grp=id=>{if(isEvo(id))return 2;const d=core(id)>0,m=!!(X[id]&&X[id].length);return d&&!m?0:d&&m?1:!d&&m?3:4};
   const leaf=show.filter(r=>r.kind==='leaf'&&r.m).sort((a,b)=>grp(a.id)-grp(b.id)||b.left-a.left||b.need-a.need||lvl(a.id)-lvl(b.id));
   const mix=show.filter(r=>r.kind==='mix'&&r.id!==cur).sort((a,b)=>lvl(b.id)-lvl(a.id));
   const totHave=Object.values(iv).reduce((a,o)=>a+Object.values(o).reduce((x,y)=>x+y,0),0);
   p.innerHTML=`<div class="stickbar" id="invBar"><span class="tag drop">남은 <b>${shortN}종 · ${shortM}마리</b></span><span class="lv">총 ${SM.t}마리 · 행동 ${SM.steps}회 · 입력 ${totHave}마리</span><span style="flex:1"></span><button class="btn sm ${only?'pri':''}" id="ivLeft">${only?'남은 것만 ✓':'전체'}</button><button class="btn sm" id="synci">동기화</button><button class="btn sm" id="ivr">전체 초기화</button></div>
-  <p class="hint">사냥으로 얻은 코어를 <b>5성</b>과 <b>잡성</b> 두 칸에만 넣으세요. 5성 이하는 모두 <b>잡성</b>으로 취급해요. 가이드가 바로 다시 계산돼요. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요. 재료 코어는 위에서부터 <b>① 드랍 전용(사냥에서 바로) → ② 믹스+드랍 겸용 → ③ 믹스로만 제작</b> 순서예요. 각 묶음 안에서는 <b>남은 재료 많은 순 → 낮은 레벨</b> 우선(로제타 1층 급부터)이에요.</p>
-  <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.length?(()=>{const GN=['드랍 전용 · 사냥에서 바로','믹스+드랍 겸용','믹스로만 제작','구해서 넣기'];const GC=['var(--drop)','var(--corn)','var(--need)','var(--mute)'];let lg=-1;return leaf.map(r=>{const g=grp(r.id),h=g!==lg?`<div style="font-size:12px;font-weight:700;margin:12px 0 6px;color:${GC[g]}">◈ ${GN[g]} <span class="lv">${leaf.filter(x=>grp(x.id)===g).length}종</span></div>`:'';lg=g;return h+row(r)}).join('')})():'<div class="empty">아직 모자란 재료가 없어요 🎉</div>'}</div>
+  <p class="hint">사냥으로 얻은 코어를 <b>5성</b>과 <b>잡성</b> 두 칸에만 넣으세요. 5성 이하는 모두 <b>잡성</b>으로 취급해요. 가이드가 바로 다시 계산돼요. 이미 만들어 둔 <b>중간 헨치</b>를 넣으면 그 아래 단계가 통째로 빠져요. 재료 코어는 위에서부터 <b>① 드랍 전용(사냥에서 바로) → ② 믹스+드랍 겸용 → ③ 에보 계열(특별 코어) → ④ 믹스로만 제작</b> 순서예요. 각 묶음 안에서는 <b>남은 재료 많은 순 → 낮은 레벨</b> 우선(로제타 1층 급부터)이에요.</p>
+  <div class="mgroup"><h3><i style="background:var(--drop)"></i>재료 코어 <span class="lv">${leaf.length}종</span></h3>${leaf.length?(()=>{const GN=['드랍 전용 · 사냥에서 바로','믹스+드랍 겸용','에보 계열 · 특별 코어','믹스로만 제작','구해서 넣기'];const GC=['var(--drop)','var(--corn)','var(--pt)','var(--need)','var(--mute)'];let lg=-1;return leaf.map(r=>{const g=grp(r.id),h=g!==lg?`<div style="font-size:12px;font-weight:700;margin:12px 0 6px;color:${GC[g]}">◈ ${GN[g]} <span class="lv">${leaf.filter(x=>grp(x.id)===g).length}종</span></div>`:'';lg=g;return h+row(r)}).join('')})():'<div class="empty">아직 모자란 재료가 없어요 🎉</div>'}</div>
   ${mix.length?`<div class="mgroup"><h3><i style="background:var(--corn)"></i>중간 헨치 (이미 만들어 둔 것) <span class="lv">${mix.length}종</span></h3>${mix.map(row).join('')}</div>`:''}`;
   const refresh=()=>{const y=window.scrollY;SM=computeSM();renderTarget();renderGuide();renderInv();renderMap();window.scrollTo(0,y)};
   const set=(id,s,v)=>{const o=iv[id]||(iv[id]={});o[s]=Math.max(0,Math.min(999,v));if(!o[s])delete o[s];if(!Object.keys(o).length)delete iv[id];save();refresh()};
