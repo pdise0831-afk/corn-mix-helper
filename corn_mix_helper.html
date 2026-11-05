@@ -340,7 +340,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <header class="top">
   <div class="brand">콘 믹스 도우미<small>최소 재료 · 최단 믹스 경로 계산기</small></div>
   <div class="hdr-r">
-    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v96</b></div>
+    <div class="stamp">헨치 <span id="cntM"></span>종 · 공식 <span id="cntX"></span>개<br>데이터 <span id="dstamp"></span> · <b id="ver">v97</b></div>
     <button class="btn sm" id="syncBtn" aria-label="동기화"><i class="dot" id="syncDot"></i>동기화</button>
     <button class="btn sm" id="theme" aria-label="밝은/어두운 화면 전환">화면 전환</button>
   </div>
@@ -450,10 +450,10 @@ const enchNM=(id,t)=>{const r=raceOf(id);return r>=0&&t>=1&&t<=4?ENCHS[r][t-1]:'
 const enT=(id,t)=>{const e=enchNM(id,t);return e?'('+e+')':''};
 const mixHowTxt=id=>{const lines=[];const w=(i2,pre,seen,dep)=>{const ff=X[i2];if(!ff||!ff.length||dep>2)return;ff.slice(0,2).forEach(f=>{const R=mixStar(f[0],5,f[2],5,i2,lvl(i2));lines.push(`${pre}${nm(f[0])} ${f[1]}단 + ${nm(f[2])} ${f[3]}단 → ${nm(i2)} ${R>=5?'5성':'★'+R}`);[f[0],f[2]].forEach(x=>{if(core(x)<=0&&!seen.has(x)&&dep<2)w(x,pre+'   ',new Set([...seen,x]),dep+1)})})};w(+id,'',new Set([+id]),0);return lines.slice(0,8).join(' / ')}
 const howTree=(id,seen,depth)=>{id=+id;seen=seen||new Set([id]);depth=depth||0;const fs=X[id];if(!fs||!fs.length)return'';
-  return `<details class="jsub"><summary>🏷 ${esc(nm(id))} 만드는 법${depth?' <span class="lv">(윗급 재료의 재료)</span>':''} · 사냥 불가 — 믹스 ${fs.length}가지</summary>${fs.slice(0,4).map(f=>{const R=mixStar(f[0],5,f[2],5,id,lvl(id));
+  return `<details class="jsub"><summary>🏷 ${esc(nm(id))} 만드는 법${depth?' <span class="lv">(윗급 재료의 재료)</span>':''} ${core(id)>0?' · 사냥도 가능':' · 사냥 불가'} — 믹스 ${fs.length}가지</summary>${fs.slice(0,4).map(f=>{const R=mixStar(f[0],5,f[2],5,id,lvl(id));
     const sub=[f[0],f[2]].filter(x=>core(x)<=0&&!seen.has(x)&&X[x]&&X[x].length&&depth<3).map(x=>howTree(x,new Set([...seen,x]),depth+1)).join('');
     return `<div class="js"><span class="res">${esc(nm(f[0]))}</span> <b>${f[1]}단</b> <span class="op">+</span> <span class="res">${esc(nm(f[2]))}</span> <b>${f[3]}단</b> <span class="op">→</span> ${esc(nm(id))} ${sb(R)}</div>${sub}`}).join('')}</details>`};
-const howBox=(id,EXP)=>{if(!X[id]||!X[id].length||core(id)>0||EXP.has(+id))return'';return howTree(id,null,0)};
+const howBox=(id,EXP)=>{if(!X[id]||!X[id].length||EXP.has(+id))return'';return howTree(id,null,0)};
 const needBar=()=>{const g=GS||SM;if(!g||!g.mats)return'';const nn=g.mats.filter(m=>m.kind==='need'&&X[m.id]);if(!nn.length)return'';return `<div class="bar" style="border:1.5px dashed var(--need);border-radius:12px;padding:8px 10px"><span class="lv">사냥으로 못 얻는 재료 <b>${nn.length}종</b> (${esc(nn.slice(0,3).map(m=>nm(m.id)).join(', '))}${nn.length>3?' 외':''}) — 각 단계의 만드는 법을 펼쳐보세요</span><button class="btn sm" data-sm="2">스마트2로 풀어서 계산</button><button class="btn sm" data-sm="3">스마트3</button></div>`};
 const enchAgg=g=>{const c={};g.P.steps.forEach(x=>{if(x.t!=='mix')return;[[x.n.main,x.n.mg],[x.n.sub,x.n.sg]].forEach(p=>{if(p[0]&&p[1]>0){const e=enchNM(p[0].id,p[1]);if(e){if(!c[e])c[e]={n:0,r:raceOf(p[0].id),t:p[1]};c[e].n++}}})});return Object.entries(c).sort((a,b)=>a[1].r-b[1].r||a[1].t-b[1].t||b[1].n-a[1].n)};
 const enchBar=()=>{if(!GS&&!SM)return'';const es=enchAgg(GS||SM);return es.length?`<div class="bar" style="border:1.5px dashed var(--line2);border-radius:12px;padding:8px 10px;gap:6px"><span class="lv">필요 인첸트 · 코어당 1개씩</span>${es.map(v=>`<span class="tag mix">${esc(v[0])} <b>×${v[1].n}</b></span>`).join('')}</div>`:''}
@@ -1303,7 +1303,7 @@ function renderInv(){const p=$('#p-inv');if(!SM){p.innerHTML=NEEDSEL;return}cons
     const req=m?`<div class="ivreq">${reqChips(m.slots)}</div>`:'';
     const ctrls=lvls.map(s=>`<span class="ivc"><span class="lvc s${s}">${lbl(s)}</span><span class="stp"><button data-iv="${id},${s},-1" aria-label="빼기">−</button><input data-ivi="${id},${s}" value="${o[s]||0}" inputmode="numeric" aria-label="보유 수"><button data-iv="${id},${s},1" aria-label="더하기">+</button></span></span>`).join('');
     return `<div class="ivr ${have?'has':''} ${r.done?'done':''}"><div class="ivtop"><div class="nmc">${face(id,'face sm')}<b onclick="pick(${id})">${esc(nm(id))}</b>${srcTag(id)}<span class="lv">Lv.${lvl(id)}</span></div>${status}</div>
-    ${req}${useTxt(id)?`<div style="font-size:12px;color:var(--corn);margin:3px 2px 0">▲ 윗급 용도 · ${useTxt(id)}</div>`:''}${!core(id)&&X[id]&&X[id].length?howTree(id,null,0):''}
+    ${req}${useTxt(id)?`<div style="font-size:12px;color:var(--corn);margin:3px 2px 0">▲ 윗급 용도 · ${useTxt(id)}</div>`:''}${X[id]&&X[id].length?howTree(id,null,0):''}
     <div class="ivs">${ctrls}${m&&r.left?`<button class="btn sm pri" data-fill="${id}">✓ 남은 ${r.left}개 다 모음</button>`:''}${have?`<button class="btn sm" data-clr="${id}">비우기</button>`:''}${m&&!r.left&&!have?`<span class="lv">✓ 완료</span>`:''}</div></div>`};
   const grp=id=>{if(isEvo(id))return 2;const d=core(id)>0,m=!!(X[id]&&X[id].length);return d&&!m?0:d&&m?1:!d&&m?3:4};
   const leaf=show.filter(r=>r.kind==='leaf'&&r.m).sort((a,b)=>grp(a.id)-grp(b.id)||b.left-a.left||b.need-a.need||lvl(a.id)-lvl(b.id));
